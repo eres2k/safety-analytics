@@ -20,20 +20,6 @@ export default {
           C: '#FFC107',
           D: '#4CAF50'
         }
-      },
-      animation: {
-        'slide-in': 'slideIn 0.3s ease-out',
-        'fade-in': 'fadeIn 0.3s ease-out'
-      },
-      keyframes: {
-        slideIn: {
-          from: { transform: 'translateY(-10px)', opacity: 0 },
-          to: { transform: 'translateY(0)', opacity: 1 }
-        },
-        fadeIn: {
-          from: { opacity: 0 },
-          to: { opacity: 1 }
-        }
       }
     }
   },

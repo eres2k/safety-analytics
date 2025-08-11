@@ -52,3 +52,56 @@
 .spinner {
   animation: spin 1s linear infinite;
 }
+
+/* PWA Install Prompt Animations */
+@keyframes slide-up {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slide-in {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.3s ease-out;
+}
+
+.animate-slide-in {
+  animation: slide-in 0.3s ease-out;
+}
+
+/* PWA Standalone Mode Styles */
+@media (display-mode: standalone) {
+  .header {
+    padding-top: env(safe-area-inset-top);
+  }
+}
+
+/* iOS PWA Styles */
+@supports (padding: max(0px)) {
+  .header {
+    padding-left: max(1rem, env(safe-area-inset-left));
+    padding-right: max(1rem, env(safe-area-inset-right));
+  }
+}
+
+/* Windows PWA Title Bar */
+@media (display-mode: window-controls-overlay) {
+  .header {
+    padding-top: env(titlebar-area-height, 40px);
+  }
+}

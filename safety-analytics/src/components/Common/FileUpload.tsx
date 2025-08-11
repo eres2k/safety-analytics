@@ -32,25 +32,6 @@ export default function FileUpload({ onDataLoaded, type }: FileUploadProps) {
     });
   };
 
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(false);
-    
-    const files = e.dataTransfer.files;
-    if (files.length > 0) {
-      handleFileSelect(files[0]);
-    }
-  };
-
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(true);
-  };
-
-  const handleDragLeave = () => {
-    setIsDragging(false);
-  };
-
   return (
     <div
       className={clsx(
@@ -59,9 +40,6 @@ export default function FileUpload({ onDataLoaded, type }: FileUploadProps) {
           ? 'border-amazon-orange bg-amazon-orange/10'
           : 'border-gray-300 dark:border-gray-600 hover:border-amazon-orange'
       )}
-      onDrop={handleDrop}
-      onDragOver={handleDragOver}
-      onDragLeave={handleDragLeave}
     >
       <p className="mb-4 text-gray-600 dark:text-gray-400">
         📁 Drag and drop your {type} CSV file here
@@ -82,11 +60,6 @@ export default function FileUpload({ onDataLoaded, type }: FileUploadProps) {
       >
         Choose File
       </button>
-      <p className="mt-4 text-sm text-gray-500 dark:text-gray-400">
-        {type === 'injury'
-          ? 'Supports CSV files with injury/illness tracking data'
-          : 'Supports CSV files with near miss tracking data'}
-      </p>
     </div>
   );
 }

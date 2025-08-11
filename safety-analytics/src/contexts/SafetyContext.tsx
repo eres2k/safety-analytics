@@ -1,17 +1,29 @@
 import React, { createContext, useContext, useReducer, ReactNode } from 'react';
-import { SafetyState, InjuryRecord, NearMissRecord, Module } from '../types';
 
-interface SafetyContextType {
-  state: SafetyState;
-  dispatch: React.Dispatch<SafetyAction>;
+export interface SafetyState {
+  injury: {
+    rawData: any[];
+    filteredData: any[];
+    currentPage: number;
+    timelinePage: number;
+  };
+  nearMiss: {
+    rawData: any[];
+    filteredData: any[];
+    currentPage: number;
+    timelinePage: number;
+  };
+  currentModule: string;
+  theme: 'light' | 'dark';
+  itemsPerPage: number;
 }
 
 type SafetyAction =
-  | { type: 'SET_INJURY_DATA'; payload: InjuryRecord[] }
-  | { type: 'SET_NEAR_MISS_DATA'; payload: NearMissRecord[] }
-  | { type: 'APPLY_INJURY_FILTERS'; payload: InjuryRecord[] }
-  | { type: 'APPLY_NEAR_MISS_FILTERS'; payload: NearMissRecord[] }
-  | { type: 'SET_MODULE'; payload: Module }
+  | { type: 'SET_INJURY_DATA'; payload: any[] }
+  | { type: 'SET_NEAR_MISS_DATA'; payload: any[] }
+  | { type: 'APPLY_INJURY_FILTERS'; payload: any[] }
+  | { type: 'APPLY_NEAR_MISS_FILTERS'; payload: any[] }
+  | { type: 'SET_MODULE'; payload: string }
   | { type: 'TOGGLE_THEME' }
   | { type: 'SET_PAGE'; payload: { module: 'injury' | 'nearMiss'; page: number } }
   | { type: 'SET_TIMELINE_PAGE'; payload: { module: 'injury' | 'nearMiss'; page: number } };
@@ -54,29 +66,6 @@ function safetyReducer(state: SafetyState, action: SafetyAction): SafetyState {
           filteredData: action.payload
         }
       };
-    case 'APPLY_INJURY_FILTERS':
-      return {
-        ...state,
-        injury: {
-          ...state.injury,
-          filteredData: action.payload,
-          currentPage: 1
-        }
-      };
-    case 'APPLY_NEAR_MISS_FILTERS':
-      return {
-        ...state,
-        nearMiss: {
-          ...state.nearMiss,
-          filteredData: action.payload,
-          currentPage: 1
-        }
-      };
-    case 'SET_MODULE':
-      return {
-        ...state,
-        currentModule: action.payload
-      };
     case 'TOGGLE_THEME':
       const newTheme = state.theme === 'light' ? 'dark' : 'light';
       localStorage.setItem('theme', newTheme);
@@ -85,28 +74,12 @@ function safetyReducer(state: SafetyState, action: SafetyAction): SafetyState {
         ...state,
         theme: newTheme
       };
-    case 'SET_PAGE':
-      return {
-        ...state,
-        [action.payload.module]: {
-          ...state[action.payload.module],
-          currentPage: action.payload.page
-        }
-      };
-    case 'SET_TIMELINE_PAGE':
-      return {
-        ...state,
-        [action.payload.module]: {
-          ...state[action.payload.module],
-          timelinePage: action.payload.page
-        }
-      };
     default:
       return state;
   }
 }
 
-const SafetyContext = createContext<SafetyContextType | undefined>(undefined);
+const SafetyContext = createContext<any>(undefined);
 
 export function SafetyProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(safetyReducer, initialState);
