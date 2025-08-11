@@ -1,68 +1,107 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  --amazon-orange: #FF9900;
+  --amazon-dark: #232F3E;
+  --amazon-gray: #37475A;
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
+/* Custom scrollbar */
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
 }
 
-body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: #f1f1f1;
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 3px;
 }
 
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: #555;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
+/* Dark mode scrollbar */
+.dark .scrollbar-thin::-webkit-scrollbar-track {
+  background: #2d3748;
+}
+
+.dark .scrollbar-thin::-webkit-scrollbar-thumb {
+  background: #4a5568;
+}
+
+/* Chart container */
+.chart-container {
+  position: relative;
+  height: 16rem;
+  width: 100%;
+}
+
+/* Loading spinner */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+/* PWA Install Prompt Animations */
+@keyframes slide-up {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
   }
-  a:hover {
-    color: #747bff;
+  to {
+    transform: translateY(0);
+    opacity: 1;
   }
-  button {
-    background-color: #f9f9f9;
+}
+
+@keyframes slide-in {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.3s ease-out;
+}
+
+.animate-slide-in {
+  animation: slide-in 0.3s ease-out;
+}
+
+/* PWA Standalone Mode Styles */
+@media (display-mode: standalone) {
+  .header {
+    padding-top: env(safe-area-inset-top);
+  }
+}
+
+/* iOS PWA Styles */
+@supports (padding: max(0px)) {
+  .header {
+    padding-left: max(1rem, env(safe-area-inset-left));
+    padding-right: max(1rem, env(safe-area-inset-right));
+  }
+}
+
+/* Windows PWA Title Bar */
+@media (display-mode: window-controls-overlay) {
+  .header {
+    padding-top: env(titlebar-area-height, 40px);
   }
 }
