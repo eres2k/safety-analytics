@@ -29,7 +29,7 @@ export interface NearMissRecord {
   primaryImpact: string;
   severity: 'A' | 'B' | 'C' | 'D' | 'Unknown';
   standardized_likelihood: Likelihood;
-  risk: string;
+  risk: number;
   contributingFactor?: string;
   initial_info_incident_description?: string;
   rca_primary_cause?: string;
@@ -37,7 +37,22 @@ export interface NearMissRecord {
   parsedDate?: Date;
 }
 
+export interface ActionItem {
+  id: string;
+  incidentId: string;
+  type: 'injury' | 'nearmiss';
+  action: string;
+  responsible: string;
+  dueDate: string;
+  status: 'open' | 'in-progress' | 'completed' | 'overdue';
+  priority: 'low' | 'medium' | 'high' | 'critical';
+  createdDate: string;
+  completedDate?: string;
+  notes?: string;
+}
+
 export type Likelihood = 'Rare' | 'Unlikely' | 'Possible' | 'Likely' | 'Almost Certain';
+export type Severity = 'A' | 'B' | 'C' | 'D' | 'Unknown';
 
 export interface SafetyState {
   injury: {
@@ -52,9 +67,11 @@ export interface SafetyState {
     currentPage: number;
     timelinePage: number;
   };
+  actions: ActionItem[];
   currentModule: Module;
   theme: 'light' | 'dark';
   itemsPerPage: number;
+  filters: FilterState;
 }
 
 export type Module = 'overview' | 'injury' | 'nearmiss' | 'combined' | 'reports' | 'actions';
@@ -64,6 +81,12 @@ export interface KPIMetrics {
   LTIR: number;
   DAFWR: number;
   NMFR: number;
+  totalIncidents: number;
+  recordableIncidents: number;
+  lostTimeIncidents: number;
+  nearMissCount: number;
+  avgRiskScore: number;
+  criticalEvents: number;
 }
 
 export interface FilterState {
@@ -71,5 +94,19 @@ export interface FilterState {
   severity?: string;
   dateFrom?: string;
   dateTo?: string;
+  bodyPart?: string;
+  processPath?: string;
   [key: string]: any;
+}
+
+export interface ChartData {
+  labels: string[];
+  datasets: {
+    label: string;
+    data: number[];
+    backgroundColor?: string | string[];
+    borderColor?: string | string[];
+    borderWidth?: number;
+    tension?: number;
+  }[];
 }
