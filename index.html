@@ -633,12 +633,14 @@
             padding: var(--spacing-lg);
             text-align: center;
             margin-bottom: var(--spacing-lg);
+            display: flex;
+            justify-content: center;
         }
 
         .quality-score-value {
             font-size: 3rem;
             font-weight: 700;
-            margin: var(--spacing-sm) 0;
+            margin: 0;
         }
 
         .quality-metrics {
@@ -652,6 +654,79 @@
             background: rgba(255, 255, 255, 0.1);
             padding: var(--spacing-md);
             border-radius: var(--border-radius);
+        }
+
+        .quality-metrics-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .quality-score-circle {
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+            background: var(--bg-primary);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+            color: var(--text-primary);
+            box-shadow: 0 2px 8px var(--shadow);
+        }
+
+        .quality-score-circle.success { border: 6px solid var(--success); }
+        .quality-score-circle.warning { border: 6px solid var(--warning); }
+        .quality-score-circle.danger { border: 6px solid var(--danger); }
+
+        .quality-score-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-top: var(--spacing-xs);
+        }
+
+        .quality-section {
+            margin-top: var(--spacing-xl);
+        }
+
+        .duplicate-list {
+            display: grid;
+            gap: var(--spacing-sm);
+            margin-top: var(--spacing-sm);
+        }
+
+        .duplicate-item {
+            background: var(--bg-primary);
+            padding: var(--spacing-sm);
+            border-radius: var(--border-radius);
+            box-shadow: 0 1px 3px var(--shadow);
+        }
+
+        .missing-fields-chart {
+            height: 300px;
+        }
+
+        .recommendations-list {
+            display: grid;
+            gap: var(--spacing-sm);
+        }
+
+        .recommendation-item {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            padding: var(--spacing-sm);
+            border-radius: var(--border-radius);
+            background: var(--bg-primary);
+            box-shadow: 0 1px 3px var(--shadow);
+        }
+
+        .recommendation-item.critical { border-left: 4px solid var(--critical); }
+        .recommendation-item.warning { border-left: 4px solid var(--warning); }
+        .recommendation-item.success { border-left: 4px solid var(--success); }
+
+        .rec-icon {
+            font-size: 1.2rem;
         }
 
         /* Status Messages */
@@ -2733,7 +2808,9 @@ function calculateQualityMetrics(type) {
         // For injury data, quality is based solely on completeness
         metrics.qualityScore = metrics.dataCompleteness;
     } else {
-        const duplicatePenalty = Math.max(0, 100 - (metrics.duplicates * 5));
+        const duplicatePenalty = metrics.totalRecords > 0
+            ? Math.max(0, 100 - (metrics.duplicates / metrics.totalRecords) * 100)
+            : 100;
         const completenessPenalty = metrics.dataCompleteness;
         metrics.qualityScore = Math.round((duplicatePenalty + completenessPenalty) / 2);
     }
