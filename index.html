@@ -711,6 +711,19 @@
             gap: var(--spacing-sm);
         }
 
+        .word-heatmap {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--spacing-xs);
+        }
+
+        .word-heatmap .heatmap-item {
+            padding: var(--spacing-xs) var(--spacing-sm);
+            border-radius: 4px;
+            color: #fff;
+            font-size: 0.85rem;
+        }
+
         .recommendation-item {
             display: flex;
             align-items: center;
@@ -1973,7 +1986,7 @@
                 </div>
                 <div class="card" style="margin-top: 1rem;">
                     <h4 style="margin-bottom: 1rem;">Word Heat Map</h4>
-                    <canvas id="nearMissWordHeatMap" height="200"></canvas>
+                    <div id="nearMissWordHeatMap" class="word-heatmap"></div>
                 </div>
             </div>
 
@@ -2887,7 +2900,7 @@ function getNearMissWordStats() {
     return { topWords, averageLength };
 }
 
-// Update near miss word analysis: count summary and heat map chart
+// Update near miss word analysis: count summary and heat map
 function updateNearMissWordAnalysis() {
     const stats = getNearMissWordStats();
     const countElem = document.getElementById('nearMissWordCount');
@@ -2896,50 +2909,23 @@ function updateNearMissWordAnalysis() {
             `Average words per record: ${stats.averageLength}` :
             'No textual data available for word analysis.';
     }
-    const canvas = document.getElementById('nearMissWordHeatMap');
-    if (canvas) {
-        const ctx = canvas.getContext('2d');
-        // If chart already exists, update it
-        if (window.nearMissWordChart) {
-            window.nearMissWordChart.data.labels = stats.topWords.map(entry => entry[0]);
-            window.nearMissWordChart.data.datasets[0].data = stats.topWords.map(entry => entry[1]);
-            window.nearMissWordChart.update();
-        } else {
-            window.nearMissWordChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: stats.topWords.map(entry => entry[0]),
-                    datasets: [{
-                        label: 'Word Frequency',
-                        data: stats.topWords.map(entry => entry[1]),
-                        backgroundColor: AMAZON_COLORS.orange,
-                        borderColor: AMAZON_COLORS.darkBlue,
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    ...getChartOptions('bar'),
-                    plugins: {
-                        legend: { display: false }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'Frequency'
-                            }
-                        },
-                        x: {
-                            title: {
-                                display: true,
-                                text: 'Word'
-                            }
-                        }
-                    }
-                }
-            });
+    const container = document.getElementById('nearMissWordHeatMap');
+    if (container) {
+        container.innerHTML = '';
+        if (stats.topWords.length === 0) {
+            container.innerHTML = '<p style="font-size: 0.85rem; color: var(--text-secondary);">No word frequency data available.</p>';
+            return;
         }
+        const rgb = hexToRgb(AMAZON_COLORS.orange);
+        const maxCount = Math.max(...stats.topWords.map(entry => entry[1]));
+        stats.topWords.forEach(([word, count]) => {
+            const intensity = count / maxCount;
+            const item = document.createElement('div');
+            item.className = 'heatmap-item';
+            item.style.backgroundColor = `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${0.3 + 0.7 * intensity})`;
+            item.textContent = `${word} (${count})`;
+            container.appendChild(item);
+        });
     }
 }
 
@@ -3038,7 +3024,7 @@ function updateQualityDisplay(type, metrics) {
             </div>
             <div class="quality-section">
                 <h4>Word Heat Map</h4>
-                <canvas id="nearMissWordHeatMap" height="200"></canvas>
+                <div id="nearMissWordHeatMap" class="word-heatmap"></div>
             </div>
             ` : ''}
         </div>
