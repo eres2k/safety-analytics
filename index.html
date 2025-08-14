@@ -695,7 +695,7 @@
             border: 1px solid rgba(33, 150, 243, 0.3);
         }
 
-        /* Austin Case Study Link */
+        /* Austin Link */
         .austin-link {
             background: var(--amazon-yellow);
             color: var(--amazon-blue);
@@ -3628,11 +3628,11 @@ function updateInjuryTable() {
     
     tbody.innerHTML = pageData.map(row => {
         const austinUrl = row.austin_url && row.austin_url !== '#' ? row.austin_url : '#';
-        const austinLinkHtml = austinUrl !== '#' ? 
-            `<a href="${austinUrl}" target="_blank" class="austin-link" title="View Austin Case Study">
+        const austinLinkHtml = austinUrl !== '#' ?
+            `<a href="${austinUrl}" target="_blank" class="austin-link" title="Austin Link">
                 <span>📚</span>
             </a>` :
-            `<span class="austin-link disabled" title="No Austin Case Study available">📚</span>`;
+            `<span class="austin-link disabled" title="No Austin Link available">📚</span>`;
         
         return `
             <tr>
@@ -3671,7 +3671,15 @@ function updateNearMissTable() {
         return;
     }
     
-    tbody.innerHTML = pageData.map(row => `
+    tbody.innerHTML = pageData.map(row => {
+        const austinUrl = row.austin_url && row.austin_url !== '#' ? row.austin_url : '#';
+        const austinLinkHtml = austinUrl !== '#' ?
+            `<a href="${austinUrl}" target="_blank" class="austin-link" title="Austin Link">
+                <span>📚</span>
+            </a>` :
+            `<span class="austin-link disabled" title="No Austin Link available">📚</span>`;
+
+        return `
         <tr>
             <td>${row.incident_id || 'N/A'}</td>
             <td>${row.nearmiss_date || 'N/A'}</td>
@@ -3684,9 +3692,11 @@ function updateNearMissTable() {
             <td><span class="badge badge-${getRiskClass(row.risk)}">${row.risk || 'N/A'}</span></td>
             <td>
                 <button class="btn btn-sm btn-outline" onclick="viewDetails('nearmiss', '${row.incident_id}')">View</button>
+                ${austinLinkHtml}
             </td>
         </tr>
-    `).join('');
+        `;
+    }).join('');
     
     updatePaginationInfo('nearmiss', currentPage, Math.ceil(data.length / state.itemsPerPage));
 }
@@ -4869,6 +4879,7 @@ function showMatrixDetails(severity, likelihood, matrixId) {
                         ${incident.location ? `Location: ${incident.location}<br>` : ''}
                         ${incident.processPath ? `Process: ${incident.processPath}<br>` : ''}
                     </span>
+                    ${incident.austin_url && incident.austin_url !== '#' ? `<a href="${incident.austin_url}" target="_blank" class="austin-link" style="margin-top:0.5rem; display:inline-block;">Austin Link</a>` : ''}
                 </div>
             `).join('')}
         </div>
@@ -4907,7 +4918,7 @@ function updateInjuryTimeline() {
                     <p><strong>Severity:</strong> <span class="badge badge-${getSeverityClass(incident.severity)}">${incident.severity}</span></p>
                     <p><strong>Recordable:</strong> <span class="badge badge-${incident.recordable === 1 ? 'danger' : 'success'}">${incident.recordable === 1 ? 'Yes' : 'No'}</span></p>
                     <p><strong>Description:</strong> ${incident.initial_info_incident_description || 'No description'}</p>
-                    ${austinUrl ? `<a href="${austinUrl}" target="_blank" class="austin-link">View Austin Case Study</a>` : ''}
+                    ${austinUrl ? `<a href="${austinUrl}" target="_blank" class="austin-link">Austin Link</a>` : ''}
                 </div>
             </div>
         `;
@@ -4934,7 +4945,10 @@ function updateNearMissTimeline() {
         return;
     }
     
-    timelineContent.innerHTML = pageData.map(incident => `
+    timelineContent.innerHTML = pageData.map(incident => {
+        const austinUrl = incident.austin_url && incident.austin_url !== '#' ? incident.austin_url : null;
+
+        return `
         <div class="timeline-item">
             <div class="timeline-date">${incident.nearmiss_date || 'N/A'}</div>
             <div class="timeline-content">
@@ -4945,9 +4959,11 @@ function updateNearMissTimeline() {
                 <p><strong>Severity:</strong> <span class="badge badge-${getSeverityClass(incident.severity)}">${incident.severity}</span></p>
                 <p><strong>Risk Score:</strong> <span class="badge badge-${getRiskClass(incident.risk)}">${incident.risk}</span></p>
                 <p><strong>Description:</strong> ${incident.initial_info_incident_description || 'No description'}</p>
+                ${austinUrl ? `<a href="${austinUrl}" target="_blank" class="austin-link">Austin Link</a>` : ''}
             </div>
         </div>
-    `).join('');
+        `;
+    }).join('');
     
     const totalPages = Math.ceil(data.length / 10);
     const pageInfo = document.getElementById('nearMissTimelinePageInfo');
@@ -5722,12 +5738,14 @@ function viewDetails(type, id) {
                 ${austinUrl ? `
                 <div style="margin-top: 1rem;">
                     <a href="${austinUrl}" target="_blank" class="btn btn-primary">
-                        <span>📚</span> View Austin Case Study
+                        <span>📚</span> Austin Link
                     </a>
                 </div>` : ''}
             </div>
         `;
     } else {
+        const austinUrl = data.austin_url && data.austin_url !== '#' ? data.austin_url : null;
+
         body.innerHTML = `
             <div style="display: grid; gap: 1rem;">
                 <div><strong>ID:</strong> ${data.incident_id}</div>
@@ -5743,6 +5761,12 @@ function viewDetails(type, id) {
                 <div><strong>Description:</strong> ${data.initial_info_incident_description || 'No description available'}</div>
                 <div><strong>Root Cause:</strong> ${data.rca_primary_cause || 'Under investigation'}</div>
                 <div><strong>Status:</strong> ${data.status || 'N/A'}</div>
+                ${austinUrl ? `
+                <div style="margin-top: 1rem;">
+                    <a href="${austinUrl}" target="_blank" class="btn btn-primary">
+                        <span>📚</span> Austin Link
+                    </a>
+                </div>` : ''}
             </div>
         `;
     }
