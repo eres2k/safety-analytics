@@ -1780,9 +1780,9 @@
                         <div class="metric-label">High Severity (A & B)</div>
                     </div>
                     <div class="metric-card">
-                        <div class="metric-icon">📍</div>
-                        <div class="metric-value" id="nearMissRepeat">0</div>
-                        <div class="metric-label">Repeat Locations</div>
+                        <div class="metric-icon">✅</div>
+                        <div class="metric-value" id="nearMissRepeat">0%</div>
+                        <div class="metric-label">Closure Rate</div>
                     </div>
                     <div class="metric-card">
                         <div class="metric-icon">⚡</div>
@@ -2394,31 +2394,51 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// Standardized chart options for both modules
+// Standardized and categorized chart options for all views
 const CHART_OPTIONS = {
-    view1: [
-        { value: 'severity', label: 'Severity Distribution' },
-        { value: 'trend', label: 'Monthly Trend' },
-        { value: 'site', label: 'Site Comparison' },
-        { value: 'rootCause', label: 'Root Causes' }
-    ],
-    view2: [
-        { value: 'processPath', label: 'Process Paths' },
-        { value: 'contributingFactors', label: 'Contributing Factors' },
-        { value: 'riskTrend', label: 'Risk Score Trend' },
-        { value: 'recordableRate', label: 'Recordable Rate' }
-    ],
-    view3: [
-        { value: 'impactType', label: 'Impact Types' },
-        { value: 'severityBySite', label: 'Severity by Site' },
-        { value: 'locationHeatmap', label: 'Location Heatmap' },
-        { value: 'bodyPartHeatmap', label: 'Body Part Heatmap' }
-    ],
-    view4: [
-        { value: 'highRiskAreas', label: 'High Risk Areas' },
-        { value: 'preventionOpportunities', label: 'Prevention Opportunities' },
-        { value: 'qualityMetrics', label: 'Data Quality Analysis' },
-        { value: 'trendForecast', label: 'Trend Forecast' }
+    all: [
+        // Distribution & Overview
+        { value: 'severity', label: '📊 Severity Distribution', category: 'distribution' },
+        { value: 'site', label: '🏢 Site Comparison', category: 'distribution' },
+        { value: 'trend', label: '📈 Monthly Trend', category: 'trends' },
+        { value: 'weeklyTrend', label: '📅 Weekly Trend', category: 'trends' },
+        
+        // Body & Location Analysis (Injury-focused)
+        { value: 'bodyPart', label: '🦴 Body Parts Affected', category: 'anatomy' },
+        { value: 'bodyPartTrend', label: '📊 Body Part Trends', category: 'anatomy' },
+        { value: 'bodyPartHeatmap', label: '🔥 Body Part Heat Map', category: 'anatomy' },
+        
+        // Process & Operations
+        { value: 'processPath', label: '🔄 Process Paths', category: 'operations' },
+        { value: 'processRisk', label: '⚠️ Process Risk Analysis', category: 'operations' },
+        { value: 'shiftAnalysis', label: '🕐 Shift Analysis', category: 'operations' },
+        
+        // Root Cause & Contributing Factors
+        { value: 'rootCause', label: '🔍 Root Causes', category: 'causation' },
+        { value: 'contributingFactors', label: '🔗 Contributing Factors', category: 'causation' },
+        { value: 'causeByMonth', label: '📅 Causes Over Time', category: 'causation' },
+        
+        // Impact & Type Analysis
+        { value: 'impactType', label: '💥 Impact Types', category: 'impact' },
+        { value: 'impactSeverity', label: '🎯 Impact vs Severity', category: 'impact' },
+        { value: 'mechanismOfInjury', label: '⚙️ Injury Mechanism', category: 'impact' },
+        
+        // Performance Metrics
+        { value: 'recordableRate', label: '📊 Recordable Rate', category: 'metrics' },
+        { value: 'recordableTrend', label: '📈 Recordable Trend', category: 'metrics' },
+        { value: 'dafwAnalysis', label: '📅 Days Away Analysis', category: 'metrics' },
+        { value: 'otrAnalysis', label: '🚗 OTR Analysis', category: 'metrics' },
+        
+        // Risk & Safety Metrics
+        { value: 'riskScore', label: '🎲 Risk Score Distribution', category: 'risk' },
+        { value: 'riskTrend', label: '📈 Risk Score Trend', category: 'risk' },
+        { value: 'riskMatrix', label: '⬜ Risk Matrix View', category: 'risk' },
+        
+        // Advanced Analytics
+        { value: 'preventionEffectiveness', label: '🛡️ Prevention Effectiveness', category: 'advanced' },
+        { value: 'predictiveAnalysis', label: '🔮 Predictive Analysis', category: 'advanced' },
+        { value: 'correlationMatrix', label: '🔗 Correlation Analysis', category: 'advanced' },
+        { value: 'seasonalPatterns', label: '🍂 Seasonal Patterns', category: 'advanced' }
     ]
 };
 
@@ -2601,28 +2621,63 @@ function parseCSV(csvText, type) {
     });
 }
 
-// Initialize chart selections with standardized options
+// Initialize chart selections with categorized options
 function initializeChartSelections() {
-    // Update Injury chart selectors
+    // Create categorized dropdown HTML
+    const createCategorizedOptions = () => {
+        const categories = {};
+        
+        // Group options by category
+        CHART_OPTIONS.all.forEach(option => {
+            if (!categories[option.category]) {
+                categories[option.category] = [];
+            }
+            categories[option.category].push(option);
+        });
+        
+        // Build HTML with optgroups
+        let html = '';
+        const categoryLabels = {
+            'distribution': '📊 Distribution & Overview',
+            'trends': '📈 Trend Analysis',
+            'anatomy': '🦴 Body Part Analysis',
+            'operations': '🔄 Operations & Process',
+            'causation': '🔍 Root Cause Analysis',
+            'impact': '💥 Impact Analysis',
+            'metrics': '📊 Performance Metrics',
+            'risk': '🎲 Risk Analysis',
+            'advanced': '🔬 Advanced Analytics'
+        };
+        
+        Object.entries(categories).forEach(([category, options]) => {
+            html += `<optgroup label="${categoryLabels[category] || category}">`;
+            options.forEach(opt => {
+                html += `<option value="${opt.value}">${opt.label}</option>`;
+            });
+            html += '</optgroup>';
+        });
+        
+        return html;
+    };
+    
+    const optionsHTML = createCategorizedOptions();
+    
+    // Update all Injury chart selectors
     const injurySelectors = document.querySelectorAll('#injury .chart-header select');
     injurySelectors.forEach((selector, index) => {
-        const chartView = `view${index + 1}`;
-        if (CHART_OPTIONS[chartView]) {
-            selector.innerHTML = CHART_OPTIONS[chartView].map(opt => 
-                `<option value="${opt.value}">${opt.label}</option>`
-            ).join('');
-        }
+        selector.innerHTML = optionsHTML;
+        // Set different default values for each view
+        const defaults = ['severity', 'bodyPart', 'rootCause', 'trend'];
+        selector.value = defaults[index] || 'severity';
     });
     
-    // Update Near Miss chart selectors
+    // Update all Near Miss chart selectors
     const nearMissSelectors = document.querySelectorAll('#nearmiss .chart-header select');
     nearMissSelectors.forEach((selector, index) => {
-        const chartView = `view${index + 1}`;
-        if (CHART_OPTIONS[chartView]) {
-            selector.innerHTML = CHART_OPTIONS[chartView].map(opt => 
-                `<option value="${opt.value}">${opt.label}</option>`
-            ).join('');
-        }
+        selector.innerHTML = optionsHTML;
+        // Set different defaults for near miss
+        const defaults = ['severity', 'location', 'impact', 'riskTrend'];
+        selector.value = defaults[index] || 'severity';
     });
 }
 
@@ -2740,7 +2795,25 @@ function processNearMissData() {
         
         // Process path
         row.processPath = row.initial_info_process_path || 'Unknown';
-        
+
+        // Extract Austin URL - check multiple possible column names
+        row.austin_url = row.austin_url || 
+                        row.austin_case_study_url || 
+                        row.austin_link || 
+                        row.case_study_url ||
+                        row.austin_case_url ||
+                        row.incident_url ||
+                        row.case_url ||
+                        row.link ||
+                        '#'; // Fallback to # if no URL found
+
+        // Validate URL format
+        if (row.austin_url && row.austin_url !== '#') {
+            if (!row.austin_url.startsWith('http://') && !row.austin_url.startsWith('https://')) {
+                row.austin_url = 'https://' + row.austin_url;
+            }
+        }
+
         // Contributing factors
         row.contributingFactor = row.rca_contributing_factor_category || 'Unknown';
         
@@ -3658,13 +3731,10 @@ function updateNearMissDashboard() {
     document.getElementById('nearMissHigh').textContent = 
         data.filter(r => r.severity === 'A' || r.severity === 'B').length;
     
-    const locationCounts = {};
-    data.forEach(row => {
-        const location = row.location || 'Unknown';
-        locationCounts[location] = (locationCounts[location] || 0) + 1;
-    });
-    const repeatLocations = Object.values(locationCounts).filter(count => count >= 2).length;
-    document.getElementById('nearMissRepeat').textContent = repeatLocations;
+    // Calculate closure rate (more meaningful metric)
+    const closedCount = data.filter(r => r.status === 'Closed' || r.status === 'Completed').length;
+    const closureRate = data.length > 0 ? ((closedCount / data.length) * 100).toFixed(0) : '0';
+    document.getElementById('nearMissRepeat').textContent = closureRate + '%';
     
     const actionableCount = data.filter(r => parseFloat(r.risk) >= 7).length;
     document.getElementById('nearMissActionable').textContent = actionableCount;
@@ -4084,6 +4154,21 @@ function updateUniversalChart(chart, data, type, module) {
             break;
         case 'trendForecast':
             updateTrendForecastChart(chart, data, module);
+            break;
+        case 'weeklyTrend':
+            updateWeeklyTrendChart(chart, data);
+            break;
+        case 'bodyPartTrend':
+            updateBodyPartTrendChart(chart, data);
+            break;
+        case 'shiftAnalysis':
+            updateShiftAnalysisChart(chart, data);
+            break;
+        case 'dafwAnalysis':
+            updateDafwAnalysisChart(chart, data);
+            break;
+        case 'otrAnalysis':
+            updateOtrAnalysisChart(chart, data);
             break;
     }
 }
@@ -4684,6 +4769,181 @@ function updateTrendForecastChart(chart, data, module) {
     };
     chart.options = getChartOptions('line');
     chart.update();
+}
+
+function updateWeeklyTrendChart(chart, data) {
+    const weeklyData = {};
+    data.forEach(row => {
+        if (row.parsedDate && !isNaN(row.parsedDate)) {
+            const weekKey = getWeekNumber(row.parsedDate);
+            weeklyData[weekKey] = (weeklyData[weekKey] || 0) + 1;
+        }
+    });
+    
+    const sortedWeeks = Object.keys(weeklyData).sort().slice(-12); // Last 12 weeks
+    
+    chart.config.type = 'line';
+    chart.data = {
+        labels: sortedWeeks.map(w => `Week ${w.split('-')[1]}`),
+        datasets: [{
+            label: 'Weekly Incidents',
+            data: sortedWeeks.map(w => weeklyData[w]),
+            borderColor: AMAZON_COLORS.orange,
+            backgroundColor: `${AMAZON_COLORS.orange}20`,
+            tension: 0.3
+        }]
+    };
+    chart.options = getChartOptions('line');
+    chart.update();
+}
+
+function updateBodyPartTrendChart(chart, data) {
+    const monthlyBodyPart = {};
+    
+    data.forEach(row => {
+        if (row.parsedDate && !isNaN(row.parsedDate) && row.bodyPart) {
+            const monthKey = `${row.parsedDate.getFullYear()}-${String(row.parsedDate.getMonth() + 1).padStart(2, '0')}`;
+            if (!monthlyBodyPart[monthKey]) {
+                monthlyBodyPart[monthKey] = {};
+            }
+            const part = row.bodyPart;
+            monthlyBodyPart[monthKey][part] = (monthlyBodyPart[monthKey][part] || 0) + 1;
+        }
+    });
+    
+    const months = Object.keys(monthlyBodyPart).sort().slice(-6);
+    const topBodyParts = getTopBodyParts(data, 5);
+    
+    chart.config.type = 'line';
+    chart.data = {
+        labels: months.map(formatMonthLabel),
+        datasets: topBodyParts.map((part, index) => ({
+            label: part,
+            data: months.map(month => monthlyBodyPart[month][part] || 0),
+            borderColor: getColorByIndex(index),
+            backgroundColor: `${getColorByIndex(index)}20`,
+            tension: 0.3
+        }))
+    };
+    chart.options = getChartOptions('line');
+    chart.update();
+}
+
+function updateShiftAnalysisChart(chart, data) {
+    const shiftData = {};
+    data.forEach(row => {
+        const shift = row.initial_info_shift || row.shift || 'Unknown';
+        shiftData[shift] = (shiftData[shift] || 0) + 1;
+    });
+    
+    chart.config.type = 'bar';
+    chart.data = {
+        labels: Object.keys(shiftData),
+        datasets: [{
+            label: 'Incidents by Shift',
+            data: Object.values(shiftData),
+            backgroundColor: AMAZON_COLORS.darkBlue,
+            borderColor: AMAZON_COLORS.orange,
+            borderWidth: 1
+        }]
+    };
+    chart.options = getChartOptions('bar');
+    chart.update();
+}
+
+function updateDafwAnalysisChart(chart, data) {
+    const dafwRanges = {
+        '0 Days': 0,
+        '1-3 Days': 0,
+        '4-7 Days': 0,
+        '8-14 Days': 0,
+        '15-30 Days': 0,
+        '30+ Days': 0
+    };
+    
+    data.forEach(row => {
+        const days = row.total_dafw_days || 0;
+        if (days === 0) dafwRanges['0 Days']++;
+        else if (days <= 3) dafwRanges['1-3 Days']++;
+        else if (days <= 7) dafwRanges['4-7 Days']++;
+        else if (days <= 14) dafwRanges['8-14 Days']++;
+        else if (days <= 30) dafwRanges['15-30 Days']++;
+        else dafwRanges['30+ Days']++;
+    });
+    
+    chart.config.type = 'doughnut';
+    chart.data = {
+        labels: Object.keys(dafwRanges),
+        datasets: [{
+            data: Object.values(dafwRanges),
+            backgroundColor: [
+                SEVERITY_COLORS.D,
+                SEVERITY_COLORS.C,
+                AMAZON_COLORS.orange,
+                SEVERITY_COLORS.B,
+                SEVERITY_COLORS.A,
+                AMAZON_COLORS.darkBlue
+            ]
+        }]
+    };
+    chart.options = getChartOptions('doughnut');
+    chart.update();
+}
+
+function updateOtrAnalysisChart(chart, data) {
+    const otrData = data.filter(r => r.otr === 'yes');
+    const nonOtrData = data.filter(r => r.otr === 'no');
+    
+    chart.config.type = 'pie';
+    chart.data = {
+        labels: ['On The Road', 'Under The Roof'],
+        datasets: [{
+            data: [otrData.length, nonOtrData.length],
+            backgroundColor: [AMAZON_COLORS.orange, AMAZON_COLORS.darkBlue]
+        }]
+    };
+    chart.options = getChartOptions('pie');
+    chart.update();
+}
+
+// Helper functions
+function getWeekNumber(date) {
+    const d = new Date(date);
+    const year = d.getFullYear();
+    const oneJan = new Date(year, 0, 1);
+    const week = Math.ceil((((d - oneJan) / 86400000) + oneJan.getDay() + 1) / 7);
+    return `${year}-${String(week).padStart(2, '0')}`;
+}
+
+function formatMonthLabel(monthKey) {
+    const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const [year, month] = monthKey.split('-');
+    return `${monthNames[parseInt(month)-1]} ${year}`;
+}
+
+function getTopBodyParts(data, limit = 5) {
+    const counts = {};
+    data.forEach(row => {
+        if (row.bodyPart) {
+            counts[row.bodyPart] = (counts[row.bodyPart] || 0) + 1;
+        }
+    });
+    return Object.entries(counts)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, limit)
+        .map(([part]) => part);
+}
+
+function getColorByIndex(index) {
+    const colors = [
+        AMAZON_COLORS.orange,
+        AMAZON_COLORS.darkBlue,
+        '#FF5722',
+        '#4CAF50',
+        '#2196F3',
+        '#9C27B0'
+    ];
+    return colors[index % colors.length];
 }
 
 // Update Overview
