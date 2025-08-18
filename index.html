@@ -2529,7 +2529,15 @@ function switchModule(module) {
     document.getElementById(module).classList.add('active');
     state.currentModule = module;
     
-    if (module === 'combined') {
+    if (module === 'injury') {
+        updateInjuryDashboard();
+        updateInjuryTable();
+        updateInjuryCharts();
+    } else if (module === 'nearmiss') {
+        updateNearMissDashboard();
+        updateNearMissTable();
+        updateNearMissCharts();
+    } else if (module === 'combined') {
         updateCombinedAnalytics();
     } else if (module === 'actions') {
         updateActionItems();
@@ -3200,13 +3208,13 @@ function updateQualityDisplay(type, metrics) {
                                 </div>
                                 <div class="duplicate-rows">
                                     Rows: ${dup.indices.map(i => `<span class="row-badge">#${i + 1}</span>`).join(' ')}
-                                    <span class="duplicate-action">→ Review & Merge</span>
+                                    <span class="duplicate-action" onclick="showDuplicateDetails(${index}, '${type}')">→ Review & Merge</span>
                                 </div>
                             </div>
                         </div>
                     `).join('')}
-                    ${metrics.duplicateDetails.length > 5 ? 
-                        `<div class="more-duplicates">
+                    ${metrics.duplicateDetails.length > 5 ?
+                        `<div class="more-duplicates" onclick="showAllDuplicates('${type}')">
                             <i>➕</i> ${metrics.duplicateDetails.length - 5} more duplicate groups...
                         </div>` : ''}
                 </div>
@@ -3542,6 +3550,7 @@ function updateQualityDisplay(type, metrics) {
                 font-size: 0.85rem;
                 padding: 1rem;
                 border-top: 1px dashed rgba(0,0,0,0.1);
+                cursor: pointer;
             }
             
             .word-distribution {
@@ -6989,6 +6998,80 @@ function showMatrixDetails(severity, likelihood, matrixId) {
     modal.style.display = 'block';
 }
 
+function showDuplicateDetails(groupIndex, type) {
+    const metrics = type === 'nearmiss' ? state.nearMiss.qualityMetrics : state.injury.qualityMetrics;
+    const group = metrics.duplicateDetails[groupIndex];
+    if (!group) return;
+
+    const source = type === 'nearmiss' ? state.nearMiss.rawData : state.injury.rawData;
+    const records = group.indices.map(i => source[i]);
+
+    const modal = document.getElementById('detailModal');
+    const title = document.getElementById('modalTitle');
+    const body = document.getElementById('modalBody');
+
+    title.textContent = `Duplicate Records (${group.indices.length})`;
+    body.innerHTML = `
+        <p style="margin-bottom:1rem;">${group.data.date || 'No date'} – ${group.data.site} – ${group.data.location}</p>
+        <div style="max-height:400px; overflow-y:auto;">
+            ${records.map((rec, idx) => `
+                <div style="padding:1rem; border-bottom:1px solid var(--bg-secondary);">
+                    <strong>${rec.case_number || rec.incident_id || 'Row #' + (group.indices[idx] + 1)}</strong><br>
+                    <span style="color: var(--text-secondary);">
+                        Date: ${rec.incident_date || rec.nearmiss_date || 'N/A'}<br>
+                        Site: ${rec.site || 'N/A'}<br>
+                        ${rec.bodyPart ? `Body Part: ${rec.bodyPart}<br>` : ''}
+        ${rec.location ? `Location: ${rec.location}<br>` : ''}
+                    </span>
+                    ${rec.austin_url && rec.austin_url !== '#' ? `<a href="${rec.austin_url}" target="_blank" class="austin-link" style="margin-top:0.5rem; display:inline-block;">Austin Link</a>` : ''}
+                </div>
+            `).join('')}
+        </div>
+        <button class="btn btn-primary" style="margin-top:1rem;" onclick="mergeDuplicateGroup(${groupIndex}, '${type}')">Merge Duplicates</button>
+    `;
+    modal.style.display = 'block';
+}
+
+function mergeDuplicateGroup(groupIndex, type) {
+    const metrics = type === 'nearmiss' ? state.nearMiss.qualityMetrics : state.injury.qualityMetrics;
+    const group = metrics.duplicateDetails[groupIndex];
+    if (!group) return;
+    const source = type === 'nearmiss' ? state.nearMiss.rawData : state.injury.rawData;
+    group.indices.slice(1).sort((a,b) => b - a).forEach(i => source.splice(i, 1));
+    calculateQualityMetrics(type);
+    applyFilters(type);
+    showStatus('Merged duplicate records', 'success');
+    closeModal();
+}
+
+function showAllDuplicates(type) {
+    const metrics = type === 'nearmiss' ? state.nearMiss.qualityMetrics : state.injury.qualityMetrics;
+    if (!metrics.duplicateDetails.length) return;
+
+    const modal = document.getElementById('detailModal');
+    const title = document.getElementById('modalTitle');
+    const body = document.getElementById('modalBody');
+
+    title.textContent = 'All Duplicate Groups';
+    body.innerHTML = `
+        <div style="max-height:400px; overflow-y:auto;">
+            ${metrics.duplicateDetails.map((dup, index) => `
+                <div style="padding:1rem; border-bottom:1px solid var(--bg-secondary);">
+                    <strong>Group ${index + 1}</strong><br>
+                    <span style="color: var(--text-secondary);">
+                        Date: ${dup.data.date || 'No date'}<br>
+                        Site: ${dup.data.site}<br>
+                        ${dup.data.location ? `Location: ${dup.data.location}<br>` : ''}
+                    </span>
+                    <div>Rows: ${dup.indices.map(i => `#${i + 1}`).join(', ')}</div>
+                    <button class="btn btn-sm btn-primary" style="margin-top:0.5rem;" onclick="showDuplicateDetails(${index}, '${type}')">Review & Merge</button>
+                </div>
+            `).join('')}
+        </div>
+    `;
+    modal.style.display = 'block';
+}
+
 // Timeline Functions
 function updateInjuryTimeline() {
     const timelineContent = document.getElementById('injuryTimelineContent');
@@ -9305,6 +9388,9 @@ window.markActionComplete = markActionComplete;
 window.switchInjuryView = switchInjuryView;
 window.switchNearMissView = switchNearMissView;
 window.viewDetails = viewDetails;
+window.showDuplicateDetails = showDuplicateDetails;
+window.showAllDuplicates = showAllDuplicates;
+window.mergeDuplicateGroup = mergeDuplicateGroup;
 
 // Expose combined filter handler so it can be invoked from the HTML
 window.applyCombinedFilters = applyCombinedFilters;
