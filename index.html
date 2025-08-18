@@ -3208,7 +3208,7 @@ function updateQualityDisplay(type, metrics) {
                                 </div>
                                 <div class="duplicate-rows">
                                     Rows: ${dup.indices.map(i => `<span class="row-badge">#${i + 1}</span>`).join(' ')}
-                                    <span class="duplicate-action" onclick="showDuplicateDetails(${index}, '${type}')">→ Review & Merge</span>
+                                    <span class="duplicate-action" onclick="showDuplicateDetails(${index}, '${type}')">→ Review</span>
                                 </div>
                             </div>
                         </div>
@@ -7021,27 +7021,15 @@ function showDuplicateDetails(groupIndex, type) {
                         Date: ${rec.incident_date || rec.nearmiss_date || 'N/A'}<br>
                         Site: ${rec.site || 'N/A'}<br>
                         ${rec.bodyPart ? `Body Part: ${rec.bodyPart}<br>` : ''}
-        ${rec.location ? `Location: ${rec.location}<br>` : ''}
+                        ${rec.location ? `Location: ${rec.location}<br>` : ''}
+                        ${type === 'nearmiss' && rec.initial_info_incident_description ? `Description: ${rec.initial_info_incident_description}<br>` : ''}
                     </span>
                     ${rec.austin_url && rec.austin_url !== '#' ? `<a href="${rec.austin_url}" target="_blank" class="austin-link" style="margin-top:0.5rem; display:inline-block;">Austin Link</a>` : ''}
                 </div>
             `).join('')}
         </div>
-        <button class="btn btn-primary" style="margin-top:1rem;" onclick="mergeDuplicateGroup(${groupIndex}, '${type}')">Merge Duplicates</button>
     `;
     modal.style.display = 'block';
-}
-
-function mergeDuplicateGroup(groupIndex, type) {
-    const metrics = type === 'nearmiss' ? state.nearMiss.qualityMetrics : state.injury.qualityMetrics;
-    const group = metrics.duplicateDetails[groupIndex];
-    if (!group) return;
-    const source = type === 'nearmiss' ? state.nearMiss.rawData : state.injury.rawData;
-    group.indices.slice(1).sort((a,b) => b - a).forEach(i => source.splice(i, 1));
-    calculateQualityMetrics(type);
-    applyFilters(type);
-    showStatus('Merged duplicate records', 'success');
-    closeModal();
 }
 
 function showAllDuplicates(type) {
@@ -7064,7 +7052,7 @@ function showAllDuplicates(type) {
                         ${dup.data.location ? `Location: ${dup.data.location}<br>` : ''}
                     </span>
                     <div>Rows: ${dup.indices.map(i => `#${i + 1}`).join(', ')}</div>
-                    <button class="btn btn-sm btn-primary" style="margin-top:0.5rem;" onclick="showDuplicateDetails(${index}, '${type}')">Review & Merge</button>
+                    <button class="btn btn-sm btn-primary" style="margin-top:0.5rem;" onclick="showDuplicateDetails(${index}, '${type}')">Review</button>
                 </div>
             `).join('')}
         </div>
@@ -9390,7 +9378,6 @@ window.switchNearMissView = switchNearMissView;
 window.viewDetails = viewDetails;
 window.showDuplicateDetails = showDuplicateDetails;
 window.showAllDuplicates = showAllDuplicates;
-window.mergeDuplicateGroup = mergeDuplicateGroup;
 
 // Expose combined filter handler so it can be invoked from the HTML
 window.applyCombinedFilters = applyCombinedFilters;
