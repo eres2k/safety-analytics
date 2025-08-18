@@ -2396,49 +2396,100 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Standardized and categorized chart options for all views
 const CHART_OPTIONS = {
-    all: [
+    injury: [
         // Distribution & Overview
         { value: 'severity', label: '📊 Severity Distribution', category: 'distribution' },
         { value: 'site', label: '🏢 Site Comparison', category: 'distribution' },
-        { value: 'trend', label: '📈 Monthly Trend', category: 'trends' },
-        { value: 'weeklyTrend', label: '📅 Weekly Trend', category: 'trends' },
-        
-        // Body & Location Analysis (Injury-focused)
+        { value: 'recordableDistribution', label: '📝 Recordable vs Non-Recordable', category: 'distribution' },
+
+        // Trends
+        { value: 'trend', label: '📈 Monthly Injury Trend', category: 'trends' },
+        { value: 'recordableTrend', label: '📊 Recordable Rate Trend', category: 'trends' },
+        { value: 'severityTrend', label: '🎯 Severity Trend Over Time', category: 'trends' },
+
+        // Body Part Analysis (Injury-specific)
         { value: 'bodyPart', label: '🦴 Body Parts Affected', category: 'anatomy' },
         { value: 'bodyPartTrend', label: '📊 Body Part Trends', category: 'anatomy' },
-        { value: 'bodyPartHeatmap', label: '🔥 Body Part Heat Map', category: 'anatomy' },
-        
+        { value: 'bodyPartHeatmap', label: '🔥 Body Part by Severity', category: 'anatomy' },
+        { value: 'bodyPartBySite', label: '🏢 Body Parts by Site', category: 'anatomy' },
+
+        // Type & Mechanism (Injury-specific)
+        { value: 'injuryType', label: '🏥 Injury Types', category: 'type' },
+        { value: 'mechanismOfInjury', label: '⚙️ How Injuries Occur', category: 'type' },
+        { value: 'injuryTypeByProcess', label: '🔄 Injury Type by Process', category: 'type' },
+
         // Process & Operations
-        { value: 'processPath', label: '🔄 Process Paths', category: 'operations' },
-        { value: 'processRisk', label: '⚠️ Process Risk Analysis', category: 'operations' },
-        { value: 'shiftAnalysis', label: '🕐 Shift Analysis', category: 'operations' },
-        
+        { value: 'processPath', label: '🔄 Process Path Analysis', category: 'operations' },
+        { value: 'shiftAnalysis', label: '🕐 Injuries by Shift', category: 'operations' },
+        { value: 'departmentAnalysis', label: '🏭 Department Analysis', category: 'operations' },
+
         // Root Cause & Contributing Factors
-        { value: 'rootCause', label: '🔍 Root Causes', category: 'causation' },
+        { value: 'rootCause', label: '🔍 Root Cause Analysis', category: 'causation' },
         { value: 'contributingFactors', label: '🔗 Contributing Factors', category: 'causation' },
-        { value: 'causeByMonth', label: '📅 Causes Over Time', category: 'causation' },
-        
-        // Impact & Type Analysis
-        { value: 'impactType', label: '💥 Impact Types', category: 'impact' },
-        { value: 'impactSeverity', label: '🎯 Impact vs Severity', category: 'impact' },
-        { value: 'mechanismOfInjury', label: '⚙️ Injury Mechanism', category: 'impact' },
-        
-        // Performance Metrics
-        { value: 'recordableRate', label: '📊 Recordable Rate', category: 'metrics' },
-        { value: 'recordableTrend', label: '📈 Recordable Trend', category: 'metrics' },
-        { value: 'dafwAnalysis', label: '📅 Days Away Analysis', category: 'metrics' },
-        { value: 'otrAnalysis', label: '🚗 OTR Analysis', category: 'metrics' },
-        
-        // Risk & Safety Metrics
-        { value: 'riskScore', label: '🎲 Risk Score Distribution', category: 'risk' },
-        { value: 'riskTrend', label: '📈 Risk Score Trend', category: 'risk' },
-        { value: 'riskMatrix', label: '⬜ Risk Matrix View', category: 'risk' },
-        
+        { value: 'rootCauseBySite', label: '🏢 Root Causes by Site', category: 'causation' },
+        { value: 'rootCauseTrend', label: '📈 Root Cause Trends', category: 'causation' },
+
+        // Performance Metrics (Injury-specific)
+        { value: 'recordableRate', label: '📊 Recordable Rate by Site', category: 'metrics' },
+        { value: 'dafwAnalysis', label: '📅 Days Away From Work', category: 'metrics' },
+        { value: 'dafwDistribution', label: '📊 DAFW Distribution', category: 'metrics' },
+        { value: 'otrAnalysis', label: '🚗 OTR vs UTR Analysis', category: 'metrics' },
+        { value: 'lostTimeAnalysis', label: '⏱️ Lost Time Analysis', category: 'metrics' },
+
         // Advanced Analytics
-        { value: 'preventionEffectiveness', label: '🛡️ Prevention Effectiveness', category: 'advanced' },
-        { value: 'predictiveAnalysis', label: '🔮 Predictive Analysis', category: 'advanced' },
-        { value: 'correlationMatrix', label: '🔗 Correlation Analysis', category: 'advanced' },
-        { value: 'seasonalPatterns', label: '🍂 Seasonal Patterns', category: 'advanced' }
+        { value: 'severityPrediction', label: '🔮 Severity Patterns', category: 'advanced' },
+        { value: 'recoveryTimeAnalysis', label: '🏥 Recovery Time Analysis', category: 'advanced' },
+        { value: 'costImpactAnalysis', label: '💰 Cost Impact Analysis', category: 'advanced' }
+    ],
+
+    nearMiss: [
+        // Distribution & Overview
+        { value: 'severity', label: '📊 Potential Severity Distribution', category: 'distribution' },
+        { value: 'site', label: '🏢 Site Comparison', category: 'distribution' },
+        { value: 'statusDistribution', label: '📋 Status Overview', category: 'distribution' },
+
+        // Trends
+        { value: 'trend', label: '📈 Near Miss Trend', category: 'trends' },
+        { value: 'riskTrend', label: '🎲 Risk Score Trend', category: 'trends' },
+        { value: 'severityTrend', label: '🎯 Severity Trend Over Time', category: 'trends' },
+
+        // Location Analysis (Near Miss-specific)
+        { value: 'location', label: '📍 Top Incident Locations', category: 'location' },
+        { value: 'locationHeatmap', label: '🔥 Location Risk Heat Map', category: 'location' },
+        { value: 'locationTrend', label: '📈 Location Trends', category: 'location' },
+        { value: 'locationBySeverity', label: '🎯 Location by Severity', category: 'location' },
+
+        // Impact Analysis (Near Miss-specific)
+        { value: 'impact', label: '💥 Primary Impact Types', category: 'impact' },
+        { value: 'impactSeverity', label: '🎯 Impact vs Severity', category: 'impact' },
+        { value: 'impactByLocation', label: '📍 Impact by Location', category: 'impact' },
+        { value: 'impactTrend', label: '📈 Impact Type Trends', category: 'impact' },
+
+        // Process & Operations
+        { value: 'processPath', label: '🔄 Process Path Analysis', category: 'operations' },
+        { value: 'processRisk', label: '⚠️ Process Risk Score', category: 'operations' },
+        { value: 'processHeatmap', label: '🔥 Process Risk Heat Map', category: 'operations' },
+
+        // Risk Analysis (Near Miss-specific)
+        { value: 'riskScore', label: '🎲 Risk Score Distribution', category: 'risk' },
+        { value: 'riskMatrix', label: '⬜ Risk Matrix Overview', category: 'risk' },
+        { value: 'likelihood', label: '📊 Likelihood Analysis', category: 'risk' },
+        { value: 'likelihoodTrend', label: '📈 Likelihood Trends', category: 'risk' },
+
+        // Contributing Factors
+        { value: 'contributingFactors', label: '🔗 Contributing Factors', category: 'causation' },
+        { value: 'rootCause', label: '🔍 Root Cause Analysis', category: 'causation' },
+        { value: 'hazardCategories', label: '⚠️ Hazard Categories', category: 'causation' },
+
+        // Prevention & Mitigation
+        { value: 'preventionEffectiveness', label: '🛡️ Prevention Opportunities', category: 'prevention' },
+        { value: 'mitigationStatus', label: '✅ Mitigation Status', category: 'prevention' },
+        { value: 'closureAnalysis', label: '📊 Closure Rate Analysis', category: 'prevention' },
+
+        // Advanced Analytics
+        { value: 'nearMissToInjuryRatio', label: '📊 Near Miss/Injury Correlation', category: 'advanced' },
+        { value: 'predictiveRisk', label: '🔮 Predictive Risk Areas', category: 'advanced' },
+        { value: 'hotspotAnalysis', label: '🔥 Risk Hotspot Analysis', category: 'advanced' }
     ]
 };
 
@@ -2623,61 +2674,64 @@ function parseCSV(csvText, type) {
 
 // Initialize chart selections with categorized options
 function initializeChartSelections() {
-    // Create categorized dropdown HTML
-    const createCategorizedOptions = () => {
+    // Helper function to create categorized dropdown HTML
+    const createCategorizedOptions = (options) => {
         const categories = {};
-        
+
         // Group options by category
-        CHART_OPTIONS.all.forEach(option => {
+        options.forEach(option => {
             if (!categories[option.category]) {
                 categories[option.category] = [];
             }
             categories[option.category].push(option);
         });
-        
+
         // Build HTML with optgroups
         let html = '';
         const categoryLabels = {
             'distribution': '📊 Distribution & Overview',
             'trends': '📈 Trend Analysis',
             'anatomy': '🦴 Body Part Analysis',
+            'type': '🏥 Injury Type Analysis',
+            'location': '📍 Location Analysis',
+            'impact': '💥 Impact Analysis',
             'operations': '🔄 Operations & Process',
             'causation': '🔍 Root Cause Analysis',
-            'impact': '💥 Impact Analysis',
             'metrics': '📊 Performance Metrics',
             'risk': '🎲 Risk Analysis',
+            'prevention': '🛡️ Prevention & Mitigation',
             'advanced': '🔬 Advanced Analytics'
         };
-        
-        Object.entries(categories).forEach(([category, options]) => {
+
+        Object.entries(categories).forEach(([category, categoryOptions]) => {
             html += `<optgroup label="${categoryLabels[category] || category}">`;
-            options.forEach(opt => {
+            categoryOptions.forEach(opt => {
                 html += `<option value="${opt.value}">${opt.label}</option>`;
             });
             html += '</optgroup>';
         });
-        
+
         return html;
     };
-    
-    const optionsHTML = createCategorizedOptions();
-    
-    // Update all Injury chart selectors
+
+    // Update Injury chart selectors
+    const injuryOptionsHTML = createCategorizedOptions(CHART_OPTIONS.injury);
     const injurySelectors = document.querySelectorAll('#injury .chart-header select');
     injurySelectors.forEach((selector, index) => {
-        selector.innerHTML = optionsHTML;
+        selector.innerHTML = injuryOptionsHTML;
         // Set different default values for each view
-        const defaults = ['severity', 'bodyPart', 'rootCause', 'trend'];
-        selector.value = defaults[index] || 'severity';
+        const injuryDefaults = ['severity', 'bodyPart', 'rootCause', 'trend'];
+        selector.value = injuryDefaults[index] || 'severity';
     });
-    
-    // Update all Near Miss chart selectors
+
+    // Update Near Miss chart selectors
+    const nearMissOptionsHTML = createCategorizedOptions(CHART_OPTIONS.nearMiss);
     const nearMissSelectors = document.querySelectorAll('#nearmiss .chart-header select');
     nearMissSelectors.forEach((selector, index) => {
-        selector.innerHTML = optionsHTML;
+        selector.innerHTML = nearMissOptionsHTML;
         // Set different defaults for near miss
-        const defaults = ['severity', 'location', 'impact', 'riskTrend'];
-        selector.value = defaults[index] || 'severity';
+        const nearMissDefaults = ['severity', 'location', 'impact', 'riskTrend'];
+        selector.value = nearMissDefaults[index] || 'severity';
     });
 }
 
@@ -4170,6 +4224,33 @@ function updateUniversalChart(chart, data, type, module) {
         case 'otrAnalysis':
             updateOtrAnalysisChart(chart, data);
             break;
+        // Near Miss specific
+        case 'location':
+            updateLocationChart(chart, data);
+            break;
+        case 'impact':
+            updateImpactChart(chart, data);
+            break;
+        case 'likelihood':
+            updateLikelihoodChart(chart, data);
+            break;
+        case 'statusDistribution':
+            updateStatusDistributionChart(chart, data);
+            break;
+        case 'closureAnalysis':
+            updateClosureAnalysisChart(chart, data);
+            break;
+
+        // Injury specific
+        case 'injuryType':
+            updateInjuryTypeChart(chart, data);
+            break;
+        case 'recordableDistribution':
+            updateRecordableDistributionChart(chart, data);
+            break;
+        case 'dafwDistribution':
+            updateDafwAnalysisChart(chart, data);
+            break;
     }
 }
 
@@ -4903,6 +4984,212 @@ function updateOtrAnalysisChart(chart, data) {
         }]
     };
     chart.options = getChartOptions('pie');
+    chart.update();
+}
+
+function updateLocationChart(chart, data) {
+    const locationCounts = {};
+    data.forEach(row => {
+        const location = row.location || row.initial_info_location_event || 'Unknown';
+        locationCounts[location] = (locationCounts[location] || 0) + 1;
+    });
+
+    const topLocations = Object.entries(locationCounts)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 10);
+
+    chart.config.type = 'bar';
+    chart.data = {
+        labels: topLocations.map(([loc]) => loc.substring(0, 30) + (loc.length > 30 ? '...' : '')),
+        datasets: [{
+            label: 'Near Misses',
+            data: topLocations.map(([, count]) => count),
+            backgroundColor: AMAZON_COLORS.orange,
+            borderWidth: 1
+        }]
+    };
+    chart.options = getChartOptions('bar');
+    chart.options.indexAxis = 'y';
+    chart.update();
+}
+
+function updateImpactChart(chart, data) {
+    const impactCounts = {};
+    data.forEach(row => {
+        const impact = row.primaryImpact || row.initial_info_primary_impact || 'Unknown';
+        impactCounts[impact] = (impactCounts[impact] || 0) + 1;
+    });
+
+    const topImpacts = Object.entries(impactCounts)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 8);
+
+    chart.config.type = 'doughnut';
+    chart.data = {
+        labels: topImpacts.map(([impact]) => impact),
+        datasets: [{
+            data: topImpacts.map(([, count]) => count),
+            backgroundColor: [
+                AMAZON_COLORS.orange,
+                AMAZON_COLORS.darkBlue,
+                '#FF5722',
+                '#4CAF50',
+                '#2196F3',
+                '#9C27B0',
+                '#FFC107',
+                '#795548'
+            ]
+        }]
+    };
+    chart.options = getChartOptions('doughnut');
+    chart.update();
+}
+
+function updateLikelihoodChart(chart, data) {
+    const likelihoodCounts = {
+        'Rare': 0,
+        'Unlikely': 0,
+        'Possible': 0,
+        'Likely': 0,
+        'Almost Certain': 0
+    };
+
+    data.forEach(row => {
+        const likelihood = row.standardized_likelihood || 'Possible';
+        if (likelihoodCounts[likelihood] !== undefined) {
+            likelihoodCounts[likelihood]++;
+        }
+    });
+
+    chart.config.type = 'bar';
+    chart.data = {
+        labels: Object.keys(likelihoodCounts),
+        datasets: [{
+            label: 'Frequency',
+            data: Object.values(likelihoodCounts),
+            backgroundColor: [
+                SEVERITY_COLORS.D,
+                SEVERITY_COLORS.C,
+                AMAZON_COLORS.orange,
+                SEVERITY_COLORS.B,
+                SEVERITY_COLORS.A
+            ]
+        }]
+    };
+    chart.options = getChartOptions('bar');
+    chart.update();
+}
+
+function updateInjuryTypeChart(chart, data) {
+    const typeCounts = {};
+    data.forEach(row => {
+        const type = row.type || row.injury_type || 'Unknown';
+        typeCounts[type] = (typeCounts[type] || 0) + 1;
+    });
+
+    const topTypes = Object.entries(typeCounts)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 8);
+
+    chart.config.type = 'pie';
+    chart.data = {
+        labels: topTypes.map(([type]) => type),
+        datasets: [{
+            data: topTypes.map(([, count]) => count),
+            backgroundColor: [
+                '#FF6384',
+                '#36A2EB',
+                '#FFCE56',
+                '#4BC0C0',
+                '#9966FF',
+                '#FF9F40',
+                '#FF6384',
+                '#C9CBCF'
+            ]
+        }]
+    };
+    chart.options = getChartOptions('pie');
+    chart.update();
+}
+
+function updateRecordableDistributionChart(chart, data) {
+    const recordable = data.filter(r => r.recordable === 1).length;
+    const nonRecordable = data.filter(r => r.recordable === 0).length;
+
+    chart.config.type = 'doughnut';
+    chart.data = {
+        labels: ['Recordable', 'Non-Recordable'],
+        datasets: [{
+            data: [recordable, nonRecordable],
+            backgroundColor: [SEVERITY_COLORS.B, SEVERITY_COLORS.D]
+        }]
+    };
+    chart.options = getChartOptions('doughnut');
+    chart.update();
+}
+
+function updateStatusDistributionChart(chart, data) {
+    const statusCounts = {};
+    data.forEach(row => {
+        const status = row.status || 'Unknown';
+        statusCounts[status] = (statusCounts[status] || 0) + 1;
+    });
+
+    chart.config.type = 'pie';
+    chart.data = {
+        labels: Object.keys(statusCounts),
+        datasets: [{
+            data: Object.values(statusCounts),
+            backgroundColor: Object.keys(statusCounts).map((status, index) => {
+                if (status === 'Closed' || status === 'Completed') return SEVERITY_COLORS.D;
+                if (status === 'Open' || status === 'In Progress') return AMAZON_COLORS.orange;
+                if (status === 'Pending') return SEVERITY_COLORS.C;
+                return ['#9E9E9E', '#607D8B', '#795548'][index % 3];
+            })
+        }]
+    };
+    chart.options = getChartOptions('pie');
+    chart.update();
+}
+
+function updateClosureAnalysisChart(chart, data) {
+    const monthlyClosures = {};
+
+    data.forEach(row => {
+        if (row.parsedDate && !isNaN(row.parsedDate)) {
+            const monthKey = `${row.parsedDate.getFullYear()}-${String(row.parsedDate.getMonth() + 1).padStart(2, '0')}`;
+            if (!monthlyClosures[monthKey]) {
+                monthlyClosures[monthKey] = { total: 0, closed: 0 };
+            }
+            monthlyClosures[monthKey].total++;
+            if (row.status === 'Closed' || row.status === 'Completed') {
+                monthlyClosures[monthKey].closed++;
+            }
+        }
+    });
+
+    const sortedMonths = Object.keys(monthlyClosures).sort();
+    const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+    chart.config.type = 'line';
+    chart.data = {
+        labels: sortedMonths.map(m => {
+            const [year, month] = m.split('-');
+            return `${monthNames[parseInt(month)-1]} ${year}`;
+        }),
+        datasets: [{
+            label: 'Closure Rate %',
+            data: sortedMonths.map(m => {
+                const data = monthlyClosures[m];
+                return data.total > 0 ? ((data.closed / data.total) * 100).toFixed(1) : 0;
+            }),
+            borderColor: SEVERITY_COLORS.D,
+            backgroundColor: `${SEVERITY_COLORS.D}20`,
+            tension: 0.3
+        }]
+    };
+    chart.options = getChartOptions('line');
+    chart.options.scales.y.max = 100;
     chart.update();
 }
 
