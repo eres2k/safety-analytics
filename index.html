@@ -2887,105 +2887,172 @@ function calculateQualityMetrics(type) {
         qualityScore: 0,
         duplicateDetails: [],
         missingFieldsDetails: {},
-        recommendations: []
+        recommendations: [],
+        // Add word analysis metrics
+        wordAnalysis: {
+            totalWords: 0,
+            averageWords: 0,
+            minWords: Infinity,
+            maxWords: 0,
+            distribution: {}
+        }
     };
-    
-    // Check for duplicates only for near miss data. For injury data we skip duplicate detection
+
+    // Check for duplicates
     if (type === 'nearmiss') {
-        const seen = new Set();
-        const duplicateGroups = {};
+        const seen = new Map();
         data.forEach((row, index) => {
-            const key = `${row.nearmiss_date}-${row.site}-${row.location}`;
+            const key = `${row.nearmiss_date}-${row.site}-${row.location}-${row.initial_info_primary_impact}`;
             if (seen.has(key)) {
                 metrics.duplicates++;
-                if (!duplicateGroups[key]) {
-                    duplicateGroups[key] = [];
+                const existingIndex = seen.get(key);
+                // Group duplicates together
+                const found = metrics.duplicateDetails.find(d => d.indices.includes(existingIndex));
+                if (found) {
+                    found.indices.push(index);
+                } else {
+                    metrics.duplicateDetails.push({
+                        key,
+                        indices: [existingIndex, index],
+                        data: {
+                            date: row.nearmiss_date,
+                            site: row.site,
+                            location: row.location || 'Unknown',
+                            impact: row.initial_info_primary_impact || 'Unknown'
+                        }
+                    });
                 }
-                duplicateGroups[key].push(index + 1);
+            } else {
+                seen.set(key, index);
             }
-            seen.add(key);
         });
-        metrics.duplicateDetails = Object.entries(duplicateGroups).map(([key, rows]) => ({
-            key,
-            rows: rows.join(', ')
-        }));
-    } else {
-        // Injuries: duplicates are not considered for quality metrics
-        metrics.duplicates = 0;
-        metrics.duplicateDetails = [];
     }
-    
+
+    // Word count analysis for near miss
+    if (type === 'nearmiss') {
+        data.forEach(row => {
+            let wordCount = 0;
+            // Count words in description and other text fields
+            const textFields = [
+                row.initial_info_incident_description,
+                row.initial_info_nearmiss_type,
+                row.rca_comments,
+                row.investigation_evidence_near_incident_location
+            ];
+
+            textFields.forEach(field => {
+                if (field && typeof field === 'string') {
+                    const words = field.trim().split(/\s+/).filter(w => w.length > 0);
+                    wordCount += words.length;
+                }
+            });
+
+            metrics.wordAnalysis.totalWords += wordCount;
+            metrics.wordAnalysis.minWords = Math.min(metrics.wordAnalysis.minWords, wordCount);
+            metrics.wordAnalysis.maxWords = Math.max(metrics.wordAnalysis.maxWords, wordCount);
+
+            // Word count distribution
+            const range = wordCount === 0 ? '0' :
+                         wordCount <= 10 ? '1-10' :
+                         wordCount <= 25 ? '11-25' :
+                         wordCount <= 50 ? '26-50' : '50+';
+            metrics.wordAnalysis.distribution[range] = (metrics.wordAnalysis.distribution[range] || 0) + 1;
+        });
+
+        metrics.wordAnalysis.averageWords = data.length > 0 ? 
+            Math.round(metrics.wordAnalysis.totalWords / data.length) : 0;
+
+        if (metrics.wordAnalysis.minWords === Infinity) {
+            metrics.wordAnalysis.minWords = 0;
+        }
+    }
+
     // Check critical fields
     const criticalFields = type === 'injury' ? 
         ['incident_date', 'site', 'severity', 'bodyPart', 'recordable'] :
         ['nearmiss_date', 'site', 'severity', 'location', 'risk'];
-    
+
     criticalFields.forEach(field => {
         metrics.missingFieldsDetails[field] = 0;
     });
-    
+
     data.forEach(row => {
         criticalFields.forEach(field => {
             const value = field === 'bodyPart' ? row.bodyPart : 
                          field === 'location' ? row.location :
                          row[field];
-            
+
             if (!value || value === 'Unknown' || value === '') {
                 metrics.missingFieldsDetails[field]++;
                 metrics.missingCriticalFields++;
             }
         });
     });
-    
+
     // Calculate completeness
     const totalFields = data.length * criticalFields.length;
     const filledFields = totalFields - metrics.missingCriticalFields;
     metrics.dataCompleteness = totalFields > 0 ? 
         Math.round((filledFields / totalFields) * 100) : 0;
-    
-    // Calculate quality score
-    if (type === 'injury') {
-        // For injury data, quality is based solely on completeness
-        metrics.qualityScore = metrics.dataCompleteness;
-    } else {
+
+    // Calculate quality score for near miss with word count consideration
+    if (type === 'nearmiss') {
         const duplicatePenalty = metrics.totalRecords > 0
             ? Math.max(0, 100 - (metrics.duplicates / metrics.totalRecords) * 100)
             : 100;
         const completenessPenalty = metrics.dataCompleteness;
-        metrics.qualityScore = Math.round((duplicatePenalty + completenessPenalty) / 2);
+        const wordCountScore = metrics.wordAnalysis.averageWords >= 15 ? 100 :
+                              metrics.wordAnalysis.averageWords >= 10 ? 80 :
+                              metrics.wordAnalysis.averageWords >= 5 ? 60 : 40;
+
+        metrics.qualityScore = Math.round((duplicatePenalty + completenessPenalty + wordCountScore) / 3);
+    } else {
+        metrics.qualityScore = metrics.dataCompleteness;
     }
-    
+
     // Generate recommendations
-    if (type === 'nearmiss' && metrics.duplicates > 0) {
-        metrics.recommendations.push({
-            type: 'warning',
-            text: `Found ${metrics.duplicates} potential duplicate records. Review and consolidate.`
-        });
-    }
-    
-    if (metrics.dataCompleteness < 80) {
-        metrics.recommendations.push({
-            type: 'critical',
-            text: `Data completeness is ${metrics.dataCompleteness}%. Missing critical fields may impact analysis accuracy.`
-        });
-    }
-    
-    Object.entries(metrics.missingFieldsDetails).forEach(([field, count]) => {
-        if (count > data.length * 0.1) {
+    if (type === 'nearmiss') {
+        if (metrics.duplicates > 0) {
             metrics.recommendations.push({
                 type: 'warning',
-                text: `${count} records (${Math.round(count/data.length*100)}%) missing ${field} data.`
+                text: `Found ${metrics.duplicates} potential duplicate records. Review and consolidate.`,
+                icon: '🔄'
             });
         }
-    });
-    
+
+        if (metrics.wordAnalysis.averageWords < 10) {
+            metrics.recommendations.push({
+                type: 'critical',
+                text: `Low description quality: Average ${metrics.wordAnalysis.averageWords} words per record. Aim for 15+ words.`,
+                icon: '📝'
+            });
+        }
+
+        if (metrics.dataCompleteness < 80) {
+            metrics.recommendations.push({
+                type: 'warning',
+                text: `Data completeness is ${metrics.dataCompleteness}%. Fill in missing location and risk data.`,
+                icon: '⚠️'
+            });
+        }
+
+        const lowWordCount = metrics.wordAnalysis.distribution['0'] || 0;
+        if (lowWordCount > data.length * 0.2) {
+            metrics.recommendations.push({
+                type: 'critical',
+                text: `${lowWordCount} records (${Math.round(lowWordCount/data.length*100)}%) have no description.`,
+                icon: '❌'
+            });
+        }
+    }
+
     // Store metrics
     if (type === 'injury') {
         state.injury.qualityMetrics = metrics;
     } else {
         state.nearMiss.qualityMetrics = metrics;
     }
-    
+
     return metrics;
 }
 
@@ -3000,68 +3067,7 @@ function updateNearMissQualityMetrics() {
     updateQualityDisplay('nearmiss', metrics);
 }
 
-// Compute word statistics for near miss data
-function getNearMissWordStats() {
-    const words = [];
-    // Aggregate words from several text fields in each near miss record
-    state.nearMiss.filteredData.forEach(row => {
-        ['location', 'primaryImpact', 'processPath', 'contributingFactor', 'rootCause'].forEach(field => {
-            const text = row[field];
-            if (text && typeof text === 'string') {
-                text.split(/\s+/).forEach(word => {
-                    const cleaned = word.toLowerCase().replace(/[^a-z0-9]/g, '');
-                    if (cleaned) words.push(cleaned);
-                });
-            }
-        });
-    });
-    const wordCounts = {};
-    words.forEach(w => {
-        wordCounts[w] = (wordCounts[w] || 0) + 1;
-    });
-    const topWords = Object.entries(wordCounts)
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 10);
-    const averageLength = state.nearMiss.filteredData.length > 0 ?
-        Math.round(words.length / state.nearMiss.filteredData.length) : 0;
-    return { topWords, averageLength };
-}
-
-// Update near miss word analysis: count summary and heat map
-function updateNearMissWordAnalysis() {
-    const stats = getNearMissWordStats();
-    const countElem = document.getElementById('nearMissWordCount');
-    if (countElem) {
-        countElem.textContent = stats.averageLength > 0 ?
-            `Average words per record: ${stats.averageLength}` :
-            'No textual data available for word analysis.';
-    }
-    const container = document.getElementById('nearMissWordHeatMap');
-    if (container) {
-        container.innerHTML = '';
-        if (stats.topWords.length === 0) {
-            container.innerHTML = '<p style="font-size: 0.85rem; color: var(--text-secondary);">No word frequency data available.</p>';
-            return;
-        }
-        const rgb = hexToRgb(AMAZON_COLORS.orange);
-        const maxCount = Math.max(...stats.topWords.map(entry => entry[1]));
-        stats.topWords.forEach(([word, count]) => {
-            const intensity = count / maxCount;
-            const item = document.createElement('div');
-            item.className = 'heatmap-item';
-            item.style.backgroundColor = `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${0.3 + 0.7 * intensity})`;
-            item.textContent = `${word} (${count})`;
-            container.appendChild(item);
-        });
-    }
-}
-
 function updateQualityDisplay(type, metrics) {
-    // Determine the correct container for the quality view.  The near miss module
-    // uses an ID with a capital "M" (nearMissQuality) whereas the injury
-    // container is lowercase.  Without this translation the quality metrics
-    // would never render for near misses because the element could not be
-    // located.
     const containerId = type === 'nearmiss' ? 'nearMissQuality' : `${type}Quality`;
     const container = document.getElementById(containerId);
     if (!container || !metrics || !metrics.totalRecords) {
@@ -3070,128 +3076,699 @@ function updateQualityDisplay(type, metrics) {
         }
         return;
     }
-    
-    const qualityClass = metrics.qualityScore >= 90 ? 'success' : 
-                        metrics.qualityScore >= 70 ? 'warning' : 'danger';
-    
+
+    const qualityClass = metrics.qualityScore >= 90 ? 'excellent' : 
+                        metrics.qualityScore >= 70 ? 'good' : 
+                        metrics.qualityScore >= 50 ? 'warning' : 'poor';
+
+    const qualityEmoji = metrics.qualityScore >= 90 ? '🌟' : 
+                        metrics.qualityScore >= 70 ? '✅' : 
+                        metrics.qualityScore >= 50 ? '⚠️' : '❌';
+
+    // Enhanced HTML with better visual design
     container.innerHTML = `
         <div class="quality-metrics-container">
-            <div class="quality-score-card">
-                <div class="quality-score-circle ${qualityClass}">
-                    <div class="quality-score-value">${metrics.qualityScore}%</div>
-                    <div class="quality-score-label">Overall Quality Score</div>
+            <!-- Main Score Card -->
+            <div class="quality-score-card-enhanced">
+                <div class="quality-score-visual">
+                    <div class="quality-score-circle ${qualityClass}">
+                        <div class="quality-score-inner">
+                            <div class="quality-emoji">${qualityEmoji}</div>
+                            <div class="quality-score-value">${metrics.qualityScore}%</div>
+                            <div class="quality-score-label">Overall Quality</div>
+                        </div>
+                    </div>
+                    <div class="quality-score-ring">
+                        <svg viewBox="0 0 200 200">
+                            <circle cx="100" cy="100" r="90" fill="none" stroke="#e0e0e0" stroke-width="10"/>
+                            <circle cx="100" cy="100" r="90" fill="none" 
+                                stroke="${qualityClass === 'excellent' ? '#4CAF50' : 
+                                         qualityClass === 'good' ? '#FFC107' : 
+                                         qualityClass === 'warning' ? '#FF9800' : '#FF5722'}"
+                                stroke-width="10"
+                                stroke-dasharray="${metrics.qualityScore * 5.65} 565"
+                                stroke-dashoffset="0"
+                                transform="rotate(-90 100 100)"
+                                style="transition: stroke-dasharray 1s ease;"/>
+                        </svg>
+                    </div>
+                </div>
+                
+                ${type === 'nearmiss' ? `
+                <!-- Word Analysis Summary -->
+                <div class="word-analysis-summary">
+                    <h4>📝 Description Quality</h4>
+                    <div class="word-stats-grid">
+                        <div class="word-stat">
+                            <div class="word-stat-value">${metrics.wordAnalysis.averageWords}</div>
+                            <div class="word-stat-label">Avg Words</div>
+                        </div>
+                        <div class="word-stat">
+                            <div class="word-stat-value">${metrics.wordAnalysis.minWords}-${metrics.wordAnalysis.maxWords}</div>
+                            <div class="word-stat-label">Range</div>
+                        </div>
+                        <div class="word-stat">
+                            <div class="word-stat-value">${metrics.totalRecords}</div>
+                            <div class="word-stat-label">Records</div>
+                        </div>
+                    </div>
+                </div>
+                ` : ''}
+            </div>
+            
+            <!-- Key Metrics Cards -->
+            <div class="quality-metrics-grid">
+                <div class="quality-metric-card">
+                    <div class="metric-icon-large">📊</div>
+                    <div class="metric-content">
+                        <div class="metric-value">${metrics.totalRecords}</div>
+                        <div class="metric-label">Total Records</div>
+                    </div>
+                </div>
+                
+                ${type === 'nearmiss' ? `
+                <div class="quality-metric-card ${metrics.duplicates > 0 ? 'has-issue' : ''}">
+                    <div class="metric-icon-large">🔄</div>
+                    <div class="metric-content">
+                        <div class="metric-value">${metrics.duplicates}</div>
+                        <div class="metric-label">Duplicates Found</div>
+                    </div>
+                </div>
+                
+                <div class="quality-metric-card">
+                    <div class="metric-icon-large">📝</div>
+                    <div class="metric-content">
+                        <div class="metric-value">${metrics.wordAnalysis.totalWords}</div>
+                        <div class="metric-label">Total Words</div>
+                    </div>
+                </div>
+                ` : `
+                <div class="quality-metric-card">
+                    <div class="metric-icon-large">⚠️</div>
+                    <div class="metric-content">
+                        <div class="metric-value">${metrics.missingCriticalFields}</div>
+                        <div class="metric-label">Missing Fields</div>
+                    </div>
+                </div>
+                `}
+                
+                <div class="quality-metric-card">
+                    <div class="metric-icon-large">✅</div>
+                    <div class="metric-content">
+                        <div class="metric-value">${metrics.dataCompleteness}%</div>
+                        <div class="metric-label">Completeness</div>
+                    </div>
                 </div>
             </div>
             
-            <div class="metrics-grid" style="margin-top: 2rem;">
-                <div class="metric-card">
-                    <div class="metric-icon">📊</div>
-                    <div class="metric-value">${metrics.totalRecords}</div>
-                    <div class="metric-label">Total Records</div>
+            ${type === 'nearmiss' && metrics.duplicateDetails.length > 0 ? `
+            <!-- Duplicate Records Section -->
+            <div class="quality-section duplicate-section">
+                <div class="section-header">
+                    <h4><span class="section-icon">🔄</span> Duplicate Records Detected</h4>
+                    <span class="duplicate-count">${metrics.duplicateDetails.length} groups</span>
                 </div>
-                <div class="metric-card">
-                    <div class="metric-icon">🔄</div>
-                    <div class="metric-value">${metrics.duplicates}</div>
-                    <div class="metric-label">Duplicate Records</div>
-                </div>
-                <div class="metric-card">
-                    <div class="metric-icon">⚠️</div>
-                    <div class="metric-value">${metrics.missingCriticalFields}</div>
-                    <div class="metric-label">Missing Critical Fields</div>
-                </div>
-                <div class="metric-card">
-                    <div class="metric-icon">✅</div>
-                    <div class="metric-value">${metrics.dataCompleteness}%</div>
-                    <div class="metric-label">Data Completeness</div>
-                </div>
-            </div>
-            
-            ${metrics.duplicateDetails.length > 0 ? `
-            <div class="quality-section">
-                <h4>Duplicate Records Details</h4>
                 <div class="duplicate-list">
-                    ${metrics.duplicateDetails.slice(0, 5).map(dup => `
+                    ${metrics.duplicateDetails.slice(0, 5).map((dup, index) => `
                         <div class="duplicate-item">
-                            <strong>Key:</strong> ${dup.key}<br>
-                            <strong>Row Numbers:</strong> ${dup.rows}
+                            <div class="duplicate-number">${index + 1}</div>
+                            <div class="duplicate-content">
+                                <div class="duplicate-key">
+                                    <span class="dup-field"><i>📅</i> ${dup.data.date || 'No date'}</span>
+                                    <span class="dup-field"><i>🏢</i> ${dup.data.site}</span>
+                                    <span class="dup-field"><i>📍</i> ${dup.data.location}</span>
+                                </div>
+                                <div class="duplicate-rows">
+                                    Rows: ${dup.indices.map(i => `<span class="row-badge">#${i + 1}</span>`).join(' ')}
+                                    <span class="duplicate-action">→ Review & Merge</span>
+                                </div>
+                            </div>
                         </div>
                     `).join('')}
                     ${metrics.duplicateDetails.length > 5 ? 
-                        `<p style="margin-top: 1rem; color: var(--text-secondary);">
-                            And ${metrics.duplicateDetails.length - 5} more duplicate groups...
-                        </p>` : ''}
+                        `<div class="more-duplicates">
+                            <i>➕</i> ${metrics.duplicateDetails.length - 5} more duplicate groups...
+                        </div>` : ''}
                 </div>
             </div>
             ` : ''}
             
+            ${type === 'nearmiss' ? `
+            <!-- Word Count Distribution -->
             <div class="quality-section">
-                <h4>Missing Fields Analysis</h4>
+                <h4><span class="section-icon">📊</span> Description Word Count Distribution</h4>
+                <div class="word-distribution">
+                    ${Object.entries(metrics.wordAnalysis.distribution).map(([range, count]) => {
+                        const percentage = (count / metrics.totalRecords * 100).toFixed(1);
+                        const barClass = range === '0' ? 'bar-critical' : 
+                                       range === '1-10' ? 'bar-warning' : 
+                                       range === '11-25' ? 'bar-good' : 'bar-excellent';
+                        return `
+                            <div class="distribution-row">
+                                <div class="dist-label">${range} words</div>
+                                <div class="dist-bar-container">
+                                    <div class="dist-bar ${barClass}" style="width: ${percentage}%"></div>
+                                    <span class="dist-value">${count} (${percentage}%)</span>
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            </div>
+            
+            <!-- Word Heat Map -->
+            <div class="quality-section">
+                <h4><span class="section-icon">🔥</span> Most Common Words</h4>
+                <div id="nearMissWordHeatMap" class="word-heatmap-enhanced"></div>
+            </div>
+            ` : `
+            <!-- Missing Fields Chart -->
+            <div class="quality-section">
+                <h4><span class="section-icon">📊</span> Missing Fields Analysis</h4>
                 <div class="missing-fields-chart">
                     <canvas id="${type}MissingFieldsChart"></canvas>
                 </div>
             </div>
+            `}
             
-            <div class="quality-section">
-                <h4>Data Quality Recommendations</h4>
+            <!-- Recommendations -->
+            <div class="quality-section recommendations-section">
+                <h4><span class="section-icon">💡</span> Quality Improvement Recommendations</h4>
                 <div class="recommendations-list">
                     ${metrics.recommendations.map(rec => `
                         <div class="recommendation-item ${rec.type}">
-                            <span class="rec-icon">${rec.type === 'critical' ? '🚨' : '⚠️'}</span>
-                            <span>${rec.text}</span>
+                            <div class="rec-icon">${rec.icon || (rec.type === 'critical' ? '🚨' : '⚠️')}</div>
+                            <div class="rec-content">
+                                <div class="rec-text">${rec.text}</div>
+                                ${rec.type === 'critical' ? 
+                                    '<div class="rec-priority">High Priority</div>' : ''}
+                            </div>
                         </div>
                     `).join('')}
                     ${metrics.recommendations.length === 0 ? 
-                        '<div class="recommendation-item success"><span class="rec-icon">✅</span><span>Data quality is excellent!</span></div>' : ''}
+                        '<div class="recommendation-item success"><div class="rec-icon">🎉</div><div class="rec-content"><div class="rec-text">Excellent data quality! Keep up the good work.</div></div></div>' : ''}
                 </div>
             </div>
-            ${type === 'nearmiss' ? `
-            <div class="quality-section">
-                <h4>Word Count Summary</h4>
-                <p id="nearMissWordCount" style="font-size: 0.9rem; margin-bottom: 1rem;"></p>
-            </div>
-            <div class="quality-section">
-                <h4>Word Heat Map</h4>
-                <div id="nearMissWordHeatMap" class="word-heatmap"></div>
-            </div>
-            ` : ''}
         </div>
     `;
     
-    // Create missing fields chart and update word analysis (if applicable)
+    // Add enhanced CSS styles
+    const styleId = 'quality-enhancement-styles';
+    if (!document.getElementById(styleId)) {
+        const style = document.createElement('style');
+        style.id = styleId;
+        style.textContent = `
+            .quality-score-card-enhanced {
+                background: linear-gradient(135deg, #f5f5f5 0%, #ffffff 100%);
+                border-radius: 16px;
+                padding: 2rem;
+                margin-bottom: 2rem;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+                display: flex;
+                gap: 3rem;
+                align-items: center;
+            }
+            
+            [data-theme="dark"] .quality-score-card-enhanced {
+                background: linear-gradient(135deg, #2d2d2d 0%, #1a1a1a 100%);
+            }
+            
+            .quality-score-visual {
+                position: relative;
+                width: 200px;
+                height: 200px;
+            }
+            
+            .quality-score-circle {
+                width: 180px;
+                height: 180px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                position: absolute;
+                top: 10px;
+                left: 10px;
+                background: white;
+                z-index: 2;
+            }
+            
+            [data-theme="dark"] .quality-score-circle {
+                background: #1a1a1a;
+            }
+            
+            .quality-score-ring {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                z-index: 1;
+            }
+            
+            .quality-score-inner {
+                text-align: center;
+            }
+            
+            .quality-emoji {
+                font-size: 3rem;
+                margin-bottom: 0.5rem;
+            }
+            
+            .quality-score-value {
+                font-size: 2.5rem;
+                font-weight: 700;
+                margin: 0;
+            }
+            
+            .quality-score-circle.excellent { color: #4CAF50; }
+            .quality-score-circle.good { color: #FFC107; }
+            .quality-score-circle.warning { color: #FF9800; }
+            .quality-score-circle.poor { color: #FF5722; }
+            
+            .word-analysis-summary {
+                flex: 1;
+                background: rgba(255, 153, 0, 0.05);
+                border-radius: 12px;
+                padding: 1.5rem;
+                border: 1px solid rgba(255, 153, 0, 0.2);
+            }
+            
+            .word-analysis-summary h4 {
+                margin: 0 0 1rem 0;
+                color: var(--amazon-orange);
+            }
+            
+            .word-stats-grid {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 1rem;
+            }
+            
+            .word-stat {
+                text-align: center;
+            }
+            
+            .word-stat-value {
+                font-size: 1.5rem;
+                font-weight: 700;
+                color: var(--text-primary);
+            }
+            
+            .word-stat-label {
+                font-size: 0.8rem;
+                color: var(--text-secondary);
+                margin-top: 0.25rem;
+            }
+            
+            .quality-metrics-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 1rem;
+                margin-bottom: 2rem;
+            }
+            
+            .quality-metric-card {
+                background: white;
+                border-radius: 12px;
+                padding: 1.5rem;
+                display: flex;
+                align-items: center;
+                gap: 1rem;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+                transition: all 0.3s ease;
+                border: 1px solid transparent;
+            }
+            
+            [data-theme="dark"] .quality-metric-card {
+                background: #2d2d2d;
+            }
+            
+            .quality-metric-card:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+            }
+            
+            .quality-metric-card.has-issue {
+                border-color: var(--danger);
+                background: rgba(255, 87, 34, 0.05);
+            }
+            
+            .metric-icon-large {
+                font-size: 2.5rem;
+            }
+            
+            .metric-content {
+                flex: 1;
+            }
+            
+            .duplicate-section {
+                background: rgba(255, 87, 34, 0.05);
+                border: 1px solid rgba(255, 87, 34, 0.2);
+                border-radius: 12px;
+                padding: 1.5rem;
+                margin: 1.5rem 0;
+            }
+            
+            .section-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 1rem;
+            }
+            
+            .section-header h4 {
+                margin: 0;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                color: var(--danger);
+            }
+            
+            .section-icon {
+                font-size: 1.2rem;
+            }
+            
+            .duplicate-count {
+                background: var(--danger);
+                color: white;
+                padding: 0.25rem 0.75rem;
+                border-radius: 20px;
+                font-size: 0.85rem;
+                font-weight: 600;
+            }
+            
+            .duplicate-list {
+                display: grid;
+                gap: 0.75rem;
+            }
+            
+            .duplicate-item {
+                background: white;
+                border-radius: 8px;
+                padding: 1rem;
+                display: flex;
+                gap: 1rem;
+                align-items: center;
+                border: 1px solid rgba(0,0,0,0.1);
+            }
+            
+            [data-theme="dark"] .duplicate-item {
+                background: #1a1a1a;
+            }
+            
+            .duplicate-number {
+                width: 32px;
+                height: 32px;
+                background: var(--danger);
+                color: white;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: 700;
+                flex-shrink: 0;
+            }
+            
+            .duplicate-content {
+                flex: 1;
+            }
+            
+            .duplicate-key {
+                display: flex;
+                gap: 1rem;
+                margin-bottom: 0.5rem;
+                flex-wrap: wrap;
+            }
+            
+            .dup-field {
+                font-size: 0.85rem;
+                color: var(--text-secondary);
+                display: flex;
+                align-items: center;
+                gap: 0.25rem;
+            }
+            
+            .dup-field i {
+                font-style: normal;
+                opacity: 0.7;
+            }
+            
+            .duplicate-rows {
+                font-size: 0.8rem;
+                color: var(--text-secondary);
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+            
+            .row-badge {
+                background: var(--bg-secondary);
+                padding: 0.15rem 0.5rem;
+                border-radius: 10px;
+                font-weight: 600;
+            }
+            
+            .duplicate-action {
+                margin-left: auto;
+                color: var(--amazon-orange);
+                font-weight: 600;
+                cursor: pointer;
+            }
+            
+            .more-duplicates {
+                text-align: center;
+                color: var(--text-secondary);
+                font-size: 0.85rem;
+                padding: 1rem;
+                border-top: 1px dashed rgba(0,0,0,0.1);
+            }
+            
+            .word-distribution {
+                margin-top: 1rem;
+            }
+            
+            .distribution-row {
+                display: flex;
+                align-items: center;
+                gap: 1rem;
+                margin-bottom: 0.75rem;
+            }
+            
+            .dist-label {
+                width: 80px;
+                font-size: 0.85rem;
+                color: var(--text-secondary);
+            }
+            
+            .dist-bar-container {
+                flex: 1;
+                background: var(--bg-secondary);
+                border-radius: 20px;
+                height: 24px;
+                position: relative;
+                overflow: hidden;
+            }
+            
+            .dist-bar {
+                height: 100%;
+                border-radius: 20px;
+                transition: width 1s ease;
+                position: relative;
+            }
+            
+            .dist-value {
+                position: absolute;
+                right: 10px;
+                top: 50%;
+                transform: translateY(-50%);
+                font-size: 0.75rem;
+                font-weight: 600;
+                color: var(--text-primary);
+            }
+            
+            .bar-critical { background: var(--danger); }
+            .bar-warning { background: var(--warning); }
+            .bar-good { background: #2196F3; }
+            .bar-excellent { background: var(--success); }
+            
+            .word-heatmap-enhanced {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 0.5rem;
+                margin-top: 1rem;
+            }
+            
+            .word-heatmap-enhanced .heatmap-item {
+                padding: 0.5rem 1rem;
+                border-radius: 20px;
+                color: white;
+                font-size: 0.85rem;
+                font-weight: 600;
+                transition: all 0.2s ease;
+                cursor: pointer;
+            }
+            
+            .word-heatmap-enhanced .heatmap-item:hover {
+                transform: scale(1.05);
+                box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            }
+            
+            .recommendations-section {
+                margin-top: 2rem;
+            }
+            
+            .recommendations-list {
+                display: grid;
+                gap: 0.75rem;
+                margin-top: 1rem;
+            }
+            
+            .recommendation-item {
+                display: flex;
+                align-items: flex-start;
+                gap: 1rem;
+                padding: 1rem;
+                border-radius: 8px;
+                background: white;
+                border: 1px solid transparent;
+                transition: all 0.2s ease;
+            }
+            
+            [data-theme="dark"] .recommendation-item {
+                background: #2d2d2d;
+            }
+            
+            .recommendation-item.critical {
+                border-color: var(--critical);
+                background: rgba(183, 28, 28, 0.05);
+            }
+            
+            .recommendation-item.warning {
+                border-color: var(--warning);
+                background: rgba(255, 193, 7, 0.05);
+            }
+            
+            .recommendation-item.success {
+                border-color: var(--success);
+                background: rgba(76, 175, 80, 0.05);
+            }
+            
+            .rec-icon {
+                font-size: 1.5rem;
+                flex-shrink: 0;
+            }
+            
+            .rec-content {
+                flex: 1;
+            }
+            
+            .rec-text {
+                color: var(--text-primary);
+                font-size: 0.9rem;
+                line-height: 1.5;
+            }
+            
+            .rec-priority {
+                margin-top: 0.25rem;
+                font-size: 0.75rem;
+                color: var(--critical);
+                font-weight: 600;
+                text-transform: uppercase;
+            }
+        `;
+        document.head.appendChild(style);
+    }
+    
+    // Update charts and word analysis after a short delay
     setTimeout(() => {
-        const ctx = document.getElementById(`${type}MissingFieldsChart`);
-        if (ctx) {
-            new Chart(ctx.getContext('2d'), {
-                type: 'bar',
-                data: {
-                    labels: Object.keys(metrics.missingFieldsDetails),
-                    datasets: [{
-                        label: 'Missing Records',
-                        data: Object.values(metrics.missingFieldsDetails),
-                        backgroundColor: AMAZON_COLORS.orange,
-                        borderColor: AMAZON_COLORS.darkBlue,
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    ...getChartOptions('bar'),
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'Number of Records'
+        if (type === 'injury') {
+            const ctx = document.getElementById(`${type}MissingFieldsChart`);
+            if (ctx) {
+                new Chart(ctx.getContext('2d'), {
+                    type: 'bar',
+                    data: {
+                        labels: Object.keys(metrics.missingFieldsDetails),
+                        datasets: [{
+                            label: 'Missing Records',
+                            data: Object.values(metrics.missingFieldsDetails),
+                            backgroundColor: AMAZON_COLORS.orange,
+                            borderColor: AMAZON_COLORS.darkBlue,
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        ...getChartOptions('bar'),
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Number of Records'
+                                }
                             }
                         }
                     }
-                }
-            });
+                });
+            }
         }
-        // For near miss quality, update word count and heat map
+        
         if (type === 'nearmiss') {
-            updateNearMissWordAnalysis();
+            updateNearMissWordHeatMap(metrics);
         }
     }, 100);
+}
+
+// Enhanced word heat map function
+function updateNearMissWordHeatMap(metrics) {
+    const words = [];
+    state.nearMiss.filteredData.forEach(row => {
+        ['initial_info_incident_description', 'initial_info_nearmiss_type', 'initial_info_primary_impact'].forEach(field => {
+            const text = row[field];
+            if (text && typeof text === 'string') {
+                text.split(/\s+/).forEach(word => {
+                    const cleaned = word.toLowerCase().replace(/[^a-z0-9]/g, '');
+                    if (cleaned && cleaned.length > 3) words.push(cleaned);
+                });
+            }
+        });
+    });
+    
+    const wordCounts = {};
+    words.forEach(w => {
+        wordCounts[w] = (wordCounts[w] || 0) + 1;
+    });
+    
+    // Filter out common words
+    const commonWords = ['that', 'this', 'with', 'from', 'have', 'been', 'were', 'their'];
+    const topWords = Object.entries(wordCounts)
+        .filter(([word]) => !commonWords.includes(word))
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 20);
+    
+    const container = document.getElementById('nearMissWordHeatMap');
+    if (container) {
+        const maxCount = Math.max(...topWords.map(entry => entry[1]));
+        const minCount = Math.min(...topWords.map(entry => entry[1]));
+        
+        container.innerHTML = topWords.map(([word, count]) => {
+            const intensity = (count - minCount) / (maxCount - minCount);
+            const size = 0.8 + (intensity * 0.6);
+            const colors = [
+                '#FFE0B2', '#FFCC80', '#FFB74D', '#FFA726',
+                '#FF9800', '#FB8C00', '#F57C00', '#EF6C00'
+            ];
+            const colorIndex = Math.floor(intensity * (colors.length - 1));
+            
+            return `<div class="heatmap-item" 
+                style="background: ${colors[colorIndex]}; 
+                       color: ${intensity > 0.5 ? '#fff' : '#333'};
+                       font-size: ${size}rem;"
+                title="${count} occurrences">
+                ${word} (${count})
+            </div>`;
+        }).join('');
+    }
 }
 
 // Standardize severity
