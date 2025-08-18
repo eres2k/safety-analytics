@@ -1172,6 +1172,98 @@
             font-size: 1.2rem;
             margin-right: var(--spacing-xs);
         }
+
+        /* PDF Export Optimierungen */
+        @media print {
+            body {
+                font-family: Arial, sans-serif;
+                line-height: 1.4;
+                color: #333;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+
+            .print-break {
+                page-break-before: always;
+            }
+        }
+
+        /* Status Badge Styles für PDF */
+        .severity-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+
+        .severity-a, .severity-critical {
+            background-color: #B71C1C;
+            color: white;
+        }
+
+        .severity-b, .severity-high {
+            background-color: #FF5722;
+            color: white;
+        }
+
+        .severity-c, .severity-medium {
+            background-color: #FFC107;
+            color: #333;
+        }
+
+        .severity-d, .severity-low {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .export-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 20px 0;
+        }
+
+        .export-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .pdf-btn {
+            background: linear-gradient(135deg, #FF5722 0%, #D32F2F 100%);
+            color: white;
+        }
+
+        .pdf-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 87, 34, 0.3);
+        }
+
+        .export-btn i {
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+
+        .export-btn span {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .export-btn small {
+            font-size: 11px;
+            opacity: 0.8;
+            margin-top: 2px;
+        }
     </style>
 </head>
 <body>
@@ -1193,24 +1285,28 @@
                 </div>
             </div>
             <div class="header-actions">
-                <div class="pdf-export-menu">
-                    <button class="pdf-export-btn" onclick="togglePDFMenu()">
-                        <i class="fas fa-file-pdf"></i> Export Report
+                <div class="export-buttons">
+                    <button onclick="generatePDFReport('injury')" class="export-btn pdf-btn" title="Generate comprehensive injury report with top cases, trends, and analytics">
+                        <i class="fas fa-file-pdf"></i> 
+                        <span>Injury Report PDF</span>
+                        <small>Detailed analysis with critical cases</small>
                     </button>
-                    <div class="pdf-export-dropdown" id="pdfExportDropdown">
-                        <div class="pdf-export-option" onclick="generatePDFReport('injury')">
-                            <i class="fas fa-user-injured"></i>
-                            <span>Injury & Illness Report</span>
-                        </div>
-                        <div class="pdf-export-option" onclick="generatePDFReport('nearMiss')">
-                            <i class="fas fa-exclamation-triangle"></i>
-                            <span>Near Miss Report</span>
-                        </div>
-                        <div class="pdf-export-option" onclick="generatePDFReport('combined')">
-                            <i class="fas fa-chart-line"></i>
-                            <span>Combined Analysis Report</span>
-                        </div>
-                    </div>
+                    <button onclick="generatePDFReport('nearMiss')" class="export-btn pdf-btn" title="Generate near miss report with risk analysis and prevention insights">
+                        <i class="fas fa-file-pdf"></i> 
+                        <span>Near Miss Report PDF</span>
+                        <small>Risk assessment & prevention focus</small>
+                    </button>
+                    <button onclick="generatePDFReport('combined')" class="export-btn pdf-btn" title="Generate combined safety report comparing injuries and near misses">
+                        <i class="fas fa-file-pdf"></i> 
+                        <span>Combined Report PDF</span>
+                        <small>Comprehensive safety overview</small>
+                    </button>
+                    <button onclick="exportToExcel('injury')" class="export-btn excel-btn">
+                        <i class="fas fa-file-excel"></i> Export Injury Data
+                    </button>
+                    <button onclick="exportToExcel('nearMiss')" class="export-btn excel-btn">
+                        <i class="fas fa-file-excel"></i> Export Near Miss Data
+                    </button>
                 </div>
                 <button class="mode-toggle" onclick="toggleTheme()">
                     <span id="themeIcon">🌙</span>

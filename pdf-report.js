@@ -1,973 +1,563 @@
-// ========== ENHANCED PDF REPORT GENERATION ==========
+// Additional helper functions for data analysis
+function calculateTrendData(data, dateField, periodDays = 30) {
+    const now = new Date();
+    const periodStart = new Date(now.getTime() - (periodDays * 24 * 60 * 60 * 1000));
 
-// PDF Report Configuration
-const PDF_CONFIG = {
-    margins: {
-        top: 40,
-        bottom: 30,
-        left: 20,
-        right: 20
-    },
-    colors: {
-        primary: '#FF9900',
-        secondary: '#232F3E',
-        success: '#4CAF50',
-        warning: '#FFC107',
-        danger: '#FF5722',
-        critical: '#B71C1C',
-        lightGray: '#F5F5F5',
-        darkGray: '#666666'
-    },
-    fonts: {
-        title: 24,
-        subtitle: 18,
-        heading: 14,
-        normal: 11,
-        small: 9
-    }
-};
+    const currentPeriod = data.filter(d => {
+        const date = new Date(d[dateField]);
+        return date >= periodStart;
+    }).length;
 
-// Enhanced PDF Generation Function
-function generatePDFReport(type) {
-    const doc = new jsPDF({
-        orientation: 'portrait',
-        unit: 'mm',
-        format: 'a4'
-    });
+    const previousStart = new Date(periodStart.getTime() - (periodDays * 24 * 60 * 60 * 1000));
+    const previousPeriod = data.filter(d => {
+        const date = new Date(d[dateField]);
+        return date >= previousStart && date < periodStart;
+    }).length;
 
-    // Set document properties
-    doc.setProperties({
-        title: `Safety Analytics Report - ${type.charAt(0).toUpperCase() + type.slice(1)}`,
-        author: 'Safety Analytics Platform',
-        creator: 'Amazon WHS Austria'
-    });
+    if (previousPeriod === 0) return 'N/A';
 
-    // Generate report based on type
-    switch(type) {
-        case 'injury':
-            generateInjuryPDFReport(doc);
-            break;
-        case 'nearMiss':
-            generateNearMissPDFReport(doc);
-            break;
-        case 'combined':
-            generateCombinedPDFReport(doc);
-            break;
-    }
-
-    // Save the PDF
-    const filename = `safety_report_${type}_${new Date().toISOString().split('T')[0]}.pdf`;
-    doc.save(filename);
+    const change = ((currentPeriod - previousPeriod) / previousPeriod * 100).toFixed(0);
+    return change > 0 ? `+${change}%` : `${change}%`;
 }
 
-// Injury Report Generation
-function generateInjuryPDFReport(doc) {
-    let yPos = PDF_CONFIG.margins.top;
-    
-    // Header
-    yPos = addReportHeader(doc, 'Injury & Illness Report', yPos);
-    
-    // Executive Summary
-    yPos = addExecutiveSummary(doc, yPos, 'injury');
-    
-    // KPI Dashboard
-    yPos = addKPIDashboard(doc, yPos, 'injury');
-    
-    // Charts Section
-    doc.addPage();
-    yPos = PDF_CONFIG.margins.top;
-    yPos = addChartsSection(doc, yPos, 'injury');
-    
-    // Detailed Incidents
-    doc.addPage();
-    yPos = PDF_CONFIG.margins.top;
-    yPos = addDetailedIncidents(doc, yPos, 'injury');
-    
-    // Risk Analysis
-    doc.addPage();
-    yPos = PDF_CONFIG.margins.top;
-    yPos = addRiskAnalysis(doc, yPos, 'injury');
-    
-    // Recommendations
-    yPos = addRecommendations(doc, yPos, 'injury');
-    
-    // Footer on all pages
-    addFooterToAllPages(doc);
-}
-
-// Near Miss Report Generation
-function generateNearMissPDFReport(doc) {
-    let yPos = PDF_CONFIG.margins.top;
-    
-    // Header
-    yPos = addReportHeader(doc, 'Near Miss Report', yPos);
-    
-    // Executive Summary
-    yPos = addExecutiveSummary(doc, yPos, 'nearMiss');
-    
-    // KPI Dashboard
-    yPos = addKPIDashboard(doc, yPos, 'nearMiss');
-    
-    // Charts Section
-    doc.addPage();
-    yPos = PDF_CONFIG.margins.top;
-    yPos = addChartsSection(doc, yPos, 'nearMiss');
-    
-    // Detailed Incidents
-    doc.addPage();
-    yPos = PDF_CONFIG.margins.top;
-    yPos = addDetailedIncidents(doc, yPos, 'nearMiss');
-    
-    // Risk Matrix
-    doc.addPage();
-    yPos = PDF_CONFIG.margins.top;
-    yPos = addRiskMatrix(doc, yPos, 'nearMiss');
-    
-    // Trending Analysis
-    yPos = addTrendingAnalysis(doc, yPos, 'nearMiss');
-    
-    // Footer on all pages
-    addFooterToAllPages(doc);
-}
-
-// Combined Report Generation
-function generateCombinedPDFReport(doc) {
-    let yPos = PDF_CONFIG.margins.top;
-    
-    // Header
-    yPos = addReportHeader(doc, 'Combined Safety Report', yPos);
-    
-    // Executive Summary
-    yPos = addExecutiveSummary(doc, yPos, 'combined');
-    
-    // Combined KPIs
-    yPos = addCombinedKPIs(doc, yPos);
-    
-    // Comparative Analysis
-    doc.addPage();
-    yPos = PDF_CONFIG.margins.top;
-    yPos = addComparativeAnalysis(doc, yPos);
-    
-    // Top Incidents from Both Categories
-    doc.addPage();
-    yPos = PDF_CONFIG.margins.top;
-    yPos = addTopIncidentsCombined(doc, yPos);
-    
-    // Combined Risk Assessment
-    doc.addPage();
-    yPos = PDF_CONFIG.margins.top;
-    yPos = addCombinedRiskAssessment(doc, yPos);
-    
-    // Action Items and Recommendations
-    yPos = addActionItems(doc, yPos);
-    
-    // Footer on all pages
-    addFooterToAllPages(doc);
-}
-
-// Helper Functions for PDF Generation
-
-function addReportHeader(doc, title, yPos) {
-    // Company Logo/Branding
-    doc.setFillColor(PDF_CONFIG.colors.secondary);
-    doc.rect(0, 0, 210, 30, 'F');
-    
-    // Title
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(PDF_CONFIG.fonts.title);
-    doc.setFont('helvetica', 'bold');
-    doc.text(title, PDF_CONFIG.margins.left, 20);
-    
-    // Date and Site Info
-    doc.setFontSize(PDF_CONFIG.fonts.normal);
-    doc.setFont('helvetica', 'normal');
-    const dateStr = new Date().toLocaleDateString('en-US', { 
-        year: 'numeric', 
-        month: 'long', 
-        day: 'numeric' 
-    });
-    doc.text(`Generated: ${dateStr}`, 210 - PDF_CONFIG.margins.right, 20, { align: 'right' });
-    
-    // Reset text color
-    doc.setTextColor(0, 0, 0);
-    
-    return yPos + 10;
-}
-
-function addExecutiveSummary(doc, yPos, type) {
-    // Section Title
-    doc.setFontSize(PDF_CONFIG.fonts.subtitle);
-    doc.setFont('helvetica', 'bold');
-    doc.setTextColor(PDF_CONFIG.colors.secondary);
-    doc.text('Executive Summary', PDF_CONFIG.margins.left, yPos);
-    yPos += 10;
-    
-    // Summary Box
-    doc.setFillColor(PDF_CONFIG.colors.lightGray);
-    doc.roundedRect(PDF_CONFIG.margins.left, yPos, 170, 40, 3, 3, 'F');
-    
-    // Summary Content
-    doc.setFontSize(PDF_CONFIG.fonts.normal);
-    doc.setFont('helvetica', 'normal');
-    doc.setTextColor(0, 0, 0);
-    
-    let summaryText = '';
+function getIncidentDescription(incident, type) {
     if (type === 'injury') {
-        const data = state.injury.filteredData;
-        const recordableCount = data.filter(d => d.recordable === 1).length;
-        const criticalCount = data.filter(d => d.severity === 'A').length;
-        summaryText = `This report analyzes ${data.length} injury and illness cases. ` +
-                     `${recordableCount} cases were recordable (${((recordableCount/data.length)*100).toFixed(1)}%). ` +
-                     `${criticalCount} cases were critical severity. ` +
-                     `The most affected site is ${getMostAffectedSite(data)} with ${getSiteIncidentCount(data, getMostAffectedSite(data))} incidents.`;
-    } else if (type === 'nearMiss') {
-        const data = state.nearMiss.filteredData;
-        const highRiskCount = data.filter(d => d.risk >= 8).length;
-        const criticalCount = data.filter(d => d.potential_severity === 'A').length;
-        summaryText = `This report analyzes ${data.length} near miss incidents. ` +
-                     `${highRiskCount} incidents were high risk (score ≥ 8). ` +
-                     `${criticalCount} had critical potential severity. ` +
-                     `The average risk score is ${getAverageRiskScore(data).toFixed(2)}.`;
+        const parts = [];
+        if (incident.initial_info_incident_description) {
+            parts.push(incident.initial_info_incident_description);
+        }
+        if (incident.initial_info_principal_body_part) {
+            parts.push(`Affected: ${incident.initial_info_principal_body_part}`);
+        }
+        if (incident.rca_primary_cause) {
+            parts.push(`Cause: ${incident.rca_primary_cause}`);
+        }
+        return parts.join(' | ') || 'No detailed description available';
     } else {
+        const parts = [];
+        if (incident.initial_info_incident_description) {
+            parts.push(incident.initial_info_incident_description);
+        }
+        if (incident.initial_info_location_event) {
+            parts.push(`Location: ${incident.initial_info_location_event}`);
+        }
+        if (incident.initial_info_primary_impact) {
+            parts.push(`Impact: ${incident.initial_info_primary_impact}`);
+        }
+        return parts.join(' | ') || 'No detailed description available';
+    }
+}
+
+function generatePDFReport(type) {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF('p', 'mm', 'a4');
+
+    // Configuration
+    const pageWidth = doc.internal.pageSize.width;
+    const pageHeight = doc.internal.pageSize.height;
+    const margin = 20;
+    const contentWidth = pageWidth - (margin * 2);
+
+    // Colors
+    const colors = {
+        primary: [255, 153, 0],
+        secondary: [35, 47, 62],
+        critical: [183, 28, 28],
+        high: [255, 87, 34],
+        medium: [255, 193, 7],
+        low: [76, 175, 80],
+        lightGray: [245, 245, 245],
+        darkGray: [66, 66, 66],
+        white: [255, 255, 255]
+    };
+
+    // Helper functions
+    const addPageNumber = (pageNum) => {
+        doc.setFontSize(9);
+        doc.setTextColor(...colors.darkGray);
+        doc.text(`Page ${pageNum}`, pageWidth - margin - 15, pageHeight - 10);
+    };
+
+    const addHeader = (title, subtitle) => {
+        doc.setFillColor(...colors.primary);
+        doc.rect(margin, margin, 40, 15, 'F');
+        doc.setFontSize(12);
+        doc.setTextColor(...colors.white);
+        doc.setFont('helvetica', 'bold');
+        doc.text('SAFETY', margin + 20, margin + 9, { align: 'center' });
+
+        doc.setFontSize(24);
+        doc.setTextColor(...colors.secondary);
+        doc.setFont('helvetica', 'bold');
+        doc.text(title, margin + 50, margin + 10);
+
+        doc.setFontSize(12);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(...colors.darkGray);
+        doc.text(subtitle, margin + 50, margin + 18);
+        doc.text(`Generated: ${new Date().toLocaleDateString()}`, pageWidth - margin - 50, margin + 10);
+
+        doc.setDrawColor(...colors.primary);
+        doc.setLineWidth(2);
+        doc.line(margin, margin + 25, pageWidth - margin, margin + 25);
+
+        return margin + 35;
+    };
+
+    const addSection = (y, title) => {
+        doc.setFillColor(...colors.secondary);
+        doc.rect(margin, y, contentWidth, 8, 'F');
+        doc.setFontSize(12);
+        doc.setTextColor(...colors.white);
+        doc.setFont('helvetica', 'bold');
+        doc.text(title, margin + 5, y + 5.5);
+        return y + 12;
+    };
+
+    const addKPICard = (x, y, width, height, title, value, trend, color) => {
+        doc.setFillColor(...colors.lightGray);
+        doc.roundedRect(x, y, width, height, 3, 3, 'F');
+
+        doc.setFillColor(...color);
+        doc.rect(x, y, width, 3, 'F');
+
+        doc.setFontSize(10);
+        doc.setTextColor(...colors.darkGray);
+        doc.setFont('helvetica', 'normal');
+        doc.text(title, x + width/2, y + 8, { align: 'center' });
+
+        doc.setFontSize(20);
+        doc.setTextColor(...colors.secondary);
+        doc.setFont('helvetica', 'bold');
+        doc.text(value.toString(), x + width/2, y + 20, { align: 'center' });
+
+        if (trend) {
+            doc.setFontSize(9);
+            const trendColor = trend.startsWith('+') ? colors.critical : colors.low;
+            doc.setTextColor(...trendColor);
+            doc.text(trend, x + width/2, y + 27, { align: 'center' });
+        }
+    };
+
+    const addIncidentDetail = (y, incident, type) => {
+        const boxHeight = 45;
+
+        doc.setFillColor(...colors.white);
+        doc.setDrawColor(...colors.lightGray[0], colors.lightGray[1], colors.lightGray[2]);
+        doc.roundedRect(margin, y, contentWidth, boxHeight, 3, 3, 'FD');
+
+        const severity = type === 'injury' ? incident.severity : incident.potential_severity;
+        const severityColor = severity === 'A' || severity === 'Critical' ? colors.critical :
+                            severity === 'B' || severity === 'High' ? colors.high :
+                            severity === 'C' || severity === 'Medium' ? colors.medium : colors.low;
+
+        doc.setFillColor(...severityColor);
+        doc.rect(margin, y, 3, boxHeight, 'F');
+
+        doc.setFontSize(11);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(...colors.secondary);
+        const caseId = type === 'injury' ? incident.case_number : incident.incident_id;
+        doc.text(`${type === 'injury' ? 'Case' : 'Incident'}: ${caseId || 'N/A'}`, margin + 8, y + 8);
+
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(...colors.darkGray);
+        const dateStr = type === 'injury' ?
+            new Date(incident.incident_date).toLocaleDateString() :
+            new Date(incident.nearmiss_date).toLocaleDateString();
+        doc.text(`Date: ${dateStr}`, margin + 80, y + 8);
+        doc.text(`Site: ${incident.site || 'Unknown'}`, margin + 130, y + 8);
+
+        doc.setFillColor(...severityColor);
+        doc.roundedRect(pageWidth - margin - 30, y + 3, 25, 8, 2, 2, 'F');
+        doc.setFontSize(9);
+        doc.setTextColor(...colors.white);
+        doc.setFont('helvetica', 'bold');
+        doc.text(severity || 'Unknown', pageWidth - margin - 17.5, y + 8, { align: 'center' });
+
+        doc.setFontSize(9);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(...colors.darkGray);
+
+        if (type === 'injury') {
+            doc.text(`Body Part: ${incident.initial_info_principal_body_part || 'Not specified'}`, margin + 8, y + 16);
+            doc.text(`Root Cause: ${incident.rca_primary_cause || 'Under investigation'}`, margin + 8, y + 22);
+
+            const description = incident.initial_info_incident_description || 'No description available';
+            const lines = doc.splitTextToSize(description, contentWidth - 16);
+            doc.text(lines.slice(0, 2), margin + 8, y + 30);
+
+            if (incident.recordable === 1) {
+                doc.setFillColor(...colors.critical);
+                doc.circle(margin + 8, y + 40, 2, 'F');
+                doc.text('Recordable', margin + 12, y + 41);
+            }
+            if (incident.total_dafw_days > 0) {
+                doc.text(`DAFW: ${incident.total_dafw_days} days`, margin + 50, y + 41);
+            }
+        } else {
+            doc.text(`Location: ${incident.initial_info_location_event || 'Not specified'}`, margin + 8, y + 16);
+            doc.text(`Primary Impact: ${incident.initial_info_primary_impact || 'Not specified'}`, margin + 8, y + 22);
+
+            const description = incident.initial_info_incident_description || 'No description available';
+            const lines = doc.splitTextToSize(description, contentWidth - 16);
+            doc.text(lines.slice(0, 2), margin + 8, y + 30);
+
+            if (incident.risk !== undefined) {
+                const riskScore = parseFloat(incident.risk).toFixed(1);
+                doc.text(`Risk Score: ${riskScore}`, margin + 8, y + 41);
+            }
+        }
+
+        return y + boxHeight + 5;
+    };
+
+    const addChart = (y, title, data, chartType = 'bar') => {
+        doc.setFontSize(11);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(...colors.secondary);
+        doc.text(title, margin, y);
+
+        y += 8;
+
+        const sortedData = Object.entries(data)
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 5);
+
+        const maxValue = Math.max(...sortedData.map(d => d[1]));
+
+        sortedData.forEach(([label, value], index) => {
+            doc.setFontSize(9);
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(...colors.darkGray);
+            doc.text(label.substring(0, 20), margin, y);
+
+            const barWidth = (value / maxValue) * (contentWidth - 80);
+            const barColor = index === 0 ? colors.critical :
+                           index === 1 ? colors.high :
+                           index === 2 ? colors.medium : colors.low;
+
+            doc.setFillColor(...barColor);
+            doc.rect(margin + 60, y - 4, barWidth, 6, 'F');
+
+            doc.text(value.toString(), margin + 65 + barWidth, y);
+
+            y += 8;
+        });
+
+        return y + 5;
+    };
+
+    const selectTopIncidents = (data, type) => {
+        const sorted = [...data].sort((a, b) => {
+            const severityOrder = { 'A': 4, 'Critical': 4, 'B': 3, 'High': 3,
+                                  'C': 2, 'Medium': 2, 'D': 1, 'Low': 1 };
+            const severityA = type === 'injury' ? a.severity : a.potential_severity;
+            const severityB = type === 'injury' ? b.severity : b.potential_severity;
+
+            const sevDiff = (severityOrder[severityB] || 0) - (severityOrder[severityA] || 0);
+            if (sevDiff !== 0) return sevDiff;
+
+            const dateA = new Date(type === 'injury' ? a.incident_date : a.nearmiss_date);
+            const dateB = new Date(type === 'injury' ? b.incident_date : b.nearmiss_date);
+            return dateB - dateA;
+        });
+
+        const selected = [];
+        const severities = new Set();
+
+        for (const incident of sorted) {
+            if (selected.length >= 3) break;
+
+            const severity = type === 'injury' ? incident.severity : incident.potential_severity;
+            if (!severities.has(severity) || selected.length < 3) {
+                selected.push(incident);
+                severities.add(severity);
+            }
+        }
+
+        return selected;
+    };
+
+    let yPosition = 0;
+    let pageNumber = 1;
+
+    if (type === 'injury') {
+        yPosition = addHeader('Injury & Illness Report', 'Workplace Health & Safety Analysis');
+
+        yPosition = addSection(yPosition, 'EXECUTIVE SUMMARY');
+
+        const injuryData = state.injury.filteredData;
+        const recordableCount = injuryData.filter(d => d.recordable === 1).length;
+        const totalDAFW = injuryData.reduce((sum, d) => sum + (parseInt(d.total_dafw_days) || 0), 0);
+        const avgDAFW = recordableCount > 0 ? (totalDAFW / recordableCount).toFixed(1) : '0';
+
+        const kpiY = yPosition;
+        const kpiWidth = 35;
+        const kpiHeight = 30;
+        const kpiSpacing = 7;
+
+        addKPICard(margin, kpiY, kpiWidth, kpiHeight, 'Total Cases',
+                  injuryData.length, null, colors.primary);
+
+        addKPICard(margin + kpiWidth + kpiSpacing, kpiY, kpiWidth, kpiHeight, 'Recordable',
+                  recordableCount, `${((recordableCount/injuryData.length)*100).toFixed(0)}%`, colors.critical);
+
+        addKPICard(margin + (kpiWidth + kpiSpacing) * 2, kpiY, kpiWidth, kpiHeight, 'Total DAFW',
+                  totalDAFW, `Avg: ${avgDAFW}`, colors.high);
+
+        addKPICard(margin + (kpiWidth + kpiSpacing) * 3, kpiY, kpiWidth, kpiHeight, 'Severity A',
+                  injuryData.filter(d => d.severity === 'A').length, null, colors.critical);
+
+        yPosition = kpiY + kpiHeight + 15;
+
+        yPosition = addSection(yPosition, 'CRITICAL INCIDENTS - TOP 3');
+
+        const topIncidents = selectTopIncidents(injuryData, 'injury');
+        topIncidents.forEach(incident => {
+            if (yPosition > pageHeight - 60) {
+                doc.addPage();
+                pageNumber++;
+                addPageNumber(pageNumber);
+                yPosition = margin;
+            }
+            yPosition = addIncidentDetail(yPosition, incident, 'injury');
+        });
+
+        doc.addPage();
+        pageNumber++;
+        addPageNumber(pageNumber);
+        yPosition = margin;
+
+        yPosition = addSection(yPosition, 'SEVERITY ANALYSIS');
+
+        const severityDist = {};
+        injuryData.forEach(d => {
+            severityDist[d.severity || 'Unknown'] = (severityDist[d.severity || 'Unknown'] || 0) + 1;
+        });
+        yPosition = addChart(yPosition + 5, 'Incidents by Severity Level', severityDist);
+
+        yPosition = addSection(yPosition + 10, 'BODY PARTS AFFECTED');
+        const bodyParts = {};
+        injuryData.forEach(d => {
+            const part = d.initial_info_principal_body_part || 'Not specified';
+            bodyParts[part] = (bodyParts[part] || 0) + 1;
+        });
+        yPosition = addChart(yPosition + 5, 'Top 5 Affected Body Parts', bodyParts);
+
+        if (yPosition > pageHeight - 80) {
+            doc.addPage();
+            pageNumber++;
+            addPageNumber(pageNumber);
+            yPosition = margin;
+        }
+
+        yPosition = addSection(yPosition + 10, 'SITE ANALYSIS');
+        const siteDist = {};
+        injuryData.forEach(d => {
+            siteDist[d.site || 'Unknown'] = (siteDist[d.site || 'Unknown'] || 0) + 1;
+        });
+        yPosition = addChart(yPosition + 5, 'Incidents by Site', siteDist);
+
+    } else if (type === 'nearMiss') {
+        yPosition = addHeader('Near Miss Report', 'Proactive Safety Management Analysis');
+
+        yPosition = addSection(yPosition, 'EXECUTIVE SUMMARY');
+
+        const nearMissData = state.nearMiss.filteredData;
+        const criticalCount = nearMissData.filter(d =>
+            d.potential_severity === 'A' || d.potential_severity === 'Critical'
+        ).length;
+        const avgRiskScore = (nearMissData.reduce((sum, d) =>
+            sum + (parseFloat(d.risk) || 0), 0) / nearMissData.length).toFixed(2);
+
+        const kpiY = yPosition;
+        const kpiWidth = 35;
+        const kpiHeight = 30;
+        const kpiSpacing = 7;
+
+        addKPICard(margin, kpiY, kpiWidth, kpiHeight, 'Total Near Misses',
+                  nearMissData.length, null, colors.primary);
+
+        addKPICard(margin + kpiWidth + kpiSpacing, kpiY, kpiWidth, kpiHeight, 'Critical Severity',
+                  criticalCount, `${((criticalCount/nearMissData.length)*100).toFixed(0)}%`, colors.critical);
+
+        addKPICard(margin + (kpiWidth + kpiSpacing) * 2, kpiY, kpiWidth, kpiHeight, 'Avg Risk Score',
+                  avgRiskScore, null, colors.high);
+
+        addKPICard(margin + (kpiWidth + kpiSpacing) * 3, kpiY, kpiWidth, kpiHeight, 'High Risk',
+                  nearMissData.filter(d => parseFloat(d.risk) >= 7).length, null, colors.critical);
+
+        yPosition = kpiY + kpiHeight + 15;
+
+        yPosition = addSection(yPosition, 'HIGH RISK NEAR MISSES - TOP 3');
+
+        const topNearMisses = selectTopIncidents(nearMissData, 'nearMiss');
+        topNearMisses.forEach(incident => {
+            if (yPosition > pageHeight - 60) {
+                doc.addPage();
+                pageNumber++;
+                addPageNumber(pageNumber);
+                yPosition = margin;
+            }
+            yPosition = addIncidentDetail(yPosition, incident, 'nearMiss');
+        });
+
+        doc.addPage();
+        pageNumber++;
+        addPageNumber(pageNumber);
+        yPosition = margin;
+
+        yPosition = addSection(yPosition, 'RISK ANALYSIS');
+
+        const potSeverityDist = {};
+        nearMissData.forEach(d => {
+            potSeverityDist[d.potential_severity || 'Unknown'] =
+                (potSeverityDist[d.potential_severity || 'Unknown'] || 0) + 1;
+        });
+        yPosition = addChart(yPosition + 5, 'Near Misses by Potential Severity', potSeverityDist);
+
+        yPosition = addSection(yPosition + 10, 'LOCATION ANALYSIS');
+        const locations = {};
+        nearMissData.forEach(d => {
+            const loc = d.initial_info_location_event || 'Not specified';
+            locations[loc] = (locations[loc] || 0) + 1;
+        });
+        yPosition = addChart(yPosition + 5, 'Top 5 Locations', locations);
+
+        if (yPosition > pageHeight - 80) {
+            doc.addPage();
+            pageNumber++;
+            addPageNumber(pageNumber);
+            yPosition = margin;
+        }
+
+        yPosition = addSection(yPosition + 10, 'PRIMARY IMPACT ANALYSIS');
+        const impacts = {};
+        nearMissData.forEach(d => {
+            const impact = d.initial_info_primary_impact || 'Not specified';
+            impacts[impact] = (impacts[impact] || 0) + 1;
+        });
+        yPosition = addChart(yPosition + 5, 'Primary Impact Types', impacts);
+
+    } else if (type === 'combined') {
+        yPosition = addHeader('Combined Safety Report', 'Comprehensive Health & Safety Analysis');
+
+        yPosition = addSection(yPosition, 'EXECUTIVE SUMMARY');
+
         const injuryData = state.injury.filteredData;
         const nearMissData = state.nearMiss.filteredData;
-        summaryText = `Combined analysis of ${injuryData.length} injuries and ${nearMissData.length} near misses. ` +
-                     `Total safety incidents: ${injuryData.length + nearMissData.length}. ` +
-                     `The proactive reporting ratio (Near Miss:Injury) is ${(nearMissData.length/injuryData.length).toFixed(2)}:1.`;
-    }
-    
-    const lines = doc.splitTextToSize(summaryText, 160);
-    doc.text(lines, PDF_CONFIG.margins.left + 5, yPos + 8);
-    
-    return yPos + 50;
-}
+        const totalIncidents = injuryData.length + nearMissData.length;
+        const recordableCount = injuryData.filter(d => d.recordable === 1).length;
+        const criticalNearMiss = nearMissData.filter(d =>
+            d.potential_severity === 'A' || d.potential_severity === 'Critical'
+        ).length;
 
-function addKPIDashboard(doc, yPos, type) {
-    // Section Title
-    doc.setFontSize(PDF_CONFIG.fonts.subtitle);
-    doc.setFont('helvetica', 'bold');
-    doc.setTextColor(PDF_CONFIG.colors.secondary);
-    doc.text('Key Performance Indicators', PDF_CONFIG.margins.left, yPos);
-    yPos += 10;
-    
-    // KPI Cards
-    const kpiData = calculateKPIs(type);
-    const cardWidth = 40;
-    const cardHeight = 25;
-    const spacing = 2;
-    let xPos = PDF_CONFIG.margins.left;
-    
-    kpiData.forEach((kpi, index) => {
-        if (index > 0 && index % 4 === 0) {
-            yPos += cardHeight + spacing;
-            xPos = PDF_CONFIG.margins.left;
-        }
-        
-        // Card Background
-        doc.setFillColor(getKPIColor(kpi.status));
-        doc.roundedRect(xPos, yPos, cardWidth, cardHeight, 2, 2, 'F');
-        
-        // KPI Value
-        doc.setTextColor(255, 255, 255);
-        doc.setFontSize(PDF_CONFIG.fonts.heading);
+        const kpiY = yPosition;
+        const kpiWidth = 42;
+        const kpiHeight = 30;
+        const kpiSpacing = 5;
+
+        addKPICard(margin, kpiY, kpiWidth, kpiHeight, 'Total Events',
+                  totalIncidents, null, colors.primary);
+
+        addKPICard(margin + kpiWidth + kpiSpacing, kpiY, kpiWidth, kpiHeight, 'Injuries',
+                  injuryData.length, `${recordableCount} recordable`, colors.high);
+
+        addKPICard(margin + (kpiWidth + kpiSpacing) * 2, kpiY, kpiWidth, kpiHeight, 'Near Misses',
+                  nearMissData.length, `${criticalNearMiss} critical`, colors.medium);
+
+        addKPICard(margin + (kpiWidth + kpiSpacing) * 3, kpiY, kpiWidth, kpiHeight, 'Ratio',
+                  nearMissData.length > 0 ? (injuryData.length / nearMissData.length).toFixed(2) : 'N/A',
+                  'Injury:NM', colors.secondary);
+
+        yPosition = kpiY + kpiHeight + 15;
+
+        yPosition = addSection(yPosition, 'CRITICAL EVENTS SUMMARY');
+
+        doc.setFontSize(11);
         doc.setFont('helvetica', 'bold');
-        doc.text(kpi.value, xPos + cardWidth/2, yPos + 10, { align: 'center' });
-        
-        // KPI Label
-        doc.setFontSize(PDF_CONFIG.fonts.small);
-        doc.setFont('helvetica', 'normal');
-        doc.text(kpi.label, xPos + cardWidth/2, yPos + 18, { align: 'center' });
-        
-        xPos += cardWidth + spacing;
-    });
-    
-    doc.setTextColor(0, 0, 0);
-    return yPos + cardHeight + 15;
-}
+        doc.setTextColor(...colors.critical);
+        doc.text('Most Severe Injuries:', margin, yPosition + 5);
+        yPosition += 10;
 
-function addChartsSection(doc, yPos, type) {
-    // Section Title
-    doc.setFontSize(PDF_CONFIG.fonts.subtitle);
-    doc.setFont('helvetica', 'bold');
-    doc.setTextColor(PDF_CONFIG.colors.secondary);
-    doc.text('Data Visualization', PDF_CONFIG.margins.left, yPos);
-    yPos += 10;
-    
-    // Create temporary canvas for charts
-    const tempCanvas = document.createElement('canvas');
-    tempCanvas.width = 400;
-    tempCanvas.height = 300;
-    const ctx = tempCanvas.getContext('2d');
-    
-    // Generate and add charts
-    const charts = generatePDFCharts(type, ctx);
-    
-    // Add charts to PDF (2x2 grid)
-    const chartWidth = 85;
-    const chartHeight = 60;
-    
-    charts.forEach((chartData, index) => {
-        const row = Math.floor(index / 2);
-        const col = index % 2;
-        const xPos = PDF_CONFIG.margins.left + (col * (chartWidth + 10));
-        const chartYPos = yPos + (row * (chartHeight + 20));
-        
-        // Chart Title
-        doc.setFontSize(PDF_CONFIG.fonts.normal);
-        doc.setFont('helvetica', 'bold');
-        doc.text(chartData.title, xPos + chartWidth/2, chartYPos, { align: 'center' });
-        
-        // Chart Image (placeholder - in real implementation, convert chart to image)
-        doc.setFillColor(PDF_CONFIG.colors.lightGray);
-        doc.rect(xPos, chartYPos + 3, chartWidth, chartHeight, 'F');
-        
-        // Add chart description
-        doc.setFontSize(PDF_CONFIG.fonts.small);
-        doc.setFont('helvetica', 'normal');
-        doc.text(chartData.description, xPos + chartWidth/2, chartYPos + chartHeight + 8, { align: 'center' });
-    });
-    
-    return yPos + 150;
-}
-
-function addDetailedIncidents(doc, yPos, type) {
-    // Section Title
-    doc.setFontSize(PDF_CONFIG.fonts.subtitle);
-    doc.setFont('helvetica', 'bold');
-    doc.setTextColor(PDF_CONFIG.colors.secondary);
-    doc.text('Detailed Incident Analysis', PDF_CONFIG.margins.left, yPos);
-    yPos += 10;
-    
-    // Get top 3 incidents based on intelligent selection
-    const incidents = selectTopIncidents(type, 3);
-    
-    incidents.forEach((incident, index) => {
-        // Incident Header
-        doc.setFillColor(PDF_CONFIG.colors.secondary);
-        doc.rect(PDF_CONFIG.margins.left, yPos, 170, 8, 'F');
-        
-        doc.setTextColor(255, 255, 255);
-        doc.setFontSize(PDF_CONFIG.fonts.normal);
-        doc.setFont('helvetica', 'bold');
-        
-        const headerText = type === 'injury' 
-            ? `Case #${incident.case_number} - ${incident.incident_date}`
-            : `Incident #${incident.incident_id} - ${incident.nearmiss_date}`;
-        
-        doc.text(headerText, PDF_CONFIG.margins.left + 2, yPos + 5);
-        yPos += 10;
-        
-        // Incident Details Box
-        doc.setTextColor(0, 0, 0);
-        doc.setFillColor(PDF_CONFIG.colors.lightGray);
-        doc.rect(PDF_CONFIG.margins.left, yPos, 170, 45, 'F');
-        
-        // Details Content
-        doc.setFontSize(PDF_CONFIG.fonts.small);
-        doc.setFont('helvetica', 'normal');
-        
-        let detailsY = yPos + 5;
-        
-        // Site and Severity
-        doc.setFont('helvetica', 'bold');
-        doc.text('Site:', PDF_CONFIG.margins.left + 2, detailsY);
-        doc.setFont('helvetica', 'normal');
-        doc.text(incident.site || 'Unknown', PDF_CONFIG.margins.left + 15, detailsY);
-        
-        doc.setFont('helvetica', 'bold');
-        doc.text('Severity:', PDF_CONFIG.margins.left + 60, detailsY);
-        doc.setFont('helvetica', 'normal');
-        const severity = type === 'injury' ? incident.severity : incident.potential_severity;
-        doc.text(severity || 'Unknown', PDF_CONFIG.margins.left + 80, detailsY);
-        
-        // Risk Score for Near Miss
-        if (type === 'nearMiss') {
-            doc.setFont('helvetica', 'bold');
-            doc.text('Risk Score:', PDF_CONFIG.margins.left + 110, detailsY);
-            doc.setFont('helvetica', 'normal');
-            doc.text((incident.risk || 0).toFixed(2), PDF_CONFIG.margins.left + 135, detailsY);
-        }
-        
-        detailsY += 7;
-        
-        // Description
-        doc.setFont('helvetica', 'bold');
-        doc.text('Description:', PDF_CONFIG.margins.left + 2, detailsY);
-        detailsY += 5;
-        
-        doc.setFont('helvetica', 'normal');
-        const description = incident.initial_info_incident_description || 'No description available';
-        const descLines = doc.splitTextToSize(description, 165);
-        doc.text(descLines.slice(0, 3), PDF_CONFIG.margins.left + 2, detailsY);
-        
-        detailsY += (descLines.length > 3 ? 15 : descLines.length * 5);
-        
-        // Root Cause / Risk Assessment
-        if (type === 'injury' && incident.rca_primary_cause) {
-            doc.setFont('helvetica', 'bold');
-            doc.text('Root Cause:', PDF_CONFIG.margins.left + 2, detailsY);
-            doc.setFont('helvetica', 'normal');
-            doc.text(incident.rca_primary_cause, PDF_CONFIG.margins.left + 25, detailsY);
-        } else if (type === 'nearMiss') {
-            doc.setFont('helvetica', 'bold');
-            doc.text('Risk Category:', PDF_CONFIG.margins.left + 2, detailsY);
-            doc.setFont('helvetica', 'normal');
-            doc.text(incident.initial_info_risk_assessment_category || 'Not specified', PDF_CONFIG.margins.left + 30, detailsY);
-        }
-        
-        yPos += 50;
-        
-        // Add spacing between incidents
-        if (index < incidents.length - 1) {
-            yPos += 5;
-        }
-        
-        // Check if we need a new page
-        if (yPos > 250 && index < incidents.length - 1) {
-            doc.addPage();
-            yPos = PDF_CONFIG.margins.top;
-        }
-    });
-    
-    return yPos + 10;
-}
-
-function addRiskAnalysis(doc, yPos, type) {
-    // Check if we need a new page
-    if (yPos > 200) {
-        doc.addPage();
-        yPos = PDF_CONFIG.margins.top;
-    }
-    
-    // Section Title
-    doc.setFontSize(PDF_CONFIG.fonts.subtitle);
-    doc.setFont('helvetica', 'bold');
-    doc.setTextColor(PDF_CONFIG.colors.secondary);
-    doc.text('Risk Analysis & Trends', PDF_CONFIG.margins.left, yPos);
-    yPos += 10;
-    
-    // Risk Summary
-    const riskData = analyzeRiskData(type);
-    
-    // Risk Categories Table
-    doc.setFontSize(PDF_CONFIG.fonts.normal);
-    doc.setFont('helvetica', 'bold');
-    doc.text('Risk Distribution by Category:', PDF_CONFIG.margins.left, yPos);
-    yPos += 7;
-    
-    // Table Header
-    doc.setFillColor(PDF_CONFIG.colors.secondary);
-    doc.rect(PDF_CONFIG.margins.left, yPos, 170, 8, 'F');
-    
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(PDF_CONFIG.fonts.small);
-    doc.text('Category', PDF_CONFIG.margins.left + 2, yPos + 5);
-    doc.text('Count', PDF_CONFIG.margins.left + 80, yPos + 5);
-    doc.text('Percentage', PDF_CONFIG.margins.left + 120, yPos + 5);
-    
-    yPos += 10;
-    
-    // Table Rows
-    doc.setTextColor(0, 0, 0);
-    doc.setFont('helvetica', 'normal');
-    
-    riskData.categories.forEach((category, index) => {
-        if (index % 2 === 0) {
-            doc.setFillColor(PDF_CONFIG.colors.lightGray);
-            doc.rect(PDF_CONFIG.margins.left, yPos - 2, 170, 7, 'F');
-        }
-        
-        doc.text(category.name, PDF_CONFIG.margins.left + 2, yPos + 3);
-        doc.text(category.count.toString(), PDF_CONFIG.margins.left + 80, yPos + 3);
-        doc.text(`${category.percentage}%`, PDF_CONFIG.margins.left + 120, yPos + 3);
-        
-        yPos += 7;
-    });
-    
-    return yPos + 10;
-}
-
-function addRecommendations(doc, yPos, type) {
-    // Check if we need a new page
-    if (yPos > 220) {
-        doc.addPage();
-        yPos = PDF_CONFIG.margins.top;
-    }
-    
-    // Section Title
-    doc.setFontSize(PDF_CONFIG.fonts.subtitle);
-    doc.setFont('helvetica', 'bold');
-    doc.setTextColor(PDF_CONFIG.colors.secondary);
-    doc.text('Recommendations', PDF_CONFIG.margins.left, yPos);
-    yPos += 10;
-    
-    // Generate recommendations based on data analysis
-    const recommendations = generateRecommendations(type);
-    
-    doc.setFontSize(PDF_CONFIG.fonts.normal);
-    doc.setFont('helvetica', 'normal');
-    doc.setTextColor(0, 0, 0);
-    
-    recommendations.forEach((rec, index) => {
-        // Recommendation number
-        doc.setFont('helvetica', 'bold');
-        doc.text(`${index + 1}.`, PDF_CONFIG.margins.left, yPos);
-        
-        // Recommendation text
-        doc.setFont('helvetica', 'normal');
-        const recLines = doc.splitTextToSize(rec, 160);
-        doc.text(recLines, PDF_CONFIG.margins.left + 8, yPos);
-        
-        yPos += recLines.length * 5 + 3;
-    });
-    
-    return yPos;
-}
-
-// Additional Helper Functions
-
-function selectTopIncidents(type, count) {
-    const data = type === 'injury' ? state.injury.filteredData : state.nearMiss.filteredData;
-    
-    // Intelligent selection logic
-    // Priority: 1. Severity, 2. Recency, 3. Completeness of data, 4. Site diversity
-    
-    const scored = data.map(incident => {
-        let score = 0;
-        
-        // Severity score (0-10)
-        const severity = type === 'injury' ? incident.severity : incident.potential_severity;
-        score += severity === 'A' ? 10 : severity === 'B' ? 7 : severity === 'C' ? 4 : 1;
-        
-        // Recency score (0-5)
-        const dateField = type === 'injury' ? 'incident_date' : 'nearmiss_date';
-        const daysSince = (new Date() - new Date(incident[dateField])) / (1000 * 60 * 60 * 24);
-        score += daysSince < 7 ? 5 : daysSince < 30 ? 3 : daysSince < 90 ? 1 : 0;
-        
-        // Data completeness score (0-5)
-        const hasDescription = incident.initial_info_incident_description ? 2 : 0;
-        const hasRootCause = type === 'injury' && incident.rca_primary_cause ? 2 : 0;
-        const hasRiskAssessment = type === 'nearMiss' && incident.initial_info_risk_assessment_category ? 2 : 0;
-        score += hasDescription + hasRootCause + hasRiskAssessment;
-        
-        // Risk score for near misses (0-5)
-        if (type === 'nearMiss' && incident.risk) {
-            score += (incident.risk / 10) * 5;
-        }
-        
-        return { ...incident, selectionScore: score };
-    });
-    
-    // Sort by score and select top incidents
-    scored.sort((a, b) => b.selectionScore - a.selectionScore);
-    
-    // Ensure site diversity
-    const selected = [];
-    const sitesIncluded = new Set();
-    
-    for (const incident of scored) {
-        if (selected.length >= count) break;
-        
-        // Prioritize different sites for diversity
-        if (selected.length < count / 2 || !sitesIncluded.has(incident.site)) {
-            selected.push(incident);
-            sitesIncluded.add(incident.site);
-        }
-    }
-    
-    // Fill remaining slots if needed
-    while (selected.length < count && selected.length < scored.length) {
-        const nextIncident = scored[selected.length];
-        if (!selected.includes(nextIncident)) {
-            selected.push(nextIncident);
-        }
-    }
-    
-    return selected;
-}
-
-function calculateKPIs(type) {
-    const baselineHours = 200000; // Standard baseline
-    
-    if (type === 'injury') {
-        const data = state.injury.filteredData;
-        const recordable = data.filter(d => d.recordable === 1).length;
-        const lostTime = data.filter(d => d.total_dafw_days > 0).length;
-        const totalDaysLost = data.reduce((sum, d) => sum + (d.total_dafw_days || 0), 0);
-        
-        return [
-            {
-                label: 'TRIR',
-                value: ((recordable / baselineHours) * 200000).toFixed(2),
-                status: recordable === 0 ? 'good' : recordable < 2 ? 'warning' : 'critical'
-            },
-            {
-                label: 'LTIR',
-                value: ((lostTime / baselineHours) * 200000).toFixed(2),
-                status: lostTime === 0 ? 'good' : lostTime < 2 ? 'warning' : 'critical'
-            },
-            {
-                label: 'Total Cases',
-                value: data.length.toString(),
-                status: data.length < 5 ? 'good' : data.length < 10 ? 'warning' : 'critical'
-            },
-            {
-                label: 'Days Lost',
-                value: totalDaysLost.toString(),
-                status: totalDaysLost === 0 ? 'good' : totalDaysLost < 30 ? 'warning' : 'critical'
+        const topInjuries = selectTopIncidents(injuryData, 'injury').slice(0, 2);
+        topInjuries.forEach(incident => {
+            if (yPosition > pageHeight - 50) {
+                doc.addPage();
+                pageNumber++;
+                addPageNumber(pageNumber);
+                yPosition = margin;
             }
-        ];
-    } else if (type === 'nearMiss') {
-        const data = state.nearMiss.filteredData;
-        const highRisk = data.filter(d => d.risk >= 8).length;
-        const avgRisk = data.length > 0 ? data.reduce((sum, d) => sum + (d.risk || 0), 0) / data.length : 0;
-        
-        return [
-            {
-                label: 'NMFR',
-                value: ((data.length / baselineHours) * 200000).toFixed(2),
-                status: data.length > 10 ? 'good' : data.length > 5 ? 'warning' : 'critical'
-            },
-            {
-                label: 'High Risk',
-                value: highRisk.toString(),
-                status: highRisk === 0 ? 'good' : highRisk < 3 ? 'warning' : 'critical'
-            },
-            {
-                label: 'Avg Risk',
-                value: avgRisk.toFixed(2),
-                status: avgRisk < 5 ? 'good' : avgRisk < 7 ? 'warning' : 'critical'
-            },
-            {
-                label: 'Total NM',
-                value: data.length.toString(),
-                status: data.length > 20 ? 'good' : data.length > 10 ? 'warning' : 'critical'
+            yPosition = addIncidentDetail(yPosition, incident, 'injury');
+        });
+
+        doc.setFontSize(11);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(...colors.high);
+        doc.text('High Risk Near Misses:', margin, yPosition + 5);
+        yPosition += 10;
+
+        const topNearMisses = selectTopIncidents(nearMissData, 'nearMiss').slice(0, 2);
+        topNearMisses.forEach(incident => {
+            if (yPosition > pageHeight - 50) {
+                doc.addPage();
+                pageNumber++;
+                addPageNumber(pageNumber);
+                yPosition = margin;
             }
-        ];
-    }
-    
-    return [];
-}
+            yPosition = addIncidentDetail(yPosition, incident, 'nearMiss');
+        });
 
-function getKPIColor(status) {
-    switch(status) {
-        case 'good': return PDF_CONFIG.colors.success;
-        case 'warning': return PDF_CONFIG.colors.warning;
-        case 'critical': return PDF_CONFIG.colors.danger;
-        default: return PDF_CONFIG.colors.secondary;
-    }
-}
+        doc.addPage();
+        pageNumber++;
+        addPageNumber(pageNumber);
+        yPosition = margin;
 
-function generateRecommendations(type) {
-    const recommendations = [];
-    
-    if (type === 'injury') {
-        const data = state.injury.filteredData;
-        const severityA = data.filter(d => d.severity === 'A').length;
-        const recordable = data.filter(d => d.recordable === 1).length;
-        
-        if (severityA > 0) {
-            recommendations.push(`Immediate action required: ${severityA} critical severity incidents detected. Conduct comprehensive safety review and implement enhanced controls.`);
-        }
-        
-        if (recordable > 5) {
-            recommendations.push(`High recordable rate detected (${recordable} cases). Review and strengthen preventive measures, particularly in PPE compliance and training.`);
-        }
-        
-        // Add site-specific recommendation
-        const topSite = getMostAffectedSite(data);
-        recommendations.push(`Focus safety improvements at ${topSite} site, which accounts for the highest incident rate.`);
-        
-        // Add body part specific recommendation
-        const topBodyPart = getMostAffectedBodyPart(data);
-        if (topBodyPart) {
-            recommendations.push(`Implement targeted ergonomic improvements for ${topBodyPart} injuries, which represent the most common injury type.`);
-        }
-    } else if (type === 'nearMiss') {
-        const data = state.nearMiss.filteredData;
-        const highRisk = data.filter(d => d.risk >= 8).length;
-        
-        if (highRisk > 3) {
-            recommendations.push(`${highRisk} high-risk near misses identified. Prioritize corrective actions for these incidents to prevent potential injuries.`);
-        }
-        
-        recommendations.push(`Maintain positive near-miss reporting culture. Current reporting rate indicates good hazard awareness among associates.`);
-        
-        // Add risk category recommendation
-        const topRiskCategory = getTopRiskCategory(data);
-        if (topRiskCategory) {
-            recommendations.push(`Focus risk mitigation efforts on ${topRiskCategory} category, which shows the highest frequency of near-miss events.`);
-        }
-    }
-    
-    // General recommendations
-    recommendations.push(`Conduct monthly safety walks focusing on identified high-risk areas and processes.`);
-    recommendations.push(`Enhance safety training programs with emphasis on hazard recognition and reporting.`);
-    
-    return recommendations;
-}
+        yPosition = addSection(yPosition, 'COMPARATIVE ANALYSIS');
 
-function addFooterToAllPages(doc) {
-    const pageCount = doc.internal.getNumberOfPages();
-    
-    for (let i = 1; i <= pageCount; i++) {
-        doc.setPage(i);
-        
-        // Footer line
-        doc.setDrawColor(PDF_CONFIG.colors.secondary);
-        doc.line(PDF_CONFIG.margins.left, 280, 210 - PDF_CONFIG.margins.right, 280);
-        
-        // Footer text
-        doc.setFontSize(PDF_CONFIG.fonts.small);
+        const combinedSites = {};
+        [...injuryData, ...nearMissData].forEach(d => {
+            combinedSites[d.site || 'Unknown'] = (combinedSites[d.site || 'Unknown'] || 0) + 1;
+        });
+        yPosition = addChart(yPosition + 5, 'Total Events by Site', combinedSites);
+
+        yPosition = addSection(yPosition + 10, 'RECOMMENDATIONS');
+
+        doc.setFontSize(10);
         doc.setFont('helvetica', 'normal');
-        doc.setTextColor(PDF_CONFIG.colors.darkGray);
-        
-        // Page number
-        doc.text(`Page ${i} of ${pageCount}`, 105, 285, { align: 'center' });
-        
-        // Confidentiality notice
-        doc.text('Confidential - Amazon Internal Use Only', PDF_CONFIG.margins.left, 285);
-        
-        // Generated by
-        doc.text('Safety Analytics Platform v2.0', 210 - PDF_CONFIG.margins.right, 285, { align: 'right' });
-    }
-}
+        doc.setTextColor(...colors.darkGray);
 
-// Additional utility functions for PDF generation
+        const recommendations = [
+            '1. Focus on sites with highest incident rates for targeted interventions',
+            '2. Analyze near miss patterns to prevent future injuries',
+            '3. Implement additional controls for high-severity potential incidents',
+            '4. Review and update training for most affected body parts/processes',
+            '5. Establish leading indicators based on near miss data trends'
+        ];
 
-function getMostAffectedSite(data) {
-    const siteCounts = {};
-    data.forEach(d => {
-        siteCounts[d.site] = (siteCounts[d.site] || 0) + 1;
-    });
-    
-    let maxSite = 'Unknown';
-    let maxCount = 0;
-    
-    for (const [site, count] of Object.entries(siteCounts)) {
-        if (count > maxCount) {
-            maxCount = count;
-            maxSite = site;
-        }
-    }
-    
-    return maxSite;
-}
-
-function getSiteIncidentCount(data, site) {
-    return data.filter(d => d.site === site).length;
-}
-
-function getAverageRiskScore(data) {
-    if (data.length === 0) return 0;
-    return data.reduce((sum, d) => sum + (d.risk || 0), 0) / data.length;
-}
-
-function getMostAffectedBodyPart(data) {
-    const bodyParts = {};
-    data.forEach(d => {
-        if (d.initial_info_principal_body_part) {
-            bodyParts[d.initial_info_principal_body_part] = (bodyParts[d.initial_info_principal_body_part] || 0) + 1;
-        }
-    });
-    
-    let maxPart = null;
-    let maxCount = 0;
-    
-    for (const [part, count] of Object.entries(bodyParts)) {
-        if (count > maxCount) {
-            maxCount = count;
-            maxPart = part;
-        }
-    }
-    
-    return maxPart;
-}
-
-function getTopRiskCategory(data) {
-    const categories = {};
-    data.forEach(d => {
-        if (d.initial_info_risk_assessment_category) {
-            categories[d.initial_info_risk_assessment_category] = (categories[d.initial_info_risk_assessment_category] || 0) + 1;
-        }
-    });
-    
-    let maxCategory = null;
-    let maxCount = 0;
-    
-    for (const [category, count] of Object.entries(categories)) {
-        if (count > maxCount) {
-            maxCount = count;
-            maxCategory = category;
-        }
-    }
-    
-    return maxCategory;
-}
-
-function analyzeRiskData(type) {
-    const data = type === 'injury' ? state.injury.filteredData : state.nearMiss.filteredData;
-    const total = data.length;
-    
-    const categories = [];
-    const categoryMap = {};
-    
-    // Analyze by severity
-    const severityField = type === 'injury' ? 'severity' : 'potential_severity';
-    data.forEach(d => {
-        const severity = d[severityField] || 'Unknown';
-        categoryMap[severity] = (categoryMap[severity] || 0) + 1;
-    });
-    
-    for (const [category, count] of Object.entries(categoryMap)) {
-        categories.push({
-            name: `Severity ${category}`,
-            count: count,
-            percentage: ((count / total) * 100).toFixed(1)
+        recommendations.forEach((rec, index) => {
+            if (yPosition > pageHeight - 20) {
+                doc.addPage();
+                pageNumber++;
+                addPageNumber(pageNumber);
+                yPosition = margin;
+            }
+            doc.text(rec, margin + 5, yPosition + (index * 7));
         });
     }
-    
-    // Sort by count
-    categories.sort((a, b) => b.count - a.count);
-    
-    return { categories };
+
+    doc.setFontSize(8);
+    doc.setTextColor(...colors.darkGray);
+    doc.setFont('helvetica', 'italic');
+    doc.text('Generated by Safety Analytics Platform | Confidential', pageWidth/2, pageHeight - 5, { align: 'center' });
+
+    const fileName = `${type}_safety_report_${new Date().toISOString().split('T')[0]}.pdf`;
+    doc.save(fileName);
+
+    showStatus(`PDF report "${fileName}" generated successfully`, 'success');
 }
 
-// Combined report specific functions
-
-function addCombinedKPIs(doc, yPos) {
-    // Implementation for combined KPIs
-    // Similar structure to addKPIDashboard but with combined metrics
-    const injuryData = state.injury.filteredData;
-    const nearMissData = state.nearMiss.filteredData;
-    
-    // Calculate combined metrics
-    const totalIncidents = injuryData.length + nearMissData.length;
-    const proactiveRatio = injuryData.length > 0 ? (nearMissData.length / injuryData.length).toFixed(2) : 'N/A';
-    
-    // Add KPI cards
-    // ... (similar implementation to addKPIDashboard)
-    
-    return yPos + 40;
-}
-
-function addComparativeAnalysis(doc, yPos) {
-    // Section Title
-    doc.setFontSize(PDF_CONFIG.fonts.subtitle);
-    doc.setFont('helvetica', 'bold');
-    doc.setTextColor(PDF_CONFIG.colors.secondary);
-    doc.text('Comparative Analysis: Injuries vs Near Misses', PDF_CONFIG.margins.left, yPos);
-    yPos += 10;
-    
-    // Add comparative charts and analysis
-    // ... (implementation details)
-    
-    return yPos + 100;
-}
-
-function addTopIncidentsCombined(doc, yPos) {
-    // Get top 3 injuries and top 3 near misses
-    const topInjuries = selectTopIncidents('injury', 3);
-    const topNearMisses = selectTopIncidents('nearMiss', 3);
-    
-    // Display in two columns
-    // ... (implementation details)
-    
-    return yPos + 150;
-}
-
-function addCombinedRiskAssessment(doc, yPos) {
-    // Combined risk matrix and assessment
-    // ... (implementation details)
-    
-    return yPos + 80;
-}
-
-function addActionItems(doc, yPos) {
-    // Priority action items based on combined analysis
-    // ... (implementation details)
-    
-    return yPos + 60;
-}
-
-function addRiskMatrix(doc, yPos, type) {
-    // Risk matrix visualization for near miss report
-    // ... (implementation details)
-    
-    return yPos + 80;
-}
-
-function addTrendingAnalysis(doc, yPos, type) {
-    // Trending analysis section
-    // ... (implementation details)
-    
-    return yPos + 60;
-}
-
-function generatePDFCharts(type, ctx) {
-    // Generate chart data for PDF
-    // This would create actual Chart.js charts and convert them to images
-    // For now, returning placeholder data
-    
-    const charts = [];
-    
-    if (type === 'injury') {
-        charts.push({
-            title: 'Severity Distribution',
-            description: 'Breakdown by severity level'
-        });
-        charts.push({
-            title: 'Site Comparison',
-            description: 'Incidents per location'
-        });
-        charts.push({
-            title: 'Body Parts Affected',
-            description: 'Most common injury areas'
-        });
-        charts.push({
-            title: 'Monthly Trend',
-            description: 'Incident frequency over time'
-        });
-    } else if (type === 'nearMiss') {
-        charts.push({
-            title: 'Risk Score Distribution',
-            description: 'Near misses by risk level'
-        });
-        charts.push({
-            title: 'Potential Severity',
-            description: 'What could have happened'
-        });
-        charts.push({
-            title: 'Location Analysis',
-            description: 'Where near misses occur'
-        });
-        charts.push({
-            title: 'Risk Categories',
-            description: 'Types of hazards identified'
-        });
-    }
-    
-    return charts;
-}
-
-// PDF Export Menu Toggle
-function togglePDFMenu() {
-    const dropdown = document.getElementById('pdfExportDropdown');
-    dropdown.classList.toggle('show');
-}
-
-// Close dropdown when clicking outside
-document.addEventListener('click', function(event) {
-    const menu = document.querySelector('.pdf-export-menu');
-    const dropdown = document.getElementById('pdfExportDropdown');
-    
-    if (!menu || !dropdown) return;
-    if (!menu.contains(event.target)) {
-        dropdown.classList.remove('show');
-    }
-});
-
-// Expose functions globally
 window.generatePDFReport = generatePDFReport;
-window.togglePDFMenu = togglePDFMenu;
 
