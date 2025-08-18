@@ -10,6 +10,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <style>
         :root {
             --amazon-orange: #FF9900;
@@ -111,11 +112,86 @@
             gap: var(--spacing-xs);
         }
 
-        .header-actions {
-            display: flex;
-            gap: var(--spacing-sm);
-            align-items: center;
-        }
+    .header-actions {
+        display: flex;
+        gap: var(--spacing-sm);
+        align-items: center;
+    }
+
+    /* PDF Export Button Styles */
+    .pdf-export-menu {
+        position: relative;
+        display: inline-block;
+    }
+
+    .pdf-export-btn {
+        background: linear-gradient(135deg, #FF9900, #FF6600);
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .pdf-export-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        background: linear-gradient(135deg, #FF6600, #FF3300);
+    }
+
+    .pdf-export-dropdown {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        padding: 8px 0;
+        margin-top: 8px;
+        min-width: 200px;
+        z-index: 1000;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-10px);
+        transition: all 0.3s ease;
+    }
+
+    .pdf-export-dropdown.show {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
+
+    .pdf-export-option {
+        padding: 12px 20px;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .pdf-export-option:hover {
+        background-color: #f5f5f5;
+    }
+
+    .pdf-export-option i {
+        width: 20px;
+        color: #FF9900;
+    }
+
+    [data-theme="dark"] .pdf-export-dropdown {
+        background: #2a2a2a;
+        border: 1px solid #444;
+    }
+
+    [data-theme="dark"] .pdf-export-option:hover {
+        background-color: #3a3a3a;
+    }
 
         /* Mode Toggle */
         .mode-toggle {
@@ -1117,6 +1193,25 @@
                 </div>
             </div>
             <div class="header-actions">
+                <div class="pdf-export-menu">
+                    <button class="pdf-export-btn" onclick="togglePDFMenu()">
+                        <i class="fas fa-file-pdf"></i> Export Report
+                    </button>
+                    <div class="pdf-export-dropdown" id="pdfExportDropdown">
+                        <div class="pdf-export-option" onclick="generatePDFReport('injury')">
+                            <i class="fas fa-user-injured"></i>
+                            <span>Injury & Illness Report</span>
+                        </div>
+                        <div class="pdf-export-option" onclick="generatePDFReport('nearMiss')">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <span>Near Miss Report</span>
+                        </div>
+                        <div class="pdf-export-option" onclick="generatePDFReport('combined')">
+                            <i class="fas fa-chart-line"></i>
+                            <span>Combined Analysis Report</span>
+                        </div>
+                    </div>
+                </div>
                 <button class="mode-toggle" onclick="toggleTheme()">
                     <span id="themeIcon">🌙</span>
                     <span id="themeText">Dark Mode</span>
@@ -1328,9 +1423,6 @@
                     <div class="control-header">
                         <h2 class="control-title">Injury & Illness Analysis</h2>
                         <div class="quick-actions">
-                            <button class="btn btn-primary" onclick="generatePDFReport('injury')">
-                                <span>📄</span> Generate Report
-                            </button>
                             <button class="btn btn-secondary" onclick="exportInjuryData()">
                                 <span>📊</span> Export Excel
                             </button>
@@ -1687,9 +1779,6 @@
                     <div class="control-header">
                         <h2 class="control-title">Near Miss Analysis</h2>
                         <div class="quick-actions">
-                            <button class="btn btn-primary" onclick="generatePDFReport('nearmiss')">
-                                <span>📄</span> Generate Report
-                            </button>
                             <button class="btn btn-secondary" onclick="exportNearMissData()">
                                 <span>📊</span> Export Excel
                             </button>
@@ -2034,11 +2123,6 @@
             <div class="control-panel">
                 <div class="control-header">
                     <h2 class="control-title">Combined Safety Analytics</h2>
-                    <div>
-                        <button class="btn btn-primary" onclick="generatePDFReport('combined')">
-                            <span>📄</span> Generate Combined Report
-                        </button>
-                    </div>
                 </div>
                 <!-- Unified filters for the combined analytics.  This mirrors the overview
                      and module-specific filters so users can slice data consistently across
@@ -2194,34 +2278,6 @@
             <div class="export-section">
                 <h3 style="margin-bottom: 1rem;">Available Reports</h3>
                 <div class="export-grid">
-                    <button class="btn btn-primary" onclick="generatePDFReport('injury')">
-                        <span>📄</span> 
-                        <div>
-                            <div>Injury Report</div>
-                            <small style="font-size: 0.75rem; opacity: 0.8;">Comprehensive analysis</small>
-                        </div>
-                    </button>
-                    <button class="btn btn-primary" onclick="generatePDFReport('nearmiss')">
-                        <span>📄</span>
-                        <div>
-                            <div>Near Miss Report</div>
-                            <small style="font-size: 0.75rem; opacity: 0.8;">Trends & patterns</small>
-                        </div>
-                    </button>
-                    <button class="btn btn-primary" onclick="generatePDFReport('combined')">
-                        <span>📄</span>
-                        <div>
-                            <div>Combined Report</div>
-                            <small style="font-size: 0.75rem; opacity: 0.8;">Full analysis</small>
-                        </div>
-                    </button>
-                    <button class="btn btn-primary" onclick="generatePDFReport('executive')">
-                        <span>📄</span>
-                        <div>
-                            <div>Executive Summary</div>
-                            <small style="font-size: 0.75rem; opacity: 0.8;">High-level overview</small>
-                        </div>
-                    </button>
                     <button class="btn btn-secondary" onclick="exportToExcel('all')">
                         <span>📊</span>
                         <div>
@@ -9387,3 +9443,4 @@ console.log('Safety Analytics Platform initialized successfully');
 console.log('Version: 2.0 | © 2024 Amazon WHS Austria');
 console.log('For support, contact: Erwin Esener @eeesener');
  </script>
+<script src="pdf-report.js"></script>
