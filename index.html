@@ -6315,6 +6315,373 @@ function updateSeverityTrendChart(chart, data) {
     chart.update();
 }
 
+function updateBodyPartChart(chart, data) {
+    const counts = {};
+    data.forEach(row => {
+        const part = row.bodyPart || row.initial_info_principal_body_part || 'Unknown';
+        counts[part] = (counts[part] || 0) + 1;
+    });
+
+    const topParts = Object.entries(counts)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 8);
+
+    chart.config.type = 'bar';
+    chart.data = {
+        labels: topParts.map(([part]) => part),
+        datasets: [{
+            label: 'Cases',
+            data: topParts.map(([, count]) => count),
+            backgroundColor: AMAZON_COLORS.orange,
+            borderWidth: 1
+        }]
+    };
+    chart.options = getChartOptions('bar');
+    chart.options.indexAxis = 'y';
+    chart.update();
+}
+
+function updateInjuryTypeByProcessChart(chart, data) {
+    const processTypes = {};
+    data.forEach(row => {
+        const process = row.processPath || 'Unknown';
+        const type = row.injuryType || row.initial_info_injury_type || 'Unknown';
+        if (!processTypes[process]) processTypes[process] = {};
+        processTypes[process][type] = (processTypes[process][type] || 0) + 1;
+    });
+
+    const processes = Object.keys(processTypes).slice(0, 5);
+    const types = [...new Set(data.map(r => r.injuryType || r.initial_info_injury_type || 'Unknown'))].slice(0, 5);
+
+    chart.config.type = 'bar';
+    chart.data = {
+        labels: processes,
+        datasets: types.map((t, idx) => ({
+            label: t.substring(0, 20),
+            data: processes.map(p => processTypes[p][t] || 0),
+            backgroundColor: getColorByIndex(idx)
+        }))
+    };
+    chart.options = getChartOptions('bar');
+    chart.options.scales.x.stacked = true;
+    chart.options.scales.y.stacked = true;
+    chart.update();
+}
+
+function updateRootCauseBySiteChart(chart, data) {
+    const siteCause = {};
+    data.forEach(row => {
+        const site = row.site || 'Unknown';
+        const cause = row.rootCause || 'Unknown';
+        if (!siteCause[site]) siteCause[site] = {};
+        siteCause[site][cause] = (siteCause[site][cause] || 0) + 1;
+    });
+
+    const sites = Object.keys(siteCause).slice(0, 5);
+    const causes = [...new Set(data.map(r => r.rootCause || 'Unknown'))].slice(0, 5);
+
+    chart.config.type = 'bar';
+    chart.data = {
+        labels: sites,
+        datasets: causes.map((c, idx) => ({
+            label: c.substring(0, 20),
+            data: sites.map(s => siteCause[s][c] || 0),
+            backgroundColor: getColorByIndex(idx)
+        }))
+    };
+    chart.options = getChartOptions('bar');
+    chart.options.scales.x.stacked = true;
+    chart.options.scales.y.stacked = true;
+    chart.update();
+}
+
+function updateSeverityPredictionChart(chart, data) {
+    updateSeverityChart(chart, data);
+}
+
+function updateCostImpactAnalysisChart(chart, data) {
+    const ranges = { '0-100': 0, '100-500': 0, '500-1000': 0, '1000+': 0 };
+    data.forEach(row => {
+        const cost = parseFloat(row.estimatedCost || row.costImpact || 0);
+        if (cost <= 100) ranges['0-100']++;
+        else if (cost <= 500) ranges['100-500']++;
+        else if (cost <= 1000) ranges['500-1000']++;
+        else ranges['1000+']++;
+    });
+
+    chart.config.type = 'bar';
+    chart.data = {
+        labels: Object.keys(ranges),
+        datasets: [{
+            label: 'Cases',
+            data: Object.values(ranges),
+            backgroundColor: AMAZON_COLORS.darkBlue
+        }]
+    };
+    chart.options = getChartOptions('bar');
+    chart.update();
+}
+
+function updateRecoveryTimeAnalysisChart(chart, data) {
+    const ranges = { '0-7': 0, '8-14': 0, '15-30': 0, '30+': 0 };
+    data.forEach(row => {
+        const days = parseFloat(row.recoveryTime || row.recoveryDays || row.total_dafw_days || 0);
+        if (days <= 7) ranges['0-7']++;
+        else if (days <= 14) ranges['8-14']++;
+        else if (days <= 30) ranges['15-30']++;
+        else ranges['30+']++;
+    });
+
+    chart.config.type = 'doughnut';
+    chart.data = {
+        labels: Object.keys(ranges),
+        datasets: [{
+            data: Object.values(ranges),
+            backgroundColor: [SEVERITY_COLORS.D, SEVERITY_COLORS.C, AMAZON_COLORS.orange, SEVERITY_COLORS.B]
+        }]
+    };
+    chart.options = getChartOptions('doughnut');
+    chart.update();
+}
+
+function updateImpactByLocationChart(chart, data) {
+    const locationImpact = {};
+    data.forEach(row => {
+        const location = row.location || row.initial_info_location_event || 'Unknown';
+        const impact = row.primaryImpact || row.initial_info_primary_impact || 'Unknown';
+        if (!locationImpact[location]) locationImpact[location] = {};
+        locationImpact[location][impact] = (locationImpact[location][impact] || 0) + 1;
+    });
+
+    const locations = Object.keys(locationImpact).slice(0, 5);
+    const impacts = [...new Set(data.map(r => r.primaryImpact || r.initial_info_primary_impact || 'Unknown'))].slice(0, 5);
+
+    chart.config.type = 'bar';
+    chart.data = {
+        labels: locations,
+        datasets: impacts.map((im, idx) => ({
+            label: im.substring(0, 20),
+            data: locations.map(loc => locationImpact[loc][im] || 0),
+            backgroundColor: getColorByIndex(idx)
+        }))
+    };
+    chart.options = getChartOptions('bar');
+    chart.options.scales.x.stacked = true;
+    chart.options.scales.y.stacked = true;
+    chart.update();
+}
+
+function updateImpactTrendChart(chart, data) {
+    const monthlyImpact = {};
+    data.forEach(row => {
+        if (row.parsedDate && !isNaN(row.parsedDate)) {
+            const monthKey = `${row.parsedDate.getFullYear()}-${String(row.parsedDate.getMonth() + 1).padStart(2, '0')}`;
+            const impact = row.primaryImpact || row.initial_info_primary_impact || 'Unknown';
+            if (!monthlyImpact[monthKey]) monthlyImpact[monthKey] = {};
+            monthlyImpact[monthKey][impact] = (monthlyImpact[monthKey][impact] || 0) + 1;
+        }
+    });
+
+    const months = Object.keys(monthlyImpact).sort().slice(-6);
+    const impacts = [...new Set(data.map(r => r.primaryImpact || r.initial_info_primary_impact || 'Unknown'))].slice(0, 5);
+
+    chart.config.type = 'line';
+    chart.data = {
+        labels: months.map(formatMonthLabel),
+        datasets: impacts.map((im, idx) => ({
+            label: im,
+            data: months.map(m => monthlyImpact[m][im] || 0),
+            borderColor: getColorByIndex(idx),
+            backgroundColor: `${getColorByIndex(idx)}20`,
+            tension: 0.3
+        }))
+    };
+    chart.options = getChartOptions('line');
+    chart.update();
+}
+
+function updateProcessRiskChart(chart, data) {
+    const processRisk = {};
+    data.forEach(row => {
+        const process = row.processPath || 'Unknown';
+        const risk = parseFloat(row.risk || calculateRiskScore(row));
+        if (!processRisk[process]) processRisk[process] = { total: 0, count: 0 };
+        processRisk[process].total += risk;
+        processRisk[process].count++;
+    });
+
+    const top = Object.entries(processRisk)
+        .map(([p, v]) => [p, v.total / v.count])
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 8);
+
+    chart.config.type = 'bar';
+    chart.data = {
+        labels: top.map(([p]) => p),
+        datasets: [{
+            label: 'Avg Risk',
+            data: top.map(([, v]) => v),
+            backgroundColor: AMAZON_COLORS.darkBlue
+        }]
+    };
+    chart.options = getChartOptions('bar');
+    chart.update();
+}
+
+function updateProcessHeatmapChart(chart, data) {
+    const processSeverity = {};
+    data.forEach(row => {
+        const process = row.processPath || 'Unknown';
+        const severity = row.severity || row.potential_severity || 'Unknown';
+        if (!processSeverity[process]) processSeverity[process] = { A: 0, B: 0, C: 0, D: 0 };
+        if (processSeverity[process][severity] !== undefined) processSeverity[process][severity]++;
+    });
+
+    const processes = Object.keys(processSeverity).slice(0, 5);
+    const severities = ['A', 'B', 'C', 'D'];
+
+    chart.config.type = 'bar';
+    chart.data = {
+        labels: processes,
+        datasets: severities.map((s, idx) => ({
+            label: `Severity ${s}`,
+            data: processes.map(p => processSeverity[p][s] || 0),
+            backgroundColor: getColorByIndex(idx)
+        }))
+    };
+    chart.options = getChartOptions('bar');
+    chart.options.scales.x.stacked = true;
+    chart.options.scales.y.stacked = true;
+    chart.update();
+}
+
+function updateRiskMatrixChart(chart, data) {
+    const matrix = {};
+    ['A','B','C','D'].forEach(sev => {
+        ['Rare','Unlikely','Possible','Likely','Almost Certain'].forEach(lik => {
+            matrix[`${sev}-${lik}`] = 0;
+        });
+    });
+
+    data.forEach(row => {
+        const severity = row.severity || row.potential_severity || 'Unknown';
+        const likelihood = row.standardized_likelihood || row.likelihood || 'Unknown';
+        const key = `${severity}-${likelihood}`;
+        if (matrix[key] !== undefined) matrix[key]++;
+    });
+
+    const likelihoods = ['Rare','Unlikely','Possible','Likely','Almost Certain'];
+    chart.config.type = 'bar';
+    chart.data = {
+        labels: likelihoods,
+        datasets: ['A','B','C','D'].map((sev, idx) => ({
+            label: `Severity ${sev}`,
+            data: likelihoods.map(lik => matrix[`${sev}-${lik}`] || 0),
+            backgroundColor: getColorByIndex(idx)
+        }))
+    };
+    chart.options = getChartOptions('bar');
+    chart.options.scales.x.stacked = true;
+    chart.options.scales.y.stacked = true;
+    chart.update();
+}
+
+function updateLikelihoodTrendChart(chart, data) {
+    const monthlyLikelihood = {};
+    data.forEach(row => {
+        if (row.parsedDate && !isNaN(row.parsedDate)) {
+            const monthKey = `${row.parsedDate.getFullYear()}-${String(row.parsedDate.getMonth() + 1).padStart(2, '0')}`;
+            const likelihood = row.standardized_likelihood || row.likelihood || 'Unknown';
+            if (!monthlyLikelihood[monthKey]) monthlyLikelihood[monthKey] = {};
+            monthlyLikelihood[monthKey][likelihood] = (monthlyLikelihood[monthKey][likelihood] || 0) + 1;
+        }
+    });
+
+    const months = Object.keys(monthlyLikelihood).sort().slice(-6);
+    const likelihoods = [...new Set(data.map(r => r.standardized_likelihood || r.likelihood || 'Unknown'))];
+
+    chart.config.type = 'line';
+    chart.data = {
+        labels: months.map(formatMonthLabel),
+        datasets: likelihoods.map((lik, idx) => ({
+            label: lik,
+            data: months.map(m => monthlyLikelihood[m][lik] || 0),
+            borderColor: getColorByIndex(idx),
+            backgroundColor: `${getColorByIndex(idx)}20`,
+            tension: 0.3
+        }))
+    };
+    chart.options = getChartOptions('line');
+    chart.update();
+}
+
+function updateHazardCategoriesChart(chart, data) {
+    const counts = {};
+    data.forEach(row => {
+        const category = row.hazardCategory || row.hazard_category || 'Unknown';
+        counts[category] = (counts[category] || 0) + 1;
+    });
+
+    const top = Object.entries(counts)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 8);
+
+    chart.config.type = 'doughnut';
+    chart.data = {
+        labels: top.map(([c]) => c),
+        datasets: [{
+            data: top.map(([, c]) => c),
+            backgroundColor: top.map((_, i) => getColorByIndex(i))
+        }]
+    };
+    chart.options = getChartOptions('doughnut');
+    chart.update();
+}
+
+function updateMitigationStatusChart(chart, data) {
+    const counts = {};
+    data.forEach(row => {
+        const status = row.mitigationStatus || row.mitigation_status || 'Unknown';
+        counts[status] = (counts[status] || 0) + 1;
+    });
+
+    chart.config.type = 'pie';
+    chart.data = {
+        labels: Object.keys(counts),
+        datasets: [{
+            data: Object.values(counts),
+            backgroundColor: Object.keys(counts).map((_, i) => getColorByIndex(i))
+        }]
+    };
+    chart.options = getChartOptions('pie');
+    chart.update();
+}
+
+function updateNearMissToInjuryRatioChart(chart, data) {
+    const nearMissCount = state.nearMiss.filteredData ? state.nearMiss.filteredData.length : 0;
+    const injuryCount = state.injury.filteredData ? state.injury.filteredData.length : 0;
+
+    chart.config.type = 'bar';
+    chart.data = {
+        labels: ['Near Misses', 'Injuries'],
+        datasets: [{
+            label: 'Count',
+            data: [nearMissCount, injuryCount],
+            backgroundColor: [AMAZON_COLORS.orange, AMAZON_COLORS.darkBlue]
+        }]
+    };
+    chart.options = getChartOptions('bar');
+    chart.update();
+}
+
+function updatePredictiveRiskChart(chart, data) {
+    updateRiskTrendChart(chart, data);
+}
+
+function updateHotspotAnalysisChart(chart, data) {
+    updateLocationHeatmapChart(chart, data);
+}
+
 // Helper functions
 function getWeekNumber(date) {
     const d = new Date(date);
