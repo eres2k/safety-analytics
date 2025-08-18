@@ -4161,96 +4161,189 @@ function updateNearMissChart(chartNum, type) {
 // Universal chart update function
 function updateUniversalChart(chart, data, type, module) {
     switch(type) {
+        // Distribution & Overview
         case 'severity':
             updateSeverityChart(chart, data);
-            break;
-        case 'trend':
-            updateTrendChart(chart, data, module);
             break;
         case 'site':
             updateSiteChart(chart, data);
             break;
-        case 'rootCause':
-            updateRootCauseChart(chart, data);
+        case 'trend':
+            updateTrendChart(chart, data, module);
             break;
-        case 'processPath':
-            updateProcessPathChart(chart, data);
+        case 'recordableDistribution':
+            updateRecordableDistributionChart(chart, data);
             break;
-        case 'contributingFactors':
-            updateContributingFactorsChart(chart, data);
+        case 'statusDistribution':
+            updateStatusDistributionChart(chart, data);
             break;
-        case 'riskTrend':
-            updateRiskTrendChart(chart, data);
-            break;
-        case 'recordableRate':
-            updateRecordableRateChart(chart, data);
-            break;
-        case 'impactType':
-            updateImpactTypeChart(chart, data);
-            break;
-        case 'severityBySite':
-            updateSeverityBySiteChart(chart, data);
-            break;
-        case 'locationHeatmap':
-            updateLocationHeatmapChart(chart, data);
-            break;
-        case 'bodyPartHeatmap':
-            updateBodyPartHeatmapChart(chart, data);
-            break;
-        case 'highRiskAreas':
-            updateHighRiskAreasChart(chart, data);
-            break;
-        case 'preventionOpportunities':
-            updatePreventionOpportunitiesChart(chart, data);
-            break;
-        case 'qualityMetrics':
-            updateQualityMetricsChart(chart, data, module);
-            break;
-        case 'trendForecast':
-            updateTrendForecastChart(chart, data, module);
-            break;
-        case 'weeklyTrend':
-            updateWeeklyTrendChart(chart, data);
+
+        // Injury specific - Body Part
+        case 'bodyPart':
+            updateBodyPartChart(chart, data);
             break;
         case 'bodyPartTrend':
             updateBodyPartTrendChart(chart, data);
             break;
+        case 'bodyPartHeatmap':
+            updateBodyPartHeatmapChart(chart, data);
+            break;
+        case 'bodyPartBySite':
+            updateBodyPartBySiteChart(chart, data);
+            break;
+
+        // Injury specific - Type & Mechanism
+        case 'injuryType':
+            updateInjuryTypeChart(chart, data);
+            break;
+        case 'mechanismOfInjury':
+            updateMechanismOfInjuryChart(chart, data);
+            break;
+        case 'injuryTypeByProcess':
+            updateInjuryTypeByProcessChart(chart, data);
+            break;
+
+        // Process & Operations
+        case 'processPath':
+            updateProcessPathChart(chart, data);
+            break;
         case 'shiftAnalysis':
             updateShiftAnalysisChart(chart, data);
             break;
+        case 'departmentAnalysis':
+            updateDepartmentAnalysisChart(chart, data);
+            break;
+        case 'processRisk':
+            updateProcessRiskChart(chart, data);
+            break;
+        case 'processHeatmap':
+            updateProcessHeatmapChart(chart, data);
+            break;
+
+        // Root Cause & Contributing Factors
+        case 'rootCause':
+            updateRootCauseChart(chart, data);
+            break;
+        case 'contributingFactors':
+            updateContributingFactorsChart(chart, data);
+            break;
+        case 'rootCauseBySite':
+            updateRootCauseBySiteChart(chart, data);
+            break;
+        case 'rootCauseTrend':
+            updateRootCauseTrendChart(chart, data);
+            break;
+
+        // Performance Metrics
+        case 'recordableRate':
+            updateRecordableRateChart(chart, data);
+            break;
+        case 'recordableTrend':
+            updateRecordableTrendChart(chart, data);
+            break;
         case 'dafwAnalysis':
+        case 'dafwDistribution':
             updateDafwAnalysisChart(chart, data);
             break;
         case 'otrAnalysis':
             updateOtrAnalysisChart(chart, data);
             break;
-        // Near Miss specific
+        case 'lostTimeAnalysis':
+            updateLostTimeAnalysisChart(chart, data);
+            break;
+
+        // Near Miss specific - Location
         case 'location':
             updateLocationChart(chart, data);
             break;
+        case 'locationHeatmap':
+            updateLocationHeatmapChart(chart, data);
+            break;
+        case 'locationTrend':
+            updateLocationTrendChart(chart, data);
+            break;
+        case 'locationBySeverity':
+            updateLocationBySeverityChart(chart, data);
+            break;
+
+        // Near Miss specific - Impact
         case 'impact':
+        case 'impactType':
             updateImpactChart(chart, data);
+            break;
+        case 'impactSeverity':
+            updateImpactSeverityChart(chart, data);
+            break;
+        case 'impactByLocation':
+            updateImpactByLocationChart(chart, data);
+            break;
+        case 'impactTrend':
+            updateImpactTrendChart(chart, data);
+            break;
+
+        // Risk Analysis
+        case 'riskScore':
+            updateRiskScoreChart(chart, data);
+            break;
+        case 'riskTrend':
+            updateRiskTrendChart(chart, data);
+            break;
+        case 'riskMatrix':
+            updateRiskMatrixChart(chart, data);
             break;
         case 'likelihood':
             updateLikelihoodChart(chart, data);
             break;
-        case 'statusDistribution':
-            updateStatusDistributionChart(chart, data);
+        case 'likelihoodTrend':
+            updateLikelihoodTrendChart(chart, data);
+            break;
+
+        // Trends
+        case 'severityTrend':
+            updateSeverityTrendChart(chart, data);
+            break;
+        case 'weeklyTrend':
+            updateWeeklyTrendChart(chart, data);
+            break;
+
+        // Prevention & Advanced
+        case 'preventionEffectiveness':
+        case 'preventionOpportunities':
+            updatePreventionOpportunitiesChart(chart, data);
             break;
         case 'closureAnalysis':
             updateClosureAnalysisChart(chart, data);
             break;
+        case 'mitigationStatus':
+            updateMitigationStatusChart(chart, data);
+            break;
+        case 'hazardCategories':
+            updateHazardCategoriesChart(chart, data);
+            break;
 
-        // Injury specific
-        case 'injuryType':
-            updateInjuryTypeChart(chart, data);
+        // Advanced Analytics
+        case 'severityPrediction':
+            updateSeverityPredictionChart(chart, data);
             break;
-        case 'recordableDistribution':
-            updateRecordableDistributionChart(chart, data);
+        case 'recoveryTimeAnalysis':
+            updateRecoveryTimeAnalysisChart(chart, data);
             break;
-        case 'dafwDistribution':
-            updateDafwAnalysisChart(chart, data);
+        case 'costImpactAnalysis':
+            updateCostImpactAnalysisChart(chart, data);
             break;
+        case 'nearMissToInjuryRatio':
+            updateNearMissToInjuryRatioChart(chart, data);
+            break;
+        case 'predictiveRisk':
+            updatePredictiveRiskChart(chart, data);
+            break;
+        case 'hotspotAnalysis':
+            updateHotspotAnalysisChart(chart, data);
+            break;
+
+        default:
+            console.warn(`Unknown chart type: ${type}`);
+            updateSeverityChart(chart, data); // Fallback
     }
 }
 
@@ -5193,6 +5286,458 @@ function updateClosureAnalysisChart(chart, data) {
     chart.update();
 }
 
+function updateBodyPartBySiteChart(chart, data) {
+    const siteBodyPart = {};
+    
+    data.forEach(row => {
+        const site = row.site || 'Unknown';
+        const bodyPart = row.bodyPart || row.initial_info_principal_body_part || 'Unknown';
+        
+        if (!siteBodyPart[site]) {
+            siteBodyPart[site] = {};
+        }
+        siteBodyPart[site][bodyPart] = (siteBodyPart[site][bodyPart] || 0) + 1;
+    });
+    
+    const sites = Object.keys(siteBodyPart).slice(0, 5);
+    const bodyParts = [...new Set(data.map(r => r.bodyPart || r.initial_info_principal_body_part || 'Unknown'))]
+        .slice(0, 5);
+    
+    chart.config.type = 'bar';
+    chart.data = {
+        labels: sites,
+        datasets: bodyParts.map((part, index) => ({
+            label: part.substring(0, 20),
+            data: sites.map(site => siteBodyPart[site][part] || 0),
+            backgroundColor: getColorByIndex(index)
+        }))
+    };
+    chart.options = getChartOptions('bar');
+    chart.options.scales.x.stacked = true;
+    chart.options.scales.y.stacked = true;
+    chart.update();
+}
+
+function updateMechanismOfInjuryChart(chart, data) {
+    const mechanisms = {};
+    
+    data.forEach(row => {
+        // Use impact type as mechanism proxy
+        const mechanism = row.initial_info_impact_type_primary || row.type || 'Unknown';
+        mechanisms[mechanism] = (mechanisms[mechanism] || 0) + 1;
+    });
+    
+    const topMechanisms = Object.entries(mechanisms)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 8);
+    
+    chart.config.type = 'doughnut';
+    chart.data = {
+        labels: topMechanisms.map(([mech]) => mech),
+        datasets: [{
+            data: topMechanisms.map(([, count]) => count),
+            backgroundColor: [
+                '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0',
+                '#9966FF', '#FF9F40', '#FF6384', '#C9CBCF'
+            ]
+        }]
+    };
+    chart.options = getChartOptions('doughnut');
+    chart.update();
+}
+
+function updateDepartmentAnalysisChart(chart, data) {
+    const deptData = {};
+    
+    data.forEach(row => {
+        const dept = row.initial_info_contractor_department || row.suborg || 'Unknown';
+        deptData[dept] = (deptData[dept] || 0) + 1;
+    });
+    
+    const topDepts = Object.entries(deptData)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 10);
+    
+    chart.config.type = 'bar';
+    chart.data = {
+        labels: topDepts.map(([dept]) => dept.substring(0, 20)),
+        datasets: [{
+            label: 'Incidents',
+            data: topDepts.map(([, count]) => count),
+            backgroundColor: AMAZON_COLORS.darkBlue,
+            borderColor: AMAZON_COLORS.orange,
+            borderWidth: 1
+        }]
+    };
+    chart.options = getChartOptions('bar');
+    chart.update();
+}
+
+function updateRootCauseTrendChart(chart, data) {
+    const monthlyRootCause = {};
+    
+    data.forEach(row => {
+        if (row.parsedDate && !isNaN(row.parsedDate)) {
+            const monthKey = `${row.parsedDate.getFullYear()}-${String(row.parsedDate.getMonth() + 1).padStart(2, '0')}`;
+            const cause = row.rootCause || row.rca_primary_cause || 'Unknown';
+            
+            if (!monthlyRootCause[monthKey]) {
+                monthlyRootCause[monthKey] = {};
+            }
+            monthlyRootCause[monthKey][cause] = (monthlyRootCause[monthKey][cause] || 0) + 1;
+        }
+    });
+    
+    const months = Object.keys(monthlyRootCause).sort().slice(-6);
+    const topCauses = [...new Set(data.map(r => r.rootCause || r.rca_primary_cause || 'Unknown'))]
+        .slice(0, 5);
+    
+    chart.config.type = 'line';
+    chart.data = {
+        labels: months.map(formatMonthLabel),
+        datasets: topCauses.map((cause, index) => ({
+            label: cause.substring(0, 30),
+            data: months.map(month => monthlyRootCause[month][cause] || 0),
+            borderColor: getColorByIndex(index),
+            backgroundColor: `${getColorByIndex(index)}20`,
+            tension: 0.3
+        }))
+    };
+    chart.options = getChartOptions('line');
+    chart.update();
+}
+
+function updateRecordableTrendChart(chart, data) {
+    const monthlyData = {};
+    
+    data.forEach(row => {
+        if (row.parsedDate && !isNaN(row.parsedDate)) {
+            const monthKey = `${row.parsedDate.getFullYear()}-${String(row.parsedDate.getMonth() + 1).padStart(2, '0')}`;
+            if (!monthlyData[monthKey]) {
+                monthlyData[monthKey] = { total: 0, recordable: 0 };
+            }
+            monthlyData[monthKey].total++;
+            if (row.recordable === 1) {
+                monthlyData[monthKey].recordable++;
+            }
+        }
+    });
+    
+    const sortedMonths = Object.keys(monthlyData).sort();
+    
+    chart.config.type = 'line';
+    chart.data = {
+        labels: sortedMonths.map(formatMonthLabel),
+        datasets: [{
+            label: 'Recordable Rate %',
+            data: sortedMonths.map(m => {
+                const data = monthlyData[m];
+                return data.total > 0 ? ((data.recordable / data.total) * 100).toFixed(1) : 0;
+            }),
+            borderColor: SEVERITY_COLORS.B,
+            backgroundColor: `${SEVERITY_COLORS.B}20`,
+            tension: 0.3
+        }]
+    };
+    chart.options = getChartOptions('line');
+    chart.options.scales.y.max = 100;
+    chart.update();
+}
+
+function updateLostTimeAnalysisChart(chart, data) {
+    const lostTimeData = data.filter(r => r.total_dafw_days > 0);
+    const siteLostTime = {};
+    
+    lostTimeData.forEach(row => {
+        const site = row.site || 'Unknown';
+        if (!siteLostTime[site]) {
+            siteLostTime[site] = { count: 0, totalDays: 0 };
+        }
+        siteLostTime[site].count++;
+        siteLostTime[site].totalDays += row.total_dafw_days;
+    });
+    
+    const sites = Object.keys(siteLostTime);
+    
+    chart.config.type = 'bar';
+    chart.data = {
+        labels: sites,
+        datasets: [
+            {
+                label: 'Lost Time Cases',
+                data: sites.map(site => siteLostTime[site].count),
+                backgroundColor: SEVERITY_COLORS.B,
+                yAxisID: 'y'
+            },
+            {
+                label: 'Total Days Lost',
+                data: sites.map(site => siteLostTime[site].totalDays),
+                backgroundColor: AMAZON_COLORS.orange,
+                yAxisID: 'y1'
+            }
+        ]
+    };
+    chart.options = {
+        ...getChartOptions('bar'),
+        scales: {
+            y: {
+                type: 'linear',
+                display: true,
+                position: 'left',
+                title: { display: true, text: 'Cases' }
+            },
+            y1: {
+                type: 'linear',
+                display: true,
+                position: 'right',
+                title: { display: true, text: 'Days' },
+                grid: { drawOnChartArea: false }
+            }
+        }
+    };
+    chart.update();
+}
+
+// Near Miss specific functions
+
+function updateLocationTrendChart(chart, data) {
+    const monthlyLocation = {};
+    
+    data.forEach(row => {
+        if (row.parsedDate && !isNaN(row.parsedDate)) {
+            const monthKey = `${row.parsedDate.getFullYear()}-${String(row.parsedDate.getMonth() + 1).padStart(2, '0')}`;
+            const location = row.location || row.initial_info_location_event || 'Unknown';
+            
+            if (!monthlyLocation[monthKey]) {
+                monthlyLocation[monthKey] = {};
+            }
+            monthlyLocation[monthKey][location] = (monthlyLocation[monthKey][location] || 0) + 1;
+        }
+    });
+    
+    const months = Object.keys(monthlyLocation).sort().slice(-6);
+    const topLocations = [...new Set(data.map(r => r.location || r.initial_info_location_event || 'Unknown'))]
+        .slice(0, 5);
+    
+    chart.config.type = 'line';
+    chart.data = {
+        labels: months.map(formatMonthLabel),
+        datasets: topLocations.map((location, index) => ({
+            label: location.substring(0, 20),
+            data: months.map(month => monthlyLocation[month][location] || 0),
+            borderColor: getColorByIndex(index),
+            backgroundColor: `${getColorByIndex(index)}20`,
+            tension: 0.3
+        }))
+    };
+    chart.options = getChartOptions('line');
+    chart.update();
+}
+
+function updateLocationBySeverityChart(chart, data) {
+    const locationSeverity = {};
+    
+    data.forEach(row => {
+        const location = row.location || row.initial_info_location_event || 'Unknown';
+        const severity = row.severity || row.potential_severity || 'Unknown';
+        
+        if (!locationSeverity[location]) {
+            locationSeverity[location] = { A: 0, B: 0, C: 0, D: 0 };
+        }
+        if (locationSeverity[location][severity] !== undefined) {
+            locationSeverity[location][severity]++;
+        }
+    });
+    
+    const topLocations = Object.entries(locationSeverity)
+        .sort((a, b) => {
+            const totalA = a[1].A + a[1].B + a[1].C + a[1].D;
+            const totalB = b[1].A + b[1].B + b[1].C + b[1].D;
+            return totalB - totalA;
+        })
+        .slice(0, 8);
+    
+    chart.config.type = 'bar';
+    chart.data = {
+        labels: topLocations.map(([loc]) => loc.substring(0, 25)),
+        datasets: [
+            {
+                label: 'Severity A',
+                data: topLocations.map(([, data]) => data.A),
+                backgroundColor: SEVERITY_COLORS.A
+            },
+            {
+                label: 'Severity B',
+                data: topLocations.map(([, data]) => data.B),
+                backgroundColor: SEVERITY_COLORS.B
+            },
+            {
+                label: 'Severity C',
+                data: topLocations.map(([, data]) => data.C),
+                backgroundColor: SEVERITY_COLORS.C
+            },
+            {
+                label: 'Severity D',
+                data: topLocations.map(([, data]) => data.D),
+                backgroundColor: SEVERITY_COLORS.D
+            }
+        ]
+    };
+    chart.options = getChartOptions('bar');
+    chart.options.scales.x.stacked = true;
+    chart.options.scales.y.stacked = true;
+    chart.update();
+}
+
+function updateImpactSeverityChart(chart, data) {
+    const impactSeverity = {};
+    
+    data.forEach(row => {
+        const impact = row.primaryImpact || row.initial_info_primary_impact || 'Unknown';
+        const severity = row.severity || row.potential_severity || 'Unknown';
+        
+        if (!impactSeverity[impact]) {
+            impactSeverity[impact] = { A: 0, B: 0, C: 0, D: 0 };
+        }
+        if (impactSeverity[impact][severity] !== undefined) {
+            impactSeverity[impact][severity]++;
+        }
+    });
+    
+    const topImpacts = Object.entries(impactSeverity)
+        .sort((a, b) => {
+            const totalA = a[1].A + a[1].B + a[1].C + a[1].D;
+            const totalB = b[1].A + b[1].B + b[1].C + b[1].D;
+            return totalB - totalA;
+        })
+        .slice(0, 6);
+    
+    chart.config.type = 'bar';
+    chart.data = {
+        labels: topImpacts.map(([impact]) => impact),
+        datasets: [
+            {
+                label: 'Severity A',
+                data: topImpacts.map(([, data]) => data.A),
+                backgroundColor: SEVERITY_COLORS.A
+            },
+            {
+                label: 'Severity B',
+                data: topImpacts.map(([, data]) => data.B),
+                backgroundColor: SEVERITY_COLORS.B
+            },
+            {
+                label: 'Severity C',
+                data: topImpacts.map(([, data]) => data.C),
+                backgroundColor: SEVERITY_COLORS.C
+            },
+            {
+                label: 'Severity D',
+                data: topImpacts.map(([, data]) => data.D),
+                backgroundColor: SEVERITY_COLORS.D
+            }
+        ]
+    };
+    chart.options = getChartOptions('bar');
+    chart.options.scales.x.stacked = true;
+    chart.options.scales.y.stacked = true;
+    chart.update();
+}
+
+function updateRiskScoreChart(chart, data) {
+    const riskRanges = {
+        '0-2': 0,
+        '2-4': 0,
+        '4-6': 0,
+        '6-8': 0,
+        '8-10': 0
+    };
+    
+    data.forEach(row => {
+        const risk = parseFloat(row.risk || calculateRiskScore(row));
+        if (risk <= 2) riskRanges['0-2']++;
+        else if (risk <= 4) riskRanges['2-4']++;
+        else if (risk <= 6) riskRanges['4-6']++;
+        else if (risk <= 8) riskRanges['6-8']++;
+        else riskRanges['8-10']++;
+    });
+    
+    chart.config.type = 'bar';
+    chart.data = {
+        labels: Object.keys(riskRanges),
+        datasets: [{
+            label: 'Near Misses',
+            data: Object.values(riskRanges),
+            backgroundColor: [
+                SEVERITY_COLORS.D,
+                SEVERITY_COLORS.C,
+                AMAZON_COLORS.orange,
+                SEVERITY_COLORS.B,
+                SEVERITY_COLORS.A
+            ]
+        }]
+    };
+    chart.options = getChartOptions('bar');
+    chart.update();
+}
+
+function updateSeverityTrendChart(chart, data) {
+    const monthlySeverity = {};
+    
+    data.forEach(row => {
+        if (row.parsedDate && !isNaN(row.parsedDate)) {
+            const monthKey = `${row.parsedDate.getFullYear()}-${String(row.parsedDate.getMonth() + 1).padStart(2, '0')}`;
+            const severity = row.severity || row.potential_severity || 'Unknown';
+            
+            if (!monthlySeverity[monthKey]) {
+                monthlySeverity[monthKey] = { A: 0, B: 0, C: 0, D: 0 };
+            }
+            if (monthlySeverity[monthKey][severity] !== undefined) {
+                monthlySeverity[monthKey][severity]++;
+            }
+        }
+    });
+    
+    const sortedMonths = Object.keys(monthlySeverity).sort();
+    
+    chart.config.type = 'line';
+    chart.data = {
+        labels: sortedMonths.map(formatMonthLabel),
+        datasets: [
+            {
+                label: 'Severity A',
+                data: sortedMonths.map(m => monthlySeverity[m].A),
+                borderColor: SEVERITY_COLORS.A,
+                backgroundColor: `${SEVERITY_COLORS.A}20`,
+                tension: 0.3
+            },
+            {
+                label: 'Severity B',
+                data: sortedMonths.map(m => monthlySeverity[m].B),
+                borderColor: SEVERITY_COLORS.B,
+                backgroundColor: `${SEVERITY_COLORS.B}20`,
+                tension: 0.3
+            },
+            {
+                label: 'Severity C',
+                data: sortedMonths.map(m => monthlySeverity[m].C),
+                borderColor: SEVERITY_COLORS.C,
+                backgroundColor: `${SEVERITY_COLORS.C}20`,
+                tension: 0.3
+            },
+            {
+                label: 'Severity D',
+                data: sortedMonths.map(m => monthlySeverity[m].D),
+                borderColor: SEVERITY_COLORS.D,
+                backgroundColor: `${SEVERITY_COLORS.D}20`,
+                tension: 0.3
+            }
+        ]
+    };
+    chart.options = getChartOptions('line');
+    chart.update();
+}
+
 // Helper functions
 function getWeekNumber(date) {
     const d = new Date(date);
@@ -5228,7 +5773,9 @@ function getColorByIndex(index) {
         '#FF5722',
         '#4CAF50',
         '#2196F3',
-        '#9C27B0'
+        '#9C27B0',
+        '#FFC107',
+        '#795548'
     ];
     return colors[index % colors.length];
 }
