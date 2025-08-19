@@ -1286,21 +1286,6 @@
             </div>
             <div class="header-actions">
                 <div class="export-buttons">
-                    <button onclick="generatePDFReport('injury')" class="export-btn pdf-btn" title="Generate comprehensive injury report with top cases, trends, and analytics">
-                        <i class="fas fa-file-pdf"></i> 
-                        <span>Injury Report PDF</span>
-                        <small>Detailed analysis with critical cases</small>
-                    </button>
-                    <button onclick="generatePDFReport('nearMiss')" class="export-btn pdf-btn" title="Generate near miss report with risk analysis and prevention insights">
-                        <i class="fas fa-file-pdf"></i> 
-                        <span>Near Miss Report PDF</span>
-                        <small>Risk assessment & prevention focus</small>
-                    </button>
-                    <button onclick="generatePDFReport('combined')" class="export-btn pdf-btn" title="Generate combined safety report comparing injuries and near misses">
-                        <i class="fas fa-file-pdf"></i> 
-                        <span>Combined Report PDF</span>
-                        <small>Comprehensive safety overview</small>
-                    </button>
                     <button onclick="exportToExcel('injury')" class="export-btn excel-btn">
                         <i class="fas fa-file-excel"></i> Export Injury Data
                     </button>
@@ -1537,13 +1522,13 @@
                     <div class="filter-section">
                         <div class="filter-group">
                             <label class="filter-label">Site</label>
-                            <select class="filter-input" id="injurySiteFilter" onchange="applyFilters('injury')">
+                            <select class="filter-input" id="injurySiteFilter" onchange="debouncedApplyFilters('injury')">
                                 <option value="">All Sites</option>
                             </select>
                         </div>
                         <div class="filter-group">
                             <label class="filter-label">Severity</label>
-                            <select class="filter-input" id="injurySeverityFilter" onchange="applyFilters('injury')">
+                            <select class="filter-input" id="injurySeverityFilter" onchange="debouncedApplyFilters('injury')">
                                 <option value="">All Severities</option>
                                 <option value="A">A - Critical</option>
                                 <option value="B">B - High</option>
@@ -1553,7 +1538,7 @@
                         </div>
                         <div class="filter-group">
                             <label class="filter-label">Recordable</label>
-                            <select class="filter-input" id="injuryRecordableFilter" onchange="applyFilters('injury')">
+                            <select class="filter-input" id="injuryRecordableFilter" onchange="debouncedApplyFilters('injury')">
                                 <option value="">All Cases</option>
                                 <option value="1">Recordable Only</option>
                                 <option value="0">Non-Recordable Only</option>
@@ -1561,7 +1546,7 @@
                         </div>
                         <div class="filter-group">
                             <label class="filter-label">OTR Status</label>
-                            <select class="filter-input" id="injuryOTRFilter" onchange="applyFilters('injury')">
+                            <select class="filter-input" id="injuryOTRFilter" onchange="debouncedApplyFilters('injury')">
                                 <option value="">All</option>
                                 <option value="yes">On The Road</option>
                                 <option value="no">Under the Roof</option>
@@ -1569,23 +1554,23 @@
                         </div>
                         <div class="filter-group">
                             <label class="filter-label">Body Part</label>
-                            <select class="filter-input" id="injuryBodyPartFilter" onchange="applyFilters('injury')">
+                            <select class="filter-input" id="injuryBodyPartFilter" onchange="debouncedApplyFilters('injury')">
                                 <option value="">All Body Parts</option>
                             </select>
                         </div>
                         <div class="filter-group">
                             <label class="filter-label">Root Cause</label>
-                            <select class="filter-input" id="injuryRootCauseFilter" onchange="applyFilters('injury')">
+                            <select class="filter-input" id="injuryRootCauseFilter" onchange="debouncedApplyFilters('injury')">
                                 <option value="">All Causes</option>
                             </select>
                         </div>
                         <div class="filter-group">
                             <label class="filter-label">Date From</label>
-                            <input type="date" class="filter-input" id="injuryDateFrom" onchange="applyFilters('injury')">
+                            <input type="date" class="filter-input" id="injuryDateFrom" onchange="debouncedApplyFilters('injury')">
                         </div>
                         <div class="filter-group">
                             <label class="filter-label">Date To</label>
-                            <input type="date" class="filter-input" id="injuryDateTo" onchange="applyFilters('injury')">
+                            <input type="date" class="filter-input" id="injuryDateTo" onchange="debouncedApplyFilters('injury')">
                         </div>
                     </div>
                 </div>
@@ -1893,13 +1878,13 @@
                     <div class="filter-section">
                         <div class="filter-group">
                             <label class="filter-label">Site</label>
-                            <select class="filter-input" id="nearMissSiteFilter" onchange="applyFilters('nearmiss')">
+                            <select class="filter-input" id="nearMissSiteFilter" onchange="debouncedApplyFilters('nearmiss')">
                                 <option value="">All Sites</option>
                             </select>
                         </div>
                         <div class="filter-group">
                             <label class="filter-label">Potential Severity</label>
-                            <select class="filter-input" id="nearMissSeverityFilter" onchange="applyFilters('nearmiss')">
+                            <select class="filter-input" id="nearMissSeverityFilter" onchange="debouncedApplyFilters('nearmiss')">
                                 <option value="">All Severities</option>
                                 <option value="A">A - Critical</option>
                                 <option value="B">B - High</option>
@@ -1909,25 +1894,25 @@
                         </div>
                         <div class="filter-group">
                             <label class="filter-label">Primary Impact</label>
-                            <select class="filter-input" id="nearMissPrimaryImpactFilter" onchange="applyFilters('nearmiss')">
+                            <select class="filter-input" id="nearMissPrimaryImpactFilter" onchange="debouncedApplyFilters('nearmiss')">
                                 <option value="">All Impacts</option>
                             </select>
                         </div>
                         <div class="filter-group">
                             <label class="filter-label">Location</label>
-                            <select class="filter-input" id="nearMissLocationFilter" onchange="applyFilters('nearmiss')">
+                            <select class="filter-input" id="nearMissLocationFilter" onchange="debouncedApplyFilters('nearmiss')">
                                 <option value="">All Locations</option>
                             </select>
                         </div>
                         <div class="filter-group">
                             <label class="filter-label">Process Path</label>
-                            <select class="filter-input" id="nearMissProcessFilter" onchange="applyFilters('nearmiss')">
+                            <select class="filter-input" id="nearMissProcessFilter" onchange="debouncedApplyFilters('nearmiss')">
                                 <option value="">All Processes</option>
                             </select>
                         </div>
                         <div class="filter-group">
                             <label class="filter-label">Likelihood</label>
-                            <select class="filter-input" id="nearMissLikelihoodFilter" onchange="applyFilters('nearmiss')">
+                            <select class="filter-input" id="nearMissLikelihoodFilter" onchange="debouncedApplyFilters('nearmiss')">
                                 <option value="">All Likelihoods</option>
                                 <option value="Rare">Rare</option>
                                 <option value="Unlikely">Unlikely</option>
@@ -1938,11 +1923,11 @@
                         </div>
                         <div class="filter-group">
                             <label class="filter-label">Date From</label>
-                            <input type="date" class="filter-input" id="nearMissDateFrom" onchange="applyFilters('nearmiss')">
+                            <input type="date" class="filter-input" id="nearMissDateFrom" onchange="debouncedApplyFilters('nearmiss')">
                         </div>
                         <div class="filter-group">
                             <label class="filter-label">Date To</label>
-                            <input type="date" class="filter-input" id="nearMissDateTo" onchange="applyFilters('nearmiss')">
+                            <input type="date" class="filter-input" id="nearMissDateTo" onchange="debouncedApplyFilters('nearmiss')">
                         </div>
                     </div>
                 </div>
@@ -2374,6 +2359,27 @@
             <div class="export-section">
                 <h3 style="margin-bottom: 1rem;">Available Reports</h3>
                 <div class="export-grid">
+                    <button class="btn btn-secondary" onclick="generatePDFReport('injury')">
+                        <span>📄</span>
+                        <div>
+                            <div>Injury Report PDF</div>
+                            <small style="font-size: 0.75rem; opacity: 0.8;">Detailed analysis</small>
+                        </div>
+                    </button>
+                    <button class="btn btn-secondary" onclick="generatePDFReport('nearMiss')">
+                        <span>📄</span>
+                        <div>
+                            <div>Near Miss Report PDF</div>
+                            <small style="font-size: 0.75rem; opacity: 0.8;">Risk assessment</small>
+                        </div>
+                    </button>
+                    <button class="btn btn-secondary" onclick="generatePDFReport('combined')">
+                        <span>📄</span>
+                        <div>
+                            <div>Combined Report PDF</div>
+                            <small style="font-size: 0.75rem; opacity: 0.8;">Comparison</small>
+                        </div>
+                    </button>
                     <button class="btn btn-secondary" onclick="exportToExcel('all')">
                         <span>📊</span>
                         <div>
@@ -2464,6 +2470,362 @@
         </p>
     </footer>
 
+    <script>
+// DataProcessor
+class DataProcessor {
+    static processInjuryData(data) {
+        return data.map(row => this.#standardizeInjuryRow(row));
+    }
+
+    static processNearMissData(data) {
+        return data.map(row => this.#standardizeNearMissRow(row));
+    }
+
+    static #standardizeInjuryRow(row) {
+        return {
+            ...row,
+            severity: this.#standardizeSeverity(row.severity),
+            recordable: parseInt(row.recordable) || 0,
+            dafw_days: parseInt(row.total_dafw_days) || 0,
+            processed_date: new Date(row.incident_date)
+        };
+    }
+
+    static #standardizeNearMissRow(row) {
+        return {
+            ...row,
+            severity: this.#standardizeSeverity(row.potential_severity),
+            processed_date: new Date(row.nearmiss_date)
+        };
+    }
+
+    static #standardizeSeverity(severity) {
+        return ['A', 'B', 'C', 'D'].includes(severity) ? severity : 'Unknown';
+    }
+}
+window.DataProcessor = DataProcessor;
+
+// ChartManager
+class ChartManager {
+    constructor() {
+        this.charts = new Map();
+    }
+
+    createOrUpdate(id, config) {
+        if (this.charts.has(id)) {
+            this.charts.get(id).destroy();
+        }
+        const ctx = document.getElementById(id).getContext('2d');
+        const chart = new Chart(ctx, config);
+        this.charts.set(id, chart);
+        return chart;
+    }
+
+    destroyAll() {
+        this.charts.forEach(chart => chart.destroy());
+        this.charts.clear();
+    }
+}
+window.ChartManager = ChartManager;
+
+// KPICalculator
+class KPICalculator {
+    static calculate(data, hours = 200000) {
+        return {
+            trir: this.calculateTRIR(data, hours),
+            ltir: this.calculateLTIR(data, hours),
+            dafwr: this.calculateDAFWR(data, hours),
+            nmfr: this.calculateNMFR(data, hours)
+        };
+    }
+
+    static calculateTRIR(data, hours) {
+        const recordable = data.filter(d => d.recordable === 1).length;
+        return (recordable / hours) * 200000;
+    }
+
+    static calculateLTIR(data, hours) {
+        const lostTime = data.filter(d => d.dafw_days > 0).length;
+        return (lostTime / hours) * 200000;
+    }
+
+    static calculateDAFWR(data, hours) {
+        const dafwDays = data.reduce((sum, d) => sum + (d.dafw_days || 0), 0);
+        return (dafwDays / hours) * 200000;
+    }
+
+    static calculateNMFR(data, hours) {
+        const nearMisses = data.length;
+        return (nearMisses / hours) * 200000;
+    }
+}
+window.KPICalculator = KPICalculator;
+
+// CSV Worker setup
+const csvWorkerScript = `
+importScripts('https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js');
+
+self.onmessage = function(e) {
+    const { csvText, type } = e.data;
+    const parsed = Papa.parse(csvText, {
+        header: true,
+        dynamicTyping: true,
+        skipEmptyLines: true,
+        delimitersToGuess: [',', '\t', '|', ';']
+    });
+    self.postMessage({ data: parsed.data, errors: parsed.errors, type });
+};
+`;
+const csvWorkerBlob = new Blob([csvWorkerScript], { type: 'application/javascript' });
+const csvWorkerUrl = URL.createObjectURL(csvWorkerBlob);
+
+// Core utilities
+const CONFIG = {
+    baseline: {
+        defaultHours: 200000,
+        customHours: null,
+        useCustom: false
+    }
+};
+
+function getBaselineHours() {
+    return CONFIG.baseline.useCustom && CONFIG.baseline.customHours
+        ? CONFIG.baseline.customHours
+        : CONFIG.baseline.defaultHours;
+}
+window.CONFIG = CONFIG;
+window.getBaselineHours = getBaselineHours;
+
+function validateCSVData(data, type) {
+    const requiredFields = {
+        injury: ['case_number', 'incident_date', 'site', 'severity', 'recordable'],
+        nearMiss: ['incident_id', 'nearmiss_date', 'site', 'potential_severity']
+    };
+
+    const missingFields = requiredFields[type].filter(field => !data[0]?.hasOwnProperty(field));
+    if (missingFields.length > 0) {
+        throw new Error(`Missing required fields: ${missingFields.join(', ')}`);
+    }
+
+    return data.map(row => {
+        if (row.incident_date || row.nearmiss_date) {
+            const dateField = type === 'injury' ? 'incident_date' : 'nearmiss_date';
+            row[dateField] = validateDate(row[dateField]);
+        }
+        if (row.recordable !== undefined) {
+            row.recordable = parseInt(row.recordable) || 0;
+        }
+        if (row.total_dafw_days !== undefined) {
+            row.total_dafw_days = parseInt(row.total_dafw_days) || 0;
+        }
+        return row;
+    });
+}
+window.validateCSVData = validateCSVData;
+
+function validateDate(value) {
+    const date = new Date(value);
+    if (isNaN(date.getTime())) {
+        throw new Error(`Invalid date: ${value}`);
+    }
+    return date.toISOString();
+}
+window.validateDate = validateDate;
+
+function sanitizeData(data) {
+    return data.map(row => {
+        const sanitized = {};
+        for (let key in row) {
+            let value = typeof row[key] === 'string' ? row[key].trim() : row[key];
+            if (value === 'NULL' || value === 'null' || value === 'N/A' || value === '') {
+                value = null;
+            }
+            if (typeof value === 'string') {
+                value = value.replace(/[<>]/g, '');
+            }
+            sanitized[key] = value;
+        }
+        return sanitized;
+    });
+}
+window.sanitizeData = sanitizeData;
+
+function updateChart(chartNum, type, module) {
+    if (!chartUpdateLimiter.canExecute()) return;
+    const chartKey = `chart${chartNum}`;
+    const existingChart = window.state?.[module]?.charts?.[chartKey];
+    if (existingChart) {
+        existingChart.destroy();
+        delete window.state[module].charts[chartKey];
+    }
+    const ctx = document.getElementById(`${module}Chart${chartNum}`).getContext('2d');
+    window.state[module].charts[chartKey] = new Chart(ctx, window.chartConfig);
+}
+window.updateChart = updateChart;
+
+const debounce = (func, wait) => {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+};
+window.debounce = debounce;
+
+class VirtualTable {
+    constructor(container, data, rowHeight = 40) {
+        this.container = container;
+        this.data = data;
+        this.rowHeight = rowHeight;
+        this.visibleRows = Math.ceil(container.clientHeight / rowHeight);
+        this.render();
+        container.addEventListener('scroll', () => this.render());
+    }
+
+    render() {
+        const scrollTop = this.container.scrollTop;
+        const startIndex = Math.floor(scrollTop / this.rowHeight);
+        const endIndex = startIndex + this.visibleRows + 1;
+        const visibleData = this.data.slice(startIndex, endIndex);
+        this.renderRows(visibleData, startIndex);
+    }
+}
+window.VirtualTable = VirtualTable;
+
+const memoize = (fn) => {
+    const cache = new Map();
+    return (...args) => {
+        const key = JSON.stringify(args);
+        if (cache.has(key)) {
+            return cache.get(key);
+        }
+        const result = fn.apply(this, args);
+        cache.set(key, result);
+        return result;
+    };
+};
+window.memoize = memoize;
+
+const calculateRiskScore = memoize((severity, likelihood) => {
+    const severityValues = { 'A': 5, 'B': 4, 'C': 3, 'D': 2, 'Unknown': 1 };
+    const likelihoodValues = {
+        'almost certain': 5, 'likely': 4, 'possible': 3,
+        'unlikely': 2, 'rare': 1
+    };
+    const sevValue = severityValues[severity] || 1;
+    const likeValue = likelihoodValues[likelihood?.toLowerCase()] || 1;
+    return (sevValue * likeValue) / 5 * 2;
+});
+window.calculateRiskScore = calculateRiskScore;
+
+class ErrorHandler {
+    static handle(error, context = '') {
+        console.error(`Error in ${context}:`, error);
+        const userMessage = this.getUserMessage(error);
+        this.showNotification?.(userMessage, 'error');
+        this.recover(context, error);
+    }
+
+    static getUserMessage(error) {
+        const errorMap = {
+            'TypeError': 'Datenfehler: Bitte überprüfen Sie die CSV-Struktur',
+            'RangeError': 'Zu viele Daten: Bitte reduzieren Sie die Datenmenge',
+            'NetworkError': 'Netzwerkfehler: Bitte überprüfen Sie Ihre Verbindung'
+        };
+        return errorMap[error.name] || 'Ein unerwarteter Fehler ist aufgetreten';
+    }
+
+    static recover(context, error) {
+        switch(context) {
+            case 'csv_import':
+                window.state.injury.rawData = [];
+                window.state.nearMiss.rawData = [];
+                break;
+            case 'chart_update':
+                this.showDataAsTable?.();
+                break;
+            default:
+                this.resetToSafeState?.();
+        }
+    }
+}
+window.ErrorHandler = ErrorHandler;
+
+function safeExecute(fn, context) {
+    return async (...args) => {
+        try {
+            return await fn(...args);
+        } catch (error) {
+            ErrorHandler.handle(error, context);
+        }
+    };
+}
+window.safeExecute = safeExecute;
+
+class StateManager {
+    static updateState(updates, rollbackFn) {
+        const backup = JSON.parse(JSON.stringify(window.state));
+        try {
+            Object.assign(window.state, updates);
+            if (!this.validateState(window.state)) {
+                throw new Error('Invalid state after update');
+            }
+        } catch (error) {
+            Object.assign(window.state, backup);
+            if (rollbackFn) rollbackFn(error);
+            throw error;
+        }
+    }
+
+    static validateState(state) {
+        return state.currentModule &&
+               Array.isArray(state.injury.rawData) &&
+               Array.isArray(state.nearMiss.rawData);
+    }
+}
+window.StateManager = StateManager;
+
+const ValidationRules = {
+    date: (value) => {
+        const date = new Date(value);
+        return !isNaN(date.getTime()) && date <= new Date();
+    },
+    severity: (value) => {
+        return ['A', 'B', 'C', 'D', 'Unknown'].includes(value);
+    },
+    numeric: (value) => {
+        return !isNaN(parseFloat(value)) && isFinite(value);
+    }
+};
+window.ValidationRules = ValidationRules;
+
+class RateLimiter {
+    constructor(maxCalls, timeWindow) {
+        this.maxCalls = maxCalls;
+        this.timeWindow = timeWindow;
+        this.calls = [];
+    }
+
+    canExecute() {
+        const now = Date.now();
+        this.calls = this.calls.filter(time => now - time < this.timeWindow);
+        if (this.calls.length < this.maxCalls) {
+            this.calls.push(now);
+            return true;
+        }
+        return false;
+    }
+}
+window.RateLimiter = RateLimiter;
+
+const chartUpdateLimiter = new RateLimiter(10, 1000);
+window.chartUpdateLimiter = chartUpdateLimiter;
+
+</script>
     <script>
        // Global State Management
 const state = {
@@ -2802,35 +3164,86 @@ function handleDragLeave(event) {
 
 // CSV Parsing
 function parseCSV(csvText, type) {
-    Papa.parse(csvText, {
-        header: true,
-        dynamicTyping: true,
-        skipEmptyLines: true,
-        complete: function(results) {
+    if (window.Worker) {
+        const worker = new Worker(csvWorkerUrl);
+        worker.onmessage = function(e) {
+            const { data, errors } = e.data;
+            if (errors && errors.length) {
+                ErrorHandler.handle(new Error(errors[0].message), 'csv_import');
+                showStatus('Failed to parse CSV: ' + errors[0].message, 'error');
+                worker.terminate();
+                return;
+            }
+            try {
+                const sanitized = sanitizeData(data);
+                const validated = validateCSVData(sanitized, type === 'nearmiss' ? 'nearMiss' : 'injury');
+                if (type === 'injury') {
+                    state.injury.rawData = validated;
+                    processInjuryData();
+                    populateInjuryFilters();
+                    debouncedApplyFilters('injury');
+                    calculateQualityMetrics('injury');
+                    showStatus(`Loaded ${validated.length} injury records successfully!`, 'success');
+                } else {
+                    state.nearMiss.rawData = validated;
+                    processNearMissData();
+                    populateNearMissFilters();
+                    debouncedApplyFilters('nearmiss');
+                    calculateQualityMetrics('nearmiss');
+                    showStatus(`Loaded ${validated.length} near miss records successfully!`, 'success');
+                }
+                updateOverview();
+                initializeChartSelections();
+            } catch (err) {
+                ErrorHandler.handle(err, 'csv_import');
+                showStatus(err.message, 'error');
+            } finally {
+                worker.terminate();
+            }
+        };
+        worker.onerror = function(err) {
+            ErrorHandler.handle(err, 'csv_import');
+            showStatus('Failed to parse CSV: ' + err.message, 'error');
+            worker.terminate();
+        };
+        worker.postMessage({ csvText, type });
+    } else {
+        try {
+            const parsed = Papa.parse(csvText, {
+                header: true,
+                dynamicTyping: true,
+                skipEmptyLines: true,
+                delimitersToGuess: [',', '\t', '|', ';']
+            });
+            if (parsed.errors.length) {
+                throw new Error(parsed.errors[0].message);
+            }
+            const sanitized = sanitizeData(parsed.data);
+            const validated = validateCSVData(sanitized, type === 'nearmiss' ? 'nearMiss' : 'injury');
             if (type === 'injury') {
-                state.injury.rawData = results.data;
+                state.injury.rawData = validated;
                 processInjuryData();
                 populateInjuryFilters();
-                applyFilters('injury');
+                debouncedApplyFilters('injury');
                 calculateQualityMetrics('injury');
-                showStatus(`Loaded ${results.data.length} injury records successfully!`, 'success');
+                showStatus(`Loaded ${validated.length} injury records successfully!`, 'success');
             } else {
-                state.nearMiss.rawData = results.data;
+                state.nearMiss.rawData = validated;
                 processNearMissData();
                 populateNearMissFilters();
-                applyFilters('nearmiss');
+                debouncedApplyFilters('nearmiss');
                 calculateQualityMetrics('nearmiss');
-                showStatus(`Loaded ${results.data.length} near miss records successfully!`, 'success');
+                showStatus(`Loaded ${validated.length} near miss records successfully!`, 'success');
             }
-            
             updateOverview();
             initializeChartSelections();
-        },
-        error: function(error) {
+        } catch (error) {
+            ErrorHandler.handle(error, 'csv_import');
             showStatus('Failed to parse CSV: ' + error.message, 'error');
         }
-    });
+    }
 }
+
 
 // Initialize chart selections with categorized options
 function initializeChartSelections() {
@@ -4341,6 +4754,9 @@ function populateCombinedFilters() {
 // the combined filter dropdowns, sets the corresponding values on
 // underlying module-specific selects, and then triggers the same logic
 // used by applyFilters() and applyOverviewFilters().
+const debouncedApplyFilters = debounce(applyFilters, 300);
+window.debouncedApplyFilters = debouncedApplyFilters;
+
 function applyCombinedFilters() {
     const site = document.getElementById('combinedSiteFilter').value;
     const severity = document.getElementById('combinedSeverityFilter').value;
@@ -9508,6 +9924,8 @@ window.SafetyAnalytics = {
 // onclick="switchModule('injury')". Explicitly attach them to window to
 // prevent ReferenceError exceptions when the page loads. Only functions
 // referenced directly in HTML markup are exposed below.
+const safeHandleFileUpload = safeExecute(handleFileUpload, 'csv_import');
+window.handleFileUpload = safeHandleFileUpload;
 window.switchModule = switchModule;
 window.toggleTheme = toggleTheme;
 window.loadSampleData = loadSampleData;
@@ -9539,4 +9957,3 @@ console.log('Safety Analytics Platform initialized successfully');
 console.log('Version: 2.0 | © 2024 Amazon WHS Austria');
 console.log('For support, contact: Erwin Esener @eeesener');
  </script>
-<script src="pdf-report.js"></script>
