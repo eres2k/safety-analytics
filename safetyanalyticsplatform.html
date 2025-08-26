@@ -4544,6 +4544,9 @@ function sortData(type) {
         if (column === 'incident_date' || column === 'nearmiss_date') {
             valA = a.parsedDate;
             valB = b.parsedDate;
+            if (valA === undefined || valA === null || isNaN(valA)) return -1 * direction;
+            if (valB === undefined || valB === null || isNaN(valB)) return 1 * direction;
+            return (valA - valB) * direction;
         }
         if (valA === undefined || valA === null) return -1 * direction;
         if (valB === undefined || valB === null) return 1 * direction;
