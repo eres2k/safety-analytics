@@ -8358,8 +8358,9 @@ function generatePDFReport(type) {
         doc.text(`Report Generated: ${new Date().toLocaleString('en-GB')}`, margin, yPos);
         doc.text(`Report Type: ${type.charAt(0).toUpperCase() + type.slice(1)} Safety Analysis`, margin, yPos + 6);
         doc.text(`Period: ${getReportPeriod()}`, margin, yPos + 12);
-        
-        yPos = 65;
+        doc.text(`Sites: ${getSelectedSites(type)}`, margin, yPos + 18);
+
+        yPos = 70;
         
         // Executive Summary
         yPos = addSectionHeader('Executive Summary', yPos);
@@ -8375,7 +8376,7 @@ function generatePDFReport(type) {
         doc.setFont('helvetica', 'normal');
         
         let summaryText = '';
-        if (type === 'injury' || type === 'combined') {
+        if (type === 'injury' || type === 'combined' || type === 'executive') {
             const injuryData = state.injury.filteredData;
             const recordableCount = injuryData.filter(r => r.recordable === 1).length;
             const lostTimeCount = injuryData.filter(r => r.total_dafw_days > 0).length;
@@ -8390,7 +8391,7 @@ function generatePDFReport(type) {
             summaryText += `• Key Finding: ${getKeyFinding(injuryData, 'injury')}`;
         }
         
-        if (type === 'nearmiss' || type === 'combined') {
+        if (type === 'nearmiss' || type === 'combined' || type === 'executive') {
             if (summaryText) summaryText += '\n\n';
             const nearMissData = state.nearMiss.filteredData;
             const highRiskCount = nearMissData.filter(r => r.severity === 'A' || r.severity === 'B').length;
@@ -8415,8 +8416,9 @@ function generatePDFReport(type) {
         const boxWidth = 38;
         const boxHeight = 28;
         const boxGap = 5;
-        
-        if (type === 'injury' || type === 'combined') {
+        let metricsBottom = metricsY;
+
+        if (type === 'injury' || type === 'combined' || type === 'executive') {
             const injuryData = state.injury.filteredData;
             const metrics = [
                 { label: 'Total Cases', value: injuryData.length, color: AMAZON_COLORS.darkBlue },
@@ -8424,14 +8426,38 @@ function generatePDFReport(type) {
                 { label: 'Lost Time', value: injuryData.filter(r => r.total_dafw_days > 0).length, color: 'rgb(183, 28, 28)' },
                 { label: 'Days Lost', value: injuryData.reduce((sum, r) => sum + (r.total_dafw_days || 0), 0), color: AMAZON_COLORS.orange }
             ];
-            
+
             metrics.forEach((metric, index) => {
                 const x = margin + (index * (boxWidth + boxGap));
                 addMetricBox(x, metricsY, boxWidth, boxHeight, metric.label, metric.value, metric.color);
             });
+            metricsBottom = metricsY + boxHeight;
         }
-        
-        yPos = metricsY + boxHeight + 15;
+
+        if (type === 'nearmiss' || type === 'combined' || type === 'executive') {
+            const nearMissData = state.nearMiss.filteredData;
+            const highRisk = nearMissData.filter(r => r.severity === 'A' || r.severity === 'B').length;
+            const avgRisk = nearMissData.length > 0 ? (
+                nearMissData.reduce((sum, r) => sum + parseFloat(r.risk || 0), 0) / nearMissData.length
+            ).toFixed(1) : '0';
+            const qualityScore = state.nearMiss.qualityMetrics?.qualityScore;
+            const qualityVal = qualityScore !== undefined ? `${qualityScore}%` : 'N/A';
+            const metrics = [
+                { label: 'Total Near Misses', value: nearMissData.length, color: AMAZON_COLORS.darkBlue },
+                { label: 'High Severity', value: highRisk, color: 'rgb(255, 87, 34)' },
+                { label: 'Avg Risk', value: avgRisk, color: AMAZON_COLORS.orange },
+                { label: 'Quality Score', value: qualityVal, color: 'rgb(183, 28, 28)' }
+            ];
+
+            const nearMissY = metricsBottom + boxGap;
+            metrics.forEach((metric, index) => {
+                const x = margin + (index * (boxWidth + boxGap));
+                addMetricBox(x, nearMissY, boxWidth, boxHeight, metric.label, metric.value, metric.color);
+            });
+            metricsBottom = nearMissY + boxHeight;
+        }
+
+        yPos = metricsBottom + 15;
         
         // Severity Distribution
         yPos = addSectionHeader('Severity Distribution Analysis', yPos);
@@ -8943,6 +8969,19 @@ function getReportPeriod() {
     const endDate = dates[dates.length - 1].toLocaleDateString('en-GB');
     
     return `${startDate} - ${endDate}`;
+}
+
+function getSelectedSites(type) {
+    let site = '';
+    if (type === 'injury') {
+        site = document.getElementById('injurySiteFilter')?.value;
+    } else if (type === 'nearmiss') {
+        site = document.getElementById('nearMissSiteFilter')?.value;
+    } else {
+        site = document.getElementById('combinedSiteFilter')?.value ||
+               document.getElementById('overviewSiteFilter')?.value;
+    }
+    return site || 'All Sites';
 }
 
 function getKeyFinding(data, type) {
