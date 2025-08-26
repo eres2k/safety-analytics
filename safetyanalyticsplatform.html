@@ -2943,6 +2943,7 @@ function calculateQualityMetrics(type) {
         dataCompleteness: 0,
         qualityScore: 0,
         duplicateDetails: [],
+        duplicateCreators: [],
         missingFieldsDetails: {},
         recommendations: [],
         // Add word analysis metrics
@@ -2958,6 +2959,7 @@ function calculateQualityMetrics(type) {
     // Check for duplicates
     if (type === 'nearmiss') {
         const processed = new Set();
+        const creatorCounts = {};
 
         data.forEach((row, index) => {
             if (processed.has(index)) return;
@@ -3002,8 +3004,20 @@ function calculateQualityMetrics(type) {
                         similarity: 'Description-based grouping'
                     }
                 });
+
+                // Track duplicate creators (excluding the base record)
+                similarIndices.slice(1).forEach(idx => {
+                    const rec = data[idx];
+                    const creator = rec.created_by || rec.creator || rec.reportedBy || rec.initial_info_reporter || 'Unknown';
+                    creatorCounts[creator] = (creatorCounts[creator] || 0) + 1;
+                });
             }
         });
+
+        metrics.duplicateCreators = Object.entries(creatorCounts)
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 3)
+            .map(([creator, count]) => ({ creator, count }));
     }
 
     // Word count analysis for near miss
@@ -3291,6 +3305,14 @@ function updateQualityDisplay(type, metrics) {
                             <i>➕</i> ${metrics.duplicateDetails.length - 5} more duplicate groups...
                         </div>` : ''}
                 </div>
+                ${metrics.duplicateCreators && metrics.duplicateCreators.length ? `
+                <div class="duplicate-creators" style="margin-top:1rem;">
+                    <h5>Top Duplicate Creators</h5>
+                    <ol>
+                        ${metrics.duplicateCreators.map(dc => `<li>${dc.creator}: ${dc.count}</li>`).join('')}
+                    </ol>
+                </div>
+                ` : ''}
             </div>
             ` : ''}
             
@@ -8368,13 +8390,14 @@ function exportNearMissDuplicatesPDF() {
 
         doc.autoTable({
             startY: yPos,
-            head: [['Description', 'Creator', 'Similarity %']],
+            head: [['Description', 'Creator', 'Austin Link', 'Similarity %']],
             body: records.map((rec, i) => {
                 const desc = (rec.initial_info_incident_description || '').substring(0, 100);
                 const creator = rec.created_by || rec.creator || rec.reportedBy || rec.initial_info_reporter || 'Unknown';
+                const austin = rec.austin_url && rec.austin_url !== '#' ? rec.austin_url : 'N/A';
                 const similarity = i === 0 ? 'Base' :
                     (calculateTextSimilarity(baseDesc, rec.initial_info_incident_description || '') * 100).toFixed(1) + '%';
-                return [desc, creator, similarity];
+                return [desc, creator, austin, similarity];
             }),
             theme: 'grid',
             headStyles: { fillColor: hexToRgb(AMAZON_COLORS.darkBlue) },
