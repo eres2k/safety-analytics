@@ -2939,26 +2939,33 @@ function calculateQualityMetrics(type) {
         const groups = [];
         const assignment = new Array(data.length).fill(null);
         const threshold = 0.9;
+        const getDesc = r => (r.initial_info_incident_description || r.description || r.incident_description || r.nearmiss_description || '').toLowerCase();
         for (let i = 0; i < data.length; i++) {
-            const descA = (data[i].initial_info_incident_description || '').toLowerCase();
+            const descA = getDesc(data[i]);
             if (!descA) continue;
             for (let j = i + 1; j < data.length; j++) {
-                const descB = (data[j].initial_info_incident_description || '').toLowerCase();
+                const descB = getDesc(data[j]);
                 if (!descB) continue;
                 const sim = stringSimilarity(descA, descB);
                 if (sim >= threshold) {
-                    let groupIndex = assignment[i] ?? assignment[j];
+                    let groupIndex = assignment[i];
+                    if (groupIndex === null) groupIndex = assignment[j];
                     if (groupIndex !== null) {
                         const group = groups[groupIndex];
-                        if (!group.indices.includes(i)) {
-                            group.indices.push(i);
-                        }
-                        if (!group.indices.includes(j)) {
-                            group.indices.push(j);
-                            metrics.duplicates++;
-                        }
-                        assignment[i] = groupIndex;
-                        assignment[j] = groupIndex;
+                        const tryAdd = (idx, desc) => {
+                            if (group.indices.includes(idx)) return;
+                            const similarToAll = group.indices.every(existingIdx => {
+                                const existingDesc = getDesc(data[existingIdx]);
+                                return stringSimilarity(desc, existingDesc) >= threshold;
+                            });
+                            if (similarToAll) {
+                                group.indices.push(idx);
+                                metrics.duplicates++;
+                                assignment[idx] = groupIndex;
+                            }
+                        };
+                        tryAdd(i, descA);
+                        tryAdd(j, descB);
                     } else {
                         groups.push({
                             key: `Similarity ${Math.round(sim * 100)}%`,
@@ -3252,7 +3259,7 @@ function updateQualityDisplay(type, metrics) {
                                 </div>
                                 <div class="duplicate-rows">
                                     Rows: ${dup.indices.map(i => `<span class="row-badge">#${i + 1}</span>`).join(' ')}
-                                    <span class="duplicate-action" onclick="showDuplicateDetails(${index}, '${type}')">→ Review & Merge</span>
+                                    <span class="duplicate-action" onclick="showDuplicateDetails(${index}, '${type}')">→ Review</span>
                                 </div>
                             </div>
                         </div>
@@ -7193,7 +7200,10 @@ function showDuplicateDetails(groupIndex, type) {
                         ${rec.bodyPart ? `Body Part: ${rec.bodyPart}<br>` : ''}
         ${rec.location ? `Location: ${rec.location}<br>` : ''}
                     </span>
-                    ${rec.initial_info_incident_description ? `<div style="margin-top:0.5rem;"><strong>Description:</strong> ${rec.initial_info_incident_description}</div>` : ''}
+                    ${(() => {
+                        const desc = rec.initial_info_incident_description || rec.description || rec.incident_description || rec.nearmiss_description;
+                        return desc ? `<div style="margin-top:0.5rem;"><strong>Description:</strong> ${desc}</div>` : '';
+                    })()}
                     ${rec.austin_url && rec.austin_url !== '#' ? `<a href="${rec.austin_url}" target="_blank" class="austin-link" style="margin-top:0.5rem; display:inline-block;">Austin Link</a>` : ''}
                 </div>
             `).join('')}
@@ -7235,7 +7245,7 @@ function showAllDuplicates(type) {
                         ${dup.data.location ? `Location: ${dup.data.location}<br>` : ''}
                     </span>
                     <div>Rows: ${dup.indices.map(i => `#${i + 1}`).join(', ')}</div>
-                    <button class="btn btn-sm btn-primary" style="margin-top:0.5rem;" onclick="showDuplicateDetails(${index}, '${type}')">Review & Merge</button>
+                    <button class="btn btn-sm btn-primary" style="margin-top:0.5rem;" onclick="showDuplicateDetails(${index}, '${type}')">Review</button>
                 </div>
             `).join('')}
         </div>
