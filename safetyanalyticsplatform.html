@@ -2935,7 +2935,7 @@ function calculateTextSimilarity(text1, text2) {
 
 // Calculate Quality Metrics
 function calculateQualityMetrics(type) {
-    const data = type === 'injury' ? state.injury.rawData : state.nearMiss.rawData;
+    const data = type === 'injury' ? state.injury.filteredData : state.nearMiss.filteredData;
     const metrics = {
         totalRecords: data.length,
         duplicates: 0,
@@ -3264,7 +3264,10 @@ function updateQualityDisplay(type, metrics) {
             <div class="quality-section duplicate-section">
                 <div class="section-header">
                     <h4><span class="section-icon">🔄</span> Duplicate Records Detected</h4>
-                    <span class="duplicate-count">${metrics.duplicateDetails.length} groups</span>
+                    <div style="display:flex; align-items:center; gap:0.5rem;">
+                        <span class="duplicate-count">${metrics.duplicateDetails.length} groups</span>
+                        <button class="btn btn-sm btn-primary" onclick="exportNearMissDuplicatesPDF()">Export PDF</button>
+                    </div>
                 </div>
                 <div class="duplicate-list">
                     ${metrics.duplicateDetails.slice(0, 5).map((dup, index) => `
@@ -4099,6 +4102,14 @@ function applyFilters(type) {
     updateKPIs();
     // Ensure the combined analytics reflect the latest filtered data
     updateCombinedAnalytics();
+
+    // Recalculate data quality metrics based on the filtered dataset
+    calculateQualityMetrics(type);
+    if (type === 'injury') {
+        updateInjuryQualityMetrics();
+    } else {
+        updateNearMissQualityMetrics();
+    }
 }
 
 // Populate overview filter options based on loaded data
@@ -7199,7 +7210,7 @@ function showDuplicateDetails(groupIndex, type) {
     const group = metrics.duplicateDetails[groupIndex];
     if (!group) return;
 
-    const source = type === 'nearmiss' ? state.nearMiss.rawData : state.injury.rawData;
+    const source = type === 'nearmiss' ? state.nearMiss.filteredData : state.injury.filteredData;
     const records = group.indices.map(i => source[i]);
 
     const modal = document.getElementById('detailModal');
@@ -8319,6 +8330,63 @@ function exportTable(type) {
         console.error('Table export error:', error);
         showStatus('Error exporting table: ' + error.message, 'error');
     }
+}
+
+// Export Near Miss Duplicate Details as PDF
+function exportNearMissDuplicatesPDF() {
+    const metrics = state.nearMiss.qualityMetrics;
+    if (!metrics || !metrics.duplicateDetails.length) {
+        showStatus('No duplicate records to export', 'warning');
+        return;
+    }
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ unit: 'pt', compress: true });
+    doc.setFont('helvetica', 'normal');
+
+    const margin = 40;
+    let yPos = margin;
+
+    doc.setFontSize(16);
+    doc.setTextColor(...hexToRgb(AMAZON_COLORS.darkBlue));
+    doc.text('Near Miss Duplicate Report', margin, yPos);
+    yPos += 20;
+
+    metrics.duplicateDetails.forEach((group, index) => {
+        if (yPos > doc.internal.pageSize.getHeight() - 80) {
+            doc.addPage();
+            yPos = margin;
+        }
+
+        doc.setFontSize(12);
+        doc.setFont('helvetica', 'bold');
+        doc.text(`Group ${index + 1} - ${group.data.site} (${group.data.date || 'N/A'})`, margin, yPos);
+        yPos += 10;
+
+        const records = group.indices.map(i => state.nearMiss.filteredData[i]);
+        const baseDesc = records[0].initial_info_incident_description || '';
+
+        doc.autoTable({
+            startY: yPos,
+            head: [['Description', 'Creator', 'Similarity %']],
+            body: records.map((rec, i) => {
+                const desc = (rec.initial_info_incident_description || '').substring(0, 100);
+                const creator = rec.created_by || rec.creator || rec.reportedBy || rec.initial_info_reporter || 'Unknown';
+                const similarity = i === 0 ? 'Base' :
+                    (calculateTextSimilarity(baseDesc, rec.initial_info_incident_description || '') * 100).toFixed(1) + '%';
+                return [desc, creator, similarity];
+            }),
+            theme: 'grid',
+            headStyles: { fillColor: hexToRgb(AMAZON_COLORS.darkBlue) },
+            styles: { fontSize: 8, cellWidth: 'wrap' },
+            margin: { left: margin, right: margin }
+        });
+
+        yPos = doc.lastAutoTable.finalY + 20;
+    });
+
+    doc.save('near_miss_duplicates.pdf');
+    showStatus('Duplicate report exported!', 'success');
 }
 
 // Export Chart
@@ -9629,6 +9697,7 @@ window.exportDashboard = exportDashboard;
 window.exportInjuryData = exportInjuryData;
 window.exportNearMissData = exportNearMissData;
 window.exportTable = exportTable;
+window.exportNearMissDuplicatesPDF = exportNearMissDuplicatesPDF;
 window.markActionComplete = markActionComplete;
 window.switchInjuryView = switchInjuryView;
 window.switchNearMissView = switchNearMissView;
