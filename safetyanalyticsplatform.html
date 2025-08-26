@@ -2878,6 +2878,40 @@ function processNearMissData() {
     });
 }
 
+// String similarity using Levenshtein distance
+function levenshtein(a, b) {
+    if (!a) return b.length;
+    if (!b) return a.length;
+    const matrix = Array.from({ length: b.length + 1 }, (_, i) => [i]);
+    for (let j = 0; j <= a.length; j++) {
+        matrix[0][j] = j;
+    }
+    for (let i = 1; i <= b.length; i++) {
+        for (let j = 1; j <= a.length; j++) {
+            if (b.charAt(i - 1) === a.charAt(j - 1)) {
+                matrix[i][j] = matrix[i - 1][j - 1];
+            } else {
+                matrix[i][j] = Math.min(
+                    matrix[i - 1][j] + 1,
+                    matrix[i][j - 1] + 1,
+                    matrix[i - 1][j - 1] + 1
+                );
+            }
+        }
+    }
+    return matrix[b.length][a.length];
+}
+
+function stringSimilarity(a, b) {
+    if (!a || !b) return 0;
+    const longer = a.length > b.length ? a : b;
+    const shorter = a.length > b.length ? b : a;
+    const longerLength = longer.length;
+    if (longerLength === 0) return 1;
+    const distance = levenshtein(longer.toLowerCase(), shorter.toLowerCase());
+    return (longerLength - distance) / longerLength;
+}
+
 // Calculate Quality Metrics
 function calculateQualityMetrics(type) {
     const data = type === 'injury' ? state.injury.rawData : state.nearMiss.rawData;
@@ -2900,34 +2934,50 @@ function calculateQualityMetrics(type) {
         }
     };
 
-    // Check for duplicates
+    // Check for duplicates using description similarity
     if (type === 'nearmiss') {
-        const seen = new Map();
-        data.forEach((row, index) => {
-            const key = `${row.nearmiss_date}-${row.site}-${row.location}-${row.initial_info_primary_impact}`;
-            if (seen.has(key)) {
-                metrics.duplicates++;
-                const existingIndex = seen.get(key);
-                // Group duplicates together
-                const found = metrics.duplicateDetails.find(d => d.indices.includes(existingIndex));
-                if (found) {
-                    found.indices.push(index);
-                } else {
-                    metrics.duplicateDetails.push({
-                        key,
-                        indices: [existingIndex, index],
-                        data: {
-                            date: row.nearmiss_date,
-                            site: row.site,
-                            location: row.location || 'Unknown',
-                            impact: row.initial_info_primary_impact || 'Unknown'
+        const groups = [];
+        const assignment = new Array(data.length).fill(null);
+        const threshold = 0.9;
+        for (let i = 0; i < data.length; i++) {
+            const descA = (data[i].initial_info_incident_description || '').toLowerCase();
+            if (!descA) continue;
+            for (let j = i + 1; j < data.length; j++) {
+                const descB = (data[j].initial_info_incident_description || '').toLowerCase();
+                if (!descB) continue;
+                const sim = stringSimilarity(descA, descB);
+                if (sim >= threshold) {
+                    let groupIndex = assignment[i] ?? assignment[j];
+                    if (groupIndex !== null) {
+                        const group = groups[groupIndex];
+                        if (!group.indices.includes(i)) {
+                            group.indices.push(i);
                         }
-                    });
+                        if (!group.indices.includes(j)) {
+                            group.indices.push(j);
+                            metrics.duplicates++;
+                        }
+                        assignment[i] = groupIndex;
+                        assignment[j] = groupIndex;
+                    } else {
+                        groups.push({
+                            key: `Similarity ${Math.round(sim * 100)}%`,
+                            indices: [i, j],
+                            data: {
+                                date: data[i].nearmiss_date,
+                                site: data[i].site,
+                                location: data[i].location || 'Unknown'
+                            }
+                        });
+                        const idx = groups.length - 1;
+                        assignment[i] = idx;
+                        assignment[j] = idx;
+                        metrics.duplicates++;
+                    }
                 }
-            } else {
-                seen.set(key, index);
             }
-        });
+        }
+        metrics.duplicateDetails = groups;
     }
 
     // Word count analysis for near miss
@@ -7102,6 +7152,7 @@ function showDuplicateDetails(groupIndex, type) {
                         ${rec.bodyPart ? `Body Part: ${rec.bodyPart}<br>` : ''}
         ${rec.location ? `Location: ${rec.location}<br>` : ''}
                     </span>
+                    ${rec.initial_info_incident_description ? `<div style="margin-top:0.5rem;"><strong>Description:</strong> ${rec.initial_info_incident_description}</div>` : ''}
                     ${rec.austin_url && rec.austin_url !== '#' ? `<a href="${rec.austin_url}" target="_blank" class="austin-link" style="margin-top:0.5rem; display:inline-block;">Austin Link</a>` : ''}
                 </div>
             `).join('')}
