@@ -2321,7 +2321,8 @@ const state = {
         charts: {},
         currentPage: 1,
         timelinePage: 1,
-        qualityMetrics: {}
+        qualityMetrics: {},
+        sort: { column: 'incident_date', direction: 'desc' }
     },
     nearMiss: {
         rawData: [],
@@ -2329,7 +2330,8 @@ const state = {
         charts: {},
         currentPage: 1,
         timelinePage: 1,
-        qualityMetrics: {}
+        qualityMetrics: {},
+        sort: { column: 'nearmiss_date', direction: 'desc' }
     },
     currentModule: 'overview',
     theme: 'light',
@@ -2386,7 +2388,9 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeCharts();
     setupEventListeners();
     createRiskMatrices();
-    
+    setupTableSorting('injury');
+    setupTableSorting('nearmiss');
+
     // Check for saved theme preference
     const savedTheme = localStorage.getItem('theme') || 'light';
     if (savedTheme === 'dark') {
@@ -3939,7 +3943,10 @@ function applyFilters(type) {
             
             return true;
         });
-        
+
+        sortData('injury');
+        updateSortIndicators('injury');
+
         state.injury.currentPage = 1;
         updateInjuryDashboard();
         updateInjuryTable();
@@ -3971,7 +3978,10 @@ function applyFilters(type) {
             
             return true;
         });
-        
+
+        sortData('nearmiss');
+        updateSortIndicators('nearmiss');
+
         state.nearMiss.currentPage = 1;
         updateNearMissDashboard();
         updateNearMissTable();
@@ -4520,6 +4530,84 @@ function getRiskClass(risk) {
     if (riskValue >= 4) return 'warning';
     if (riskValue >= 2) return 'success';
     return 'info';
+}
+
+// Table Sorting Utilities
+function sortData(type) {
+    const sort = state[type].sort;
+    const data = state[type].filteredData;
+    const column = sort.column;
+    const direction = sort.direction === 'asc' ? 1 : -1;
+    data.sort((a, b) => {
+        let valA = a[column];
+        let valB = b[column];
+        if (column === 'incident_date' || column === 'nearmiss_date') {
+            valA = a.parsedDate;
+            valB = b.parsedDate;
+        }
+        if (valA === undefined || valA === null) return -1 * direction;
+        if (valB === undefined || valB === null) return 1 * direction;
+        const numA = parseFloat(valA);
+        const numB = parseFloat(valB);
+        if (!isNaN(numA) && !isNaN(numB)) {
+            return (numA - numB) * direction;
+        }
+        return valA.toString().localeCompare(valB.toString()) * direction;
+    });
+}
+
+function toggleSort(type, column) {
+    const sort = state[type].sort;
+    if (sort.column === column) {
+        sort.direction = sort.direction === 'asc' ? 'desc' : 'asc';
+    } else {
+        sort.column = column;
+        sort.direction = column === 'incident_date' || column === 'nearmiss_date' ? 'desc' : 'asc';
+    }
+}
+
+function updateSortIndicators(type) {
+    const tableId = type === 'injury' ? 'injuryTable' : 'nearMissTable';
+    const columns = type === 'injury' ?
+        ['case_number','incident_date','site','bodyPart','type','severity','recordable','otr','total_dafw_days','rootCause'] :
+        ['incident_id','nearmiss_date','site','location','processPath','primaryImpact','severity','standardized_likelihood','risk'];
+    const headers = document.querySelectorAll(`#${tableId} thead th`);
+    headers.forEach((th, index) => {
+        if (index >= columns.length) return;
+        const column = columns[index];
+        const base = th.dataset.originalText || th.textContent;
+        th.dataset.originalText = base;
+        let text = base;
+        const sort = state[type].sort;
+        if (sort.column === column) {
+            text += sort.direction === 'asc' ? ' ▲' : ' ▼';
+        }
+        th.textContent = text;
+    });
+}
+
+function setupTableSorting(type) {
+    const tableId = type === 'injury' ? 'injuryTable' : 'nearMissTable';
+    const columns = type === 'injury' ?
+        ['case_number','incident_date','site','bodyPart','type','severity','recordable','otr','total_dafw_days','rootCause'] :
+        ['incident_id','nearmiss_date','site','location','processPath','primaryImpact','severity','standardized_likelihood','risk'];
+    const headers = document.querySelectorAll(`#${tableId} thead th`);
+    headers.forEach((th, index) => {
+        if (index >= columns.length) return;
+        const column = columns[index];
+        th.style.cursor = 'pointer';
+        th.addEventListener('click', () => {
+            toggleSort(type, column);
+            sortData(type);
+            if (type === 'injury') {
+                updateInjuryTable();
+            } else {
+                updateNearMissTable();
+            }
+            updateSortIndicators(type);
+        });
+    });
+    updateSortIndicators(type);
 }
 
 // Initialize Charts
