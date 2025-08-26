@@ -1,8 +1,0 @@
-{
-  "name": "safety-analytics",
-  "version": "1.0.0",
-  "description": "Static site build configuration for Netlify",
-  "scripts": {
-    "build": "mkdir -p dist && cp index.html dist/index.html"
-  }
-}
