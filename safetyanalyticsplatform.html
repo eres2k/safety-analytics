@@ -2912,6 +2912,27 @@ function stringSimilarity(a, b) {
     return (longerLength - distance) / longerLength;
 }
 
+// Calculate text similarity using Jaccard index
+function calculateTextSimilarity(text1, text2) {
+    if (!text1 || !text2) return 0;
+
+    // Convert to lowercase and clean
+    const clean1 = text1.toLowerCase().replace(/[^\w\s]/g, ' ').trim();
+    const clean2 = text2.toLowerCase().replace(/[^\w\s]/g, ' ').trim();
+
+    if (clean1 === clean2) return 1;
+
+    // Create word sets
+    const words1 = new Set(clean1.split(/\s+/).filter(w => w.length > 2));
+    const words2 = new Set(clean2.split(/\s+/).filter(w => w.length > 2));
+
+    // Calculate Jaccard similarity
+    const intersection = new Set([...words1].filter(x => words2.has(x)));
+    const union = new Set([...words1, ...words2]);
+
+    return union.size === 0 ? 0 : intersection.size / union.size;
+}
+
 // Calculate Quality Metrics
 function calculateQualityMetrics(type) {
     const data = type === 'injury' ? state.injury.rawData : state.nearMiss.rawData;
@@ -2934,57 +2955,55 @@ function calculateQualityMetrics(type) {
         }
     };
 
-    // Check for duplicates using description similarity
+    // Check for duplicates
     if (type === 'nearmiss') {
-        const groups = [];
-        const assignment = new Array(data.length).fill(null);
-        const threshold = 0.9;
-        const getDesc = r => (r.initial_info_incident_description || r.description || r.incident_description || r.nearmiss_description || '').toLowerCase();
-        for (let i = 0; i < data.length; i++) {
-            const descA = getDesc(data[i]);
-            if (!descA) continue;
-            for (let j = i + 1; j < data.length; j++) {
-                const descB = getDesc(data[j]);
-                if (!descB) continue;
-                const sim = stringSimilarity(descA, descB);
-                if (sim >= threshold) {
-                    let groupIndex = assignment[i];
-                    if (groupIndex === null) groupIndex = assignment[j];
-                    if (groupIndex !== null) {
-                        const group = groups[groupIndex];
-                        const tryAdd = (idx, desc) => {
-                            if (group.indices.includes(idx)) return;
-                            const similarToAll = group.indices.every(existingIdx => {
-                                const existingDesc = getDesc(data[existingIdx]);
-                                return stringSimilarity(desc, existingDesc) >= threshold;
-                            });
-                            if (similarToAll) {
-                                group.indices.push(idx);
-                                metrics.duplicates++;
-                                assignment[idx] = groupIndex;
-                            }
-                        };
-                        tryAdd(i, descA);
-                        tryAdd(j, descB);
-                    } else {
-                        groups.push({
-                            key: `Similarity ${Math.round(sim * 100)}%`,
-                            indices: [i, j],
-                            data: {
-                                date: data[i].nearmiss_date,
-                                site: data[i].site,
-                                location: data[i].location || 'Unknown'
-                            }
-                        });
-                        const idx = groups.length - 1;
-                        assignment[i] = idx;
-                        assignment[j] = idx;
-                        metrics.duplicates++;
+        const processed = new Set();
+
+        data.forEach((row, index) => {
+            if (processed.has(index)) return;
+
+            const currentDesc = row.initial_info_incident_description || '';
+            if (!currentDesc || currentDesc.trim().length < 10) return;
+
+            const similarIndices = [index];
+            processed.add(index);
+
+            // Compare with remaining unprocessed items
+            for (let j = index + 1; j < data.length; j++) {
+                if (processed.has(j)) continue;
+
+                const compareDesc = data[j].initial_info_incident_description || '';
+                if (!compareDesc || compareDesc.trim().length < 10) continue;
+
+                // Check if same site and within 30 days
+                const sameContext = data[j].site === row.site;
+                const dateDiff = Math.abs(new Date(data[j].nearmiss_date) - new Date(row.nearmiss_date)) / (1000 * 60 * 60 * 24);
+                const withinTimeframe = dateDiff <= 30;
+
+                if (sameContext && withinTimeframe) {
+                    const similarity = calculateTextSimilarity(currentDesc, compareDesc);
+                    if (similarity >= 0.9) {
+                        similarIndices.push(j);
+                        processed.add(j);
                     }
                 }
             }
-        }
-        metrics.duplicateDetails = groups;
+
+            // Only create duplicate group if we found similar records
+            if (similarIndices.length > 1) {
+                metrics.duplicates += similarIndices.length - 1;
+                metrics.duplicateDetails.push({
+                    key: `similarity-group-${metrics.duplicateDetails.length}`,
+                    indices: similarIndices,
+                    data: {
+                        date: row.nearmiss_date,
+                        site: row.site,
+                        location: row.location || row.initial_info_location_event || 'Unknown',
+                        similarity: 'Description-based grouping'
+                    }
+                });
+            }
+        });
     }
 
     // Word count analysis for near miss
@@ -7187,42 +7206,52 @@ function showDuplicateDetails(groupIndex, type) {
     const title = document.getElementById('modalTitle');
     const body = document.getElementById('modalBody');
 
-    title.textContent = `Duplicate Records (${group.indices.length})`;
+    title.textContent = `Similar Records Review (${group.indices.length})`;
     body.innerHTML = `
-        <p style="margin-bottom:1rem;">${group.data.date || 'No date'} – ${group.data.site} – ${group.data.location}</p>
-        <div style="max-height:400px; overflow-y:auto;">
-            ${records.map((rec, idx) => `
-                <div style="padding:1rem; border-bottom:1px solid var(--bg-secondary);">
-                    <strong>${rec.case_number || rec.incident_id || 'Row #' + (group.indices[idx] + 1)}</strong><br>
-                    <span style="color: var(--text-secondary);">
-                        Date: ${rec.incident_date || rec.nearmiss_date || 'N/A'}<br>
-                        Site: ${rec.site || 'N/A'}<br>
-                        ${rec.bodyPart ? `Body Part: ${rec.bodyPart}<br>` : ''}
-        ${rec.location ? `Location: ${rec.location}<br>` : ''}
-                    </span>
-                    ${(() => {
-                        const desc = rec.initial_info_incident_description || rec.description || rec.incident_description || rec.nearmiss_description;
-                        return desc ? `<div style="margin-top:0.5rem;"><strong>Description:</strong> ${desc}</div>` : '';
-                    })()}
-                    ${rec.austin_url && rec.austin_url !== '#' ? `<a href="${rec.austin_url}" target="_blank" class="austin-link" style="margin-top:0.5rem; display:inline-block;">Austin Link</a>` : ''}
+        <p style="margin-bottom:1rem; color: var(--text-secondary);">
+            <strong>Group:</strong> ${group.data.date || 'No date'} – ${group.data.site} – ${group.data.location}
+            ${group.data.similarity ? `<br><strong>Grouping:</strong> ${group.data.similarity}` : ''}
+        </p>
+        <div style="max-height:500px; overflow-y:auto;">
+            ${records.map((rec, idx) => {
+                const description = rec.initial_info_incident_description || 'No description available';
+                const similarity = idx > 0 ? 
+                    (type === 'nearmiss' ? 
+                        (calculateTextSimilarity(records[0].initial_info_incident_description || '', description) * 100).toFixed(1) + '% similar' 
+                        : '') : 'Base record';
+                
+                return `
+                <div style="padding:1.5rem; border-bottom:1px solid var(--bg-secondary); background: ${idx % 2 === 0 ? 'var(--bg-primary)' : 'var(--bg-secondary)'};">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                        <strong>${rec.case_number || rec.incident_id || 'Row #' + (group.indices[idx] + 1)}</strong>
+                        ${type === 'nearmiss' && idx > 0 ? `<span style="color: var(--primary); font-size: 0.9rem;">${similarity}</span>` : ''}
+                    </div>
+                    <div style="color: var(--text-secondary); margin-bottom: 1rem;">
+                        <div><strong>Date:</strong> ${rec.incident_date || rec.nearmiss_date || 'N/A'}</div>
+                        <div><strong>Site:</strong> ${rec.site || 'N/A'}</div>
+                        ${rec.location || rec.initial_info_location_event ? `<div><strong>Location:</strong> ${rec.location || rec.initial_info_location_event}</div>` : ''}
+                ${rec.bodyPart ? `<div><strong>Body Part:</strong> ${rec.bodyPart}</div>` : ''}
+                    </div>
+                    ${type === 'nearmiss' ? `
+                        <div style="background: var(--bg-tertiary); padding: 1rem; border-radius: 4px; margin-bottom: 1rem;">
+                            <strong style="color: var(--primary);">Description:</strong><br>
+                            <div style="margin-top: 0.5rem; line-height: 1.4; max-height: 120px; overflow-y: auto;">
+                                ${description}
+                            </div>
+                        </div>` : ''}
+                    ${rec.austin_url && rec.austin_url !== '#' ? `<a href="${rec.austin_url}" target="_blank" class="austin-link" style="display:inline-block; margin-top:0.5rem;">Austin Link</a>` : ''}
                 </div>
-            `).join('')}
+            `}).join('')}
         </div>
-        <button class="btn btn-primary" style="margin-top:1rem;" onclick="mergeDuplicateGroup(${groupIndex}, '${type}')">Merge Duplicates</button>
+        ${type === 'nearmiss' && records.length > 1 ? `
+            <div style="margin-top: 1rem; padding: 1rem; background: var(--bg-secondary); border-radius: 4px;">
+                <p style="color: var(--text-secondary); font-size: 0.9rem; margin: 0;">
+                    <strong>Note:</strong> These records were grouped based on text similarity analysis. 
+                    Review each description to determine if they represent the same incident or similar but separate events.
+                </p>
+            </div>` : ''}
     `;
     modal.style.display = 'block';
-}
-
-function mergeDuplicateGroup(groupIndex, type) {
-    const metrics = type === 'nearmiss' ? state.nearMiss.qualityMetrics : state.injury.qualityMetrics;
-    const group = metrics.duplicateDetails[groupIndex];
-    if (!group) return;
-    const source = type === 'nearmiss' ? state.nearMiss.rawData : state.injury.rawData;
-    group.indices.slice(1).sort((a,b) => b - a).forEach(i => source.splice(i, 1));
-    calculateQualityMetrics(type);
-    applyFilters(type);
-    showStatus('Merged duplicate records', 'success');
-    closeModal();
 }
 
 function showAllDuplicates(type) {
@@ -9606,7 +9635,6 @@ window.switchNearMissView = switchNearMissView;
 window.viewDetails = viewDetails;
 window.showDuplicateDetails = showDuplicateDetails;
 window.showAllDuplicates = showAllDuplicates;
-window.mergeDuplicateGroup = mergeDuplicateGroup;
 
 // Expose combined filter handler so it can be invoked from the HTML
 window.applyCombinedFilters = applyCombinedFilters;
