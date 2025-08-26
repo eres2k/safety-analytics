@@ -1636,34 +1636,26 @@
                 <div class="charts-grid">
                     <div class="chart-card">
                         <div class="chart-header">
-                            <h3 class="chart-title">Recordable Rate Trend</h3>
+                            <h3 class="chart-title">Severity Pattern Radar</h3>
                         </div>
                         <div class="chart-container">
-                            <canvas id="injuryRecordableRateTrendChart"></canvas>
+                            <canvas id="injurySeverityPatternChart"></canvas>
                         </div>
                     </div>
                     <div class="chart-card">
                         <div class="chart-header">
-                            <h3 class="chart-title">Body Part Heat Map</h3>
+                            <h3 class="chart-title">Average Recovery Time</h3>
                         </div>
                         <div class="chart-container">
-                            <canvas id="injuryBodyPartHeatMapChart"></canvas>
+                            <canvas id="injuryRecoveryTimeChart"></canvas>
                         </div>
                     </div>
                     <div class="chart-card">
                         <div class="chart-header">
-                            <h3 class="chart-title">Root Cause by Site</h3>
+                            <h3 class="chart-title">Estimated Cost Impact</h3>
                         </div>
                         <div class="chart-container">
-                            <canvas id="injuryRootCauseBySiteChart"></canvas>
-                        </div>
-                    </div>
-                    <div class="chart-card">
-                        <div class="chart-header">
-                            <h3 class="chart-title">DAFW Distribution</h3>
-                        </div>
-                        <div class="chart-container">
-                            <canvas id="injuryDAFWDistributionChart"></canvas>
+                            <canvas id="injuryCostImpactChart"></canvas>
                         </div>
                     </div>
                 </div>
@@ -1995,34 +1987,26 @@
                 <div class="charts-grid">
                     <div class="chart-card">
                         <div class="chart-header">
-                            <h3 class="chart-title">Risk Trend Analysis</h3>
+                            <h3 class="chart-title">Near Miss to Injury Ratio</h3>
                         </div>
                         <div class="chart-container">
-                            <canvas id="nearMissRiskTrendChart"></canvas>
+                            <canvas id="nearMissToInjuryRatioChart"></canvas>
                         </div>
                     </div>
                     <div class="chart-card">
                         <div class="chart-header">
-                            <h3 class="chart-title">Impact vs Severity</h3>
+                            <h3 class="chart-title">Emerging Risk Locations</h3>
                         </div>
                         <div class="chart-container">
-                            <canvas id="nearMissImpactAnalysisChart"></canvas>
+                            <canvas id="nearMissPredictiveRiskChart"></canvas>
                         </div>
                     </div>
                     <div class="chart-card">
                         <div class="chart-header">
-                            <h3 class="chart-title">Location Risk Map</h3>
+                            <h3 class="chart-title">Risk Hotspots</h3>
                         </div>
                         <div class="chart-container">
-                            <canvas id="nearMissLocationRiskChart"></canvas>
-                        </div>
-                    </div>
-                    <div class="chart-card">
-                        <div class="chart-header">
-                            <h3 class="chart-title">Process Risk Analysis</h3>
-                        </div>
-                        <div class="chart-container">
-                            <canvas id="nearMissProcessRiskChart"></canvas>
+                            <canvas id="nearMissHotspotChart"></canvas>
                         </div>
                     </div>
                 </div>
@@ -4652,37 +4636,35 @@ function initializeCharts() {
 
 function initializeAdvancedCharts() {
     const injuryAdvancedCharts = [
-        'injuryRecordableRateTrendChart',
-        'injuryBodyPartHeatMapChart',
-        'injuryRootCauseBySiteChart',
-        'injuryDAFWDistributionChart'
+        { id: 'injurySeverityPatternChart', type: 'radar' },
+        { id: 'injuryRecoveryTimeChart', type: 'bar' },
+        { id: 'injuryCostImpactChart', type: 'line' }
     ];
-    
-    injuryAdvancedCharts.forEach(chartId => {
-        const ctx = document.getElementById(chartId)?.getContext('2d');
+
+    injuryAdvancedCharts.forEach(({ id, type }) => {
+        const ctx = document.getElementById(id)?.getContext('2d');
         if (ctx) {
-            state.injury.charts[chartId] = new Chart(ctx, {
-                type: 'line',
+            state.injury.charts[id] = new Chart(ctx, {
+                type,
                 data: { labels: [], datasets: [] },
-                options: getChartOptions('line')
+                options: getChartOptions(type)
             });
         }
     });
-    
+
     const nearMissAdvancedCharts = [
-        'nearMissRiskTrendChart',
-        'nearMissImpactAnalysisChart',
-        'nearMissLocationRiskChart',
-        'nearMissProcessRiskChart'
+        { id: 'nearMissToInjuryRatioChart', type: 'line' },
+        { id: 'nearMissPredictiveRiskChart', type: 'bar' },
+        { id: 'nearMissHotspotChart', type: 'bubble' }
     ];
-    
-    nearMissAdvancedCharts.forEach(chartId => {
-        const ctx = document.getElementById(chartId)?.getContext('2d');
+
+    nearMissAdvancedCharts.forEach(({ id, type }) => {
+        const ctx = document.getElementById(id)?.getContext('2d');
         if (ctx) {
-            state.nearMiss.charts[chartId] = new Chart(ctx, {
-                type: 'line',
+            state.nearMiss.charts[id] = new Chart(ctx, {
+                type,
                 data: { labels: [], datasets: [] },
-                options: getChartOptions('line')
+                options: getChartOptions(type)
             });
         }
     });
@@ -7273,229 +7255,225 @@ function changeTimelinePage(type, direction) {
 
 // Advanced Analytics
 function updateInjuryAdvancedAnalytics() {
-    const recordableRateChart = state.injury.charts.injuryRecordableRateTrendChart;
-    if (recordableRateChart) {
-        const monthlyRates = {};
-        const monthlyTotals = {};
-        
+    const severityPatternChart = state.injury.charts.injurySeverityPatternChart;
+    if (severityPatternChart) {
+        const severityCounts = { A: 0, B: 0, C: 0, D: 0 };
+        state.injury.filteredData.forEach(row => {
+            if (severityCounts[row.severity] !== undefined) {
+                severityCounts[row.severity]++;
+            }
+        });
+
+        severityPatternChart.config.type = 'radar';
+        severityPatternChart.data = {
+            labels: ['A - Critical', 'B - High', 'C - Medium', 'D - Low'],
+            datasets: [{
+                label: 'Incidents',
+                data: Object.values(severityCounts),
+                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                borderColor: AMAZON_COLORS.darkBlue
+            }]
+        };
+        severityPatternChart.options = getChartOptions('radar');
+        severityPatternChart.update();
+    }
+
+    const recoveryTimeChart = state.injury.charts.injuryRecoveryTimeChart;
+    if (recoveryTimeChart) {
+        const severityDays = { A: [], B: [], C: [], D: [] };
+        state.injury.filteredData.forEach(row => {
+            const sev = row.severity;
+            const days = parseFloat(row.total_dafw_days);
+            if (severityDays[sev] && !isNaN(days)) {
+                severityDays[sev].push(days);
+            }
+        });
+
+        const avgDays = Object.keys(severityDays).map(sev => {
+            const arr = severityDays[sev];
+            return arr.length ? (arr.reduce((a, b) => a + b, 0) / arr.length).toFixed(1) : 0;
+        });
+
+        recoveryTimeChart.config.type = 'bar';
+        recoveryTimeChart.data = {
+            labels: ['Severity A', 'Severity B', 'Severity C', 'Severity D'],
+            datasets: [{
+                label: 'Avg DAFW Days',
+                data: avgDays,
+                backgroundColor: [
+                    SEVERITY_COLORS.A,
+                    SEVERITY_COLORS.B,
+                    SEVERITY_COLORS.C,
+                    SEVERITY_COLORS.D
+                ]
+            }]
+        };
+        recoveryTimeChart.options = getChartOptions('bar');
+        recoveryTimeChart.update();
+    }
+
+    const costImpactChart = state.injury.charts.injuryCostImpactChart;
+    if (costImpactChart) {
+        const monthlyCost = {};
         state.injury.filteredData.forEach(row => {
             if (row.parsedDate && !isNaN(row.parsedDate)) {
                 const monthKey = `${row.parsedDate.getFullYear()}-${String(row.parsedDate.getMonth() + 1).padStart(2, '0')}`;
-                if (!monthlyTotals[monthKey]) {
-                    monthlyTotals[monthKey] = 0;
-                    monthlyRates[monthKey] = 0;
-                }
-                monthlyTotals[monthKey]++;
-                if (row.recordable === 1) {
-                    monthlyRates[monthKey]++;
-                }
+                const days = parseFloat(row.total_dafw_days) || 0;
+                monthlyCost[monthKey] = (monthlyCost[monthKey] || 0) + days * 300;
             }
         });
-        
-        const sortedMonths = Object.keys(monthlyTotals).sort();
+
+        const sortedMonths = Object.keys(monthlyCost).sort();
         const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-        
-        recordableRateChart.data = {
+
+        costImpactChart.config.type = 'line';
+        costImpactChart.data = {
             labels: sortedMonths.map(m => {
                 const [year, month] = m.split('-');
-                return `${monthNames[parseInt(month)-1]} ${year}`;
+                return `${monthNames[parseInt(month) - 1]} ${year}`;
             }),
             datasets: [{
-                label: 'Recordable Rate %',
-                data: sortedMonths.map(m => 
-                    monthlyTotals[m] > 0 ? ((monthlyRates[m] / monthlyTotals[m]) * 100).toFixed(1) : 0
-                ),
-                borderColor: SEVERITY_COLORS.B,
-                backgroundColor: `${SEVERITY_COLORS.B}20`,
+                label: 'Estimated Cost (€)',
+                data: sortedMonths.map(m => monthlyCost[m].toFixed(0)),
+                borderColor: AMAZON_COLORS.orange,
+                backgroundColor: `${AMAZON_COLORS.orange}33`,
                 tension: 0.3
             }]
         };
-        recordableRateChart.update();
-    }
-    
-    const bodyPartHeatMapChart = state.injury.charts.injuryBodyPartHeatMapChart;
-    if (bodyPartHeatMapChart) {
-        updateBodyPartHeatmapChart(bodyPartHeatMapChart, state.injury.filteredData);
-    }
-    
-    const rootCauseBySiteChart = state.injury.charts.injuryRootCauseBySiteChart;
-    if (rootCauseBySiteChart) {
-        const siteRootCause = {};
-        state.injury.filteredData.forEach(row => {
-            const site = row.site || 'Unknown';
-            const cause = row.rootCause || 'Unknown';
-            if (!siteRootCause[site]) {
-                siteRootCause[site] = {};
-            }
-            siteRootCause[site][cause] = (siteRootCause[site][cause] || 0) + 1;
-        });
-        
-        const sites = Object.keys(siteRootCause).sort();
-        const allCauses = [...new Set(state.injury.filteredData.map(r => r.rootCause || 'Unknown'))];
-        
-        rootCauseBySiteChart.config.type = 'bar';
-        rootCauseBySiteChart.data = {
-            labels: sites,
-            datasets: allCauses.slice(0, 5).map((cause, index) => ({
-                label: cause,
-                data: sites.map(site => siteRootCause[site][cause] || 0),
-                backgroundColor: [
-                    AMAZON_COLORS.orange,
-                    AMAZON_COLORS.darkBlue,
-                    AMAZON_COLORS.lightBlue,
-                    '#FF5722',
-                    '#4CAF50'
-                ][index]
-            }))
-        };
-        rootCauseBySiteChart.options = getChartOptions('bar');
-        rootCauseBySiteChart.options.scales.x.stacked = true;
-        rootCauseBySiteChart.options.scales.y.stacked = true;
-        rootCauseBySiteChart.update();
-    }
-    
-    const dafwDistributionChart = state.injury.charts.injuryDAFWDistributionChart;
-    if (dafwDistributionChart) {
-        const dafwRanges = {
-            '0 Days': 0,
-            '1-3 Days': 0,
-            '4-7 Days': 0,
-            '8-14 Days': 0,
-            '15-30 Days': 0,
-            '30+ Days': 0
-        };
-        
-        state.injury.filteredData.forEach(row => {
-            const days = row.total_dafw_days || 0;
-            if (days === 0) dafwRanges['0 Days']++;
-            else if (days <= 3) dafwRanges['1-3 Days']++;
-            else if (days <= 7) dafwRanges['4-7 Days']++;
-            else if (days <= 14) dafwRanges['8-14 Days']++;
-            else if (days <= 30) dafwRanges['15-30 Days']++;
-            else dafwRanges['30+ Days']++;
-        });
-        
-        dafwDistributionChart.config.type = 'doughnut';
-        dafwDistributionChart.data = {
-            labels: Object.keys(dafwRanges),
-            datasets: [{
-                data: Object.values(dafwRanges),
-                backgroundColor: [
-                    SEVERITY_COLORS.D,
-                    SEVERITY_COLORS.C,
-                    AMAZON_COLORS.orange,
-                    SEVERITY_COLORS.B,
-                    SEVERITY_COLORS.A,
-                    AMAZON_COLORS.darkBlue
-                ],
-                label: 'Cases'
-            }]
-        };
-        dafwDistributionChart.options = getChartOptions('doughnut');
-        dafwDistributionChart.update();
+        costImpactChart.options = getChartOptions('line');
+        costImpactChart.update();
     }
 }
 
 function updateNearMissAdvancedAnalytics() {
-    const riskTrendChart = state.nearMiss.charts.nearMissRiskTrendChart;
-    if (riskTrendChart) {
-        updateRiskTrendChart(riskTrendChart, state.nearMiss.filteredData);
-    }
-    
-    const impactAnalysisChart = state.nearMiss.charts.nearMissImpactAnalysisChart;
-    if (impactAnalysisChart) {
-        const impactSeverity = {};
+    const ratioChart = state.nearMiss.charts.nearMissToInjuryRatioChart;
+    if (ratioChart) {
+        const monthlyNearMiss = {};
+        const monthlyInjury = {};
+        const monthKey = date => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+
         state.nearMiss.filteredData.forEach(row => {
-            const impact = row.primaryImpact || 'Unknown';
-            if (!impactSeverity[impact]) {
-                impactSeverity[impact] = { A: 0, B: 0, C: 0, D: 0 };
-            }
-            if (row.severity && impactSeverity[impact][row.severity] !== undefined) {
-                impactSeverity[impact][row.severity]++;
+            if (row.parsedDate && !isNaN(row.parsedDate)) {
+                const key = monthKey(row.parsedDate);
+                monthlyNearMiss[key] = (monthlyNearMiss[key] || 0) + 1;
             }
         });
-        
-        const topImpacts = Object.entries(impactSeverity)
-            .map(([impact, severities]) => ({
-                impact,
-                total: Object.values(severities).reduce((a, b) => a + b, 0),
-                severities
-            }))
-            .sort((a, b) => b.total - a.total)
-            .slice(0, 8);
-        
-        impactAnalysisChart.config.type = 'bar';
-        impactAnalysisChart.data = {
-            labels: topImpacts.map(i => i.impact),
-            datasets: [
-                {
-                    label: 'Severity A',
-                    data: topImpacts.map(i => i.severities.A),
-                    backgroundColor: SEVERITY_COLORS.A
-                },
-                {
-                    label: 'Severity B',
-                    data: topImpacts.map(i => i.severities.B),
-                    backgroundColor: SEVERITY_COLORS.B
-                },
-                {
-                    label: 'Severity C',
-                    data: topImpacts.map(i => i.severities.C),
-                    backgroundColor: SEVERITY_COLORS.C
-                },
-                {
-                    label: 'Severity D',
-                    data: topImpacts.map(i => i.severities.D),
-                    backgroundColor: SEVERITY_COLORS.D
-                }
-            ]
-        };
-        impactAnalysisChart.options = getChartOptions('bar');
-        impactAnalysisChart.options.scales.x.stacked = true;
-        impactAnalysisChart.options.scales.y.stacked = true;
-        impactAnalysisChart.update();
-    }
-    
-    const locationRiskChart = state.nearMiss.charts.nearMissLocationRiskChart;
-    if (locationRiskChart) {
-        updateLocationHeatmapChart(locationRiskChart, state.nearMiss.filteredData);
-    }
-    
-    const processRiskChart = state.nearMiss.charts.nearMissProcessRiskChart;
-    if (processRiskChart) {
-        const processRisk = {};
-        state.nearMiss.filteredData.forEach(row => {
-            const process = row.processPath || 'Unknown';
-            if (!processRisk[process]) {
-                processRisk[process] = { total: 0, highRisk: 0 };
-            }
-            processRisk[process].total++;
-            const risk = parseFloat(row.risk || calculateRiskScore(row));
-            if (risk >= 7) {
-                processRisk[process].highRisk++;
+
+        state.injury.filteredData.forEach(row => {
+            if (row.parsedDate && !isNaN(row.parsedDate)) {
+                const key = monthKey(row.parsedDate);
+                monthlyInjury[key] = (monthlyInjury[key] || 0) + 1;
             }
         });
-        
-        const topProcesses = Object.entries(processRisk)
-            .map(([process, data]) => ({
-                process,
-                riskRate: data.total > 0 ? ((data.highRisk / data.total) * 100).toFixed(1) : 0
-            }))
-            .sort((a, b) => b.riskRate - a.riskRate)
-            .slice(0, 10);
-        
-        processRiskChart.config.type = 'bar';
-        processRiskChart.data = {
-            labels: topProcesses.map(p => p.process),
+
+        const allMonths = Array.from(new Set([...Object.keys(monthlyNearMiss), ...Object.keys(monthlyInjury)])).sort();
+        const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+        ratioChart.config.type = 'line';
+        ratioChart.data = {
+            labels: allMonths.map(m => {
+                const [y, mo] = m.split('-');
+                return `${monthNames[parseInt(mo) - 1]} ${y}`;
+            }),
             datasets: [{
-                label: 'High Risk Rate %',
-                data: topProcesses.map(p => parseFloat(p.riskRate)),
-                backgroundColor: SEVERITY_COLORS.B,
-                borderWidth: 1
+                label: 'Near Miss/Injury Ratio',
+                data: allMonths.map(m => {
+                    const nm = monthlyNearMiss[m] || 0;
+                    const inj = monthlyInjury[m] || 0;
+                    return inj > 0 ? (nm / inj).toFixed(2) : 0;
+                }),
+                borderColor: AMAZON_COLORS.darkBlue,
+                backgroundColor: `${AMAZON_COLORS.darkBlue}33`,
+                tension: 0.3
             }]
         };
-        processRiskChart.options = getChartOptions('bar');
-        processRiskChart.update();
+        ratioChart.options = getChartOptions('line');
+        ratioChart.update();
+    }
+
+    const predictiveChart = state.nearMiss.charts.nearMissPredictiveRiskChart;
+    if (predictiveChart) {
+        const mk = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+        const months = state.nearMiss.filteredData
+            .filter(r => r.parsedDate && !isNaN(r.parsedDate))
+            .map(r => mk(r.parsedDate))
+            .sort();
+        const latest = months[months.length - 1];
+        const prev = months.length > 1 ? months[months.length - 2] : null;
+        const locationCounts = {};
+
+        state.nearMiss.filteredData.forEach(row => {
+            if (row.parsedDate && !isNaN(row.parsedDate)) {
+                const key = mk(row.parsedDate);
+                const loc = row.location || 'Unknown';
+                if (!locationCounts[loc]) locationCounts[loc] = { current: 0, previous: 0 };
+                if (key === latest) locationCounts[loc].current++;
+                else if (key === prev) locationCounts[loc].previous++;
+            }
+        });
+
+        const growth = Object.entries(locationCounts)
+            .map(([loc, val]) => ({ loc, increase: val.current - val.previous }))
+            .filter(d => d.increase > 0)
+            .sort((a, b) => b.increase - a.increase)
+            .slice(0, 5);
+
+        predictiveChart.config.type = 'bar';
+        predictiveChart.data = {
+            labels: growth.map(g => g.loc),
+            datasets: [{
+                label: 'Increase in Near Misses',
+                data: growth.map(g => g.increase),
+                backgroundColor: AMAZON_COLORS.orange
+            }]
+        };
+        predictiveChart.options = getChartOptions('bar');
+        predictiveChart.update();
+    }
+
+    const hotspotChart = state.nearMiss.charts.nearMissHotspotChart;
+    if (hotspotChart) {
+        const severityMap = { A: 4, B: 3, C: 2, D: 1 };
+        const stats = {};
+        state.nearMiss.filteredData.forEach(row => {
+            const loc = row.location || 'Unknown';
+            if (!stats[loc]) stats[loc] = { count: 0, riskTotal: 0, severityTotal: 0 };
+            const risk = parseFloat(row.risk || calculateRiskScore(row)) || 0;
+            const sev = severityMap[row.severity] || 0;
+            stats[loc].count++;
+            stats[loc].riskTotal += risk;
+            stats[loc].severityTotal += sev;
+        });
+
+        const data = Object.entries(stats)
+            .map(([loc, s]) => ({
+                x: s.riskTotal / s.count,
+                y: s.severityTotal / s.count,
+                r: Math.sqrt(s.count) * 5,
+                label: loc
+            }))
+            .sort((a, b) => b.r - a.r)
+            .slice(0, 10);
+
+        hotspotChart.config.type = 'bubble';
+        hotspotChart.data = {
+            datasets: [{
+                label: 'Locations',
+                data: data.map(d => ({ x: d.x, y: d.y, r: d.r, label: d.label })),
+                backgroundColor: AMAZON_COLORS.darkBlue
+            }]
+        };
+        hotspotChart.options = getChartOptions('bubble');
+        hotspotChart.options.scales = {
+            x: { title: { display: true, text: 'Average Risk Score' } },
+            y: { title: { display: true, text: 'Average Severity' }, min: 0, max: 4 }
+        };
+        hotspotChart.options.plugins.tooltip = {
+            callbacks: {
+                label: ctx => `${ctx.raw.label}: ${Math.round((ctx.raw.r / 5) ** 2)} incidents`
+            }
+        };
+        hotspotChart.update();
     }
 }
 
