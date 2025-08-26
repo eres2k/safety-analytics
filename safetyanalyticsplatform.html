@@ -1128,27 +1128,27 @@
     <!-- Navigation -->
     <nav class="nav-container">
         <div class="nav-tabs">
-            <div class="nav-tab active" onclick="switchModule('overview')">
+            <div class="nav-tab active" data-module="overview" onclick="switchModule('overview', event)">
                 <span class="nav-tab-icon">📊</span>
                 <span>Overview</span>
             </div>
-            <div class="nav-tab" onclick="switchModule('injury')">
+            <div class="nav-tab" data-module="injury" onclick="switchModule('injury', event)">
                 <span class="nav-tab-icon">🏥</span>
                 <span>Injury & Illness</span>
             </div>
-            <div class="nav-tab" onclick="switchModule('nearmiss')">
+            <div class="nav-tab" data-module="nearmiss" onclick="switchModule('nearmiss', event)">
                 <span class="nav-tab-icon">⚠️</span>
                 <span>Near Miss</span>
             </div>
-            <div class="nav-tab" onclick="switchModule('combined')">
+            <div class="nav-tab" data-module="combined" onclick="switchModule('combined', event)">
                 <span class="nav-tab-icon">📈</span>
                 <span>Combined Analytics</span>
             </div>
-            <div class="nav-tab" onclick="switchModule('reports')">
+            <div class="nav-tab" data-module="reports" onclick="switchModule('reports', event)">
                 <span class="nav-tab-icon">📄</span>
                 <span>Reports</span>
             </div>
-            <div class="nav-tab" onclick="switchModule('actions')">
+            <div class="nav-tab" data-module="actions" onclick="switchModule('actions', event)">
                 <span class="nav-tab-icon">✅</span>
                 <span>Actions</span>
             </div>
@@ -2520,19 +2520,25 @@ function toggleTheme() {
 }
 
 // Module Switching
-function switchModule(module) {
+function switchModule(module, evt) {
     document.querySelectorAll('.nav-tab').forEach(tab => {
         tab.classList.remove('active');
     });
-    event.target.closest('.nav-tab').classList.add('active');
-    
+    if (evt) {
+        const navTab = evt.target.closest('.nav-tab');
+        if (navTab) navTab.classList.add('active');
+    } else {
+        const navTab = document.querySelector(`.nav-tab[data-module="${module}"]`);
+        if (navTab) navTab.classList.add('active');
+    }
+
     document.querySelectorAll('.tab-content').forEach(content => {
         content.classList.remove('active');
     });
-    
+
     document.getElementById(module).classList.add('active');
     state.currentModule = module;
-    
+
     if (module === 'injury') {
         updateInjuryDashboard();
         updateInjuryTable();
