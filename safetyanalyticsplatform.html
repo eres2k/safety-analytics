@@ -3921,37 +3921,78 @@ function populateInjuryFilters() {
 
 function populateNearMissFilters() {
     // Sites
-    const sites = [...new Set(state.nearMiss.rawData.map(r => r.site).filter(Boolean))];
     const siteFilter = document.getElementById('nearMissSiteFilter');
-    siteFilter.innerHTML = '<option value="">All Sites</option>';
-    sites.sort().forEach(site => {
-        siteFilter.innerHTML += `<option value="${site}">${site}</option>`;
-    });
-    
+    if (siteFilter) {
+        siteFilter.innerHTML = '';
+        const defaultOption = document.createElement('option');
+        defaultOption.value = '';
+        defaultOption.textContent = 'All Sites';
+        siteFilter.appendChild(defaultOption);
+
+        const sites = [...new Set(state.nearMiss.rawData.map(r => r.site).filter(Boolean))].sort();
+        sites.forEach(site => {
+            const option = document.createElement('option');
+            option.value = site;
+            option.textContent = site;
+            siteFilter.appendChild(option);
+        });
+    }
+
     // Primary Impacts
-    const impacts = [...new Set(state.nearMiss.rawData.map(r => r.primaryImpact).filter(Boolean))];
     const impactFilter = document.getElementById('nearMissPrimaryImpactFilter');
-    impactFilter.innerHTML = '<option value="">All Impacts</option>';
-    impacts.sort().forEach(impact => {
-        impactFilter.innerHTML += `<option value="${impact}">${impact}</option>`;
-    });
-    
+    if (impactFilter) {
+        impactFilter.innerHTML = '';
+        const defaultImpact = document.createElement('option');
+        defaultImpact.value = '';
+        defaultImpact.textContent = 'All Impacts';
+        impactFilter.appendChild(defaultImpact);
+
+        const impacts = [...new Set(state.nearMiss.rawData.map(r => r.primaryImpact).filter(Boolean))].sort();
+        impacts.forEach(impact => {
+            const option = document.createElement('option');
+            option.value = impact;
+            option.textContent = impact;
+            impactFilter.appendChild(option);
+        });
+    }
+
     // Locations
-    const locations = [...new Set(state.nearMiss.rawData.map(r => r.location).filter(Boolean))];
     const locationFilter = document.getElementById('nearMissLocationFilter');
-    locationFilter.innerHTML = '<option value="">All Locations</option>';
-    locations.sort().slice(0, 20).forEach(location => {
-        const truncated = location.length > 30 ? location.substring(0, 30) + '...' : location;
-        locationFilter.innerHTML += `<option value="${location}">${truncated}</option>`;
-    });
-    
+    if (locationFilter) {
+        locationFilter.innerHTML = '';
+        const defaultLocation = document.createElement('option');
+        defaultLocation.value = '';
+        defaultLocation.textContent = 'All Locations';
+        locationFilter.appendChild(defaultLocation);
+
+        const locations = [...new Set(state.nearMiss.rawData.map(r => r.location).filter(Boolean))]
+            .sort()
+            .slice(0, 20);
+        locations.forEach(location => {
+            const option = document.createElement('option');
+            option.value = location;
+            option.textContent = location.length > 30 ? location.substring(0, 30) + '...' : location;
+            locationFilter.appendChild(option);
+        });
+    }
+
     // Process Paths
-    const processes = [...new Set(state.nearMiss.rawData.map(r => r.processPath).filter(Boolean))];
     const processFilter = document.getElementById('nearMissProcessFilter');
-    processFilter.innerHTML = '<option value="">All Processes</option>';
-    processes.sort().forEach(process => {
-        processFilter.innerHTML += `<option value="${process}">${process}</option>`;
-    });
+    if (processFilter) {
+        processFilter.innerHTML = '';
+        const defaultProcess = document.createElement('option');
+        defaultProcess.value = '';
+        defaultProcess.textContent = 'All Processes';
+        processFilter.appendChild(defaultProcess);
+
+        const processes = [...new Set(state.nearMiss.rawData.map(r => r.processPath).filter(Boolean))].sort();
+        processes.forEach(process => {
+            const option = document.createElement('option');
+            option.value = process;
+            option.textContent = process;
+            processFilter.appendChild(option);
+        });
+    }
 }
 
 // Apply Filters
