@@ -2389,7 +2389,7 @@ document.addEventListener('DOMContentLoaded', function() {
     setupEventListeners();
     createRiskMatrices();
     setupTableSorting('injury');
-    setupTableSorting('nearmiss');
+    setupTableSorting('nearMiss');
 
     // Check for saved theme preference
     const savedTheme = localStorage.getItem('theme') || 'light';
@@ -3979,8 +3979,8 @@ function applyFilters(type) {
             return true;
         });
 
-        sortData('nearmiss');
-        updateSortIndicators('nearmiss');
+        sortData('nearMiss');
+        updateSortIndicators('nearMiss');
 
         state.nearMiss.currentPage = 1;
         updateNearMissDashboard();
