@@ -8421,6 +8421,7 @@ function exportNearMissDuplicatesPDF() {
 
     const margin = 40;
     let yPos = margin;
+    const tableWidth = doc.internal.pageSize.getWidth() - margin * 2;
 
     doc.setFontSize(16);
     doc.setTextColor(...hexToRgb(AMAZON_COLORS.darkBlue));
@@ -8454,7 +8455,13 @@ function exportNearMissDuplicatesPDF() {
             }),
             theme: 'grid',
             headStyles: { fillColor: hexToRgb(AMAZON_COLORS.darkBlue) },
-            styles: { fontSize: 8, cellWidth: 'wrap' },
+            styles: { fontSize: 8, overflow: 'linebreak' },
+            columnStyles: {
+                0: { cellWidth: tableWidth * 0.5 },
+                1: { cellWidth: tableWidth * 0.15 },
+                2: { cellWidth: tableWidth * 0.25 },
+                3: { cellWidth: tableWidth * 0.1, halign: 'right' }
+            },
             margin: { left: margin, right: margin }
         });
 
