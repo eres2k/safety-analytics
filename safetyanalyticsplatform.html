@@ -1121,6 +1121,10 @@
                     <span id="themeIcon">🌙</span>
                     <span id="themeText">Dark Mode</span>
                 </button>
+                <button class="mode-toggle" onclick="openHelpModal()">
+                    <span>❔</span>
+                    <span>Help</span>
+                </button>
             </div>
         </div>
     </header>
@@ -2274,6 +2278,30 @@
         </div>
     </div>
 
+    <!-- Help Modal -->
+    <div id="helpModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Welcome to Safety Analytics</h3>
+                <button class="modal-close" onclick="closeHelpModal()">&times;</button>
+            </div>
+            <div>
+                <p>First steps:</p>
+                <ol>
+                    <li>Upload Injury or Near Miss CSV files using the respective upload sections.</li>
+                    <li>Use filters to focus on specific sites, processes, or time frames.</li>
+                    <li>Explore dashboards, charts, and reports for deeper insights.</li>
+                </ol>
+                <p>Key features:</p>
+                <ul>
+                    <li>Interactive dashboards for Injuries & Illness and Near Misses.</li>
+                    <li>Risk matrices, timelines, and quality metrics.</li>
+                    <li>Export capabilities to Excel and PDF.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
     <!-- Modal for details -->
     <div id="detailModal" class="modal">
         <div class="modal-content">
@@ -2595,7 +2623,24 @@ function handleFileUpload(event, type) {
     
     const reader = new FileReader();
     reader.onload = function(e) {
-        parseCSV(e.target.result, type);
+        const text = e.target.result;
+        const headerLine = text.split(/\r?\n/)[0].toLowerCase();
+        const injuryIndicators = ['incident_date', 'case_number', 'recordable'];
+        const nearMissIndicators = ['nearmiss_date', 'incident_id', 'primary_impact'];
+        const hasIndicator = (line, arr) => arr.some(ind => line.includes(ind));
+        const looksInjury = hasIndicator(headerLine, injuryIndicators);
+        const looksNearMiss = hasIndicator(headerLine, nearMissIndicators);
+
+        if (type === 'injury' && looksNearMiss && !looksInjury) {
+            showStatus('It looks like you uploaded a Near Miss CSV to the Injury uploader. Please choose the correct file.', 'error');
+            return;
+        }
+        if (type === 'nearmiss' && looksInjury && !looksNearMiss) {
+            showStatus('It looks like you uploaded an Injury CSV to the Near Miss uploader. Please choose the correct file.', 'error');
+            return;
+        }
+
+        parseCSV(text, type);
     };
     reader.onerror = function() {
         showStatus('Error reading file', 'error');
@@ -8201,6 +8246,14 @@ function closeModal() {
     document.getElementById('detailModal').style.display = 'none';
 }
 
+function openHelpModal() {
+    document.getElementById('helpModal').style.display = 'block';
+}
+
+function closeHelpModal() {
+    document.getElementById('helpModal').style.display = 'none';
+}
+
 // Export Functions
 function exportInjuryData() {
     exportToExcel('injury');
@@ -9590,9 +9643,13 @@ function showStatus(message, type = 'info') {
 function setupEventListeners() {
     // Close modal when clicking outside
     window.onclick = function(event) {
-        const modal = document.getElementById('detailModal');
-        if (event.target === modal) {
+        const detailModal = document.getElementById('detailModal');
+        const helpModal = document.getElementById('helpModal');
+        if (event.target === detailModal) {
             closeModal();
+        }
+        if (event.target === helpModal) {
+            closeHelpModal();
         }
     };
     
@@ -9607,6 +9664,7 @@ function setupEventListeners() {
         // Escape to close modal
         if (event.key === 'Escape') {
             closeModal();
+            closeHelpModal();
         }
         
         // Ctrl/Cmd + P to generate PDF
@@ -9727,6 +9785,8 @@ window.switchNearMissView = switchNearMissView;
 window.viewDetails = viewDetails;
 window.showDuplicateDetails = showDuplicateDetails;
 window.showAllDuplicates = showAllDuplicates;
+window.openHelpModal = openHelpModal;
+window.closeHelpModal = closeHelpModal;
 
 // Expose combined filter handler so it can be invoked from the HTML
 window.applyCombinedFilters = applyCombinedFilters;
