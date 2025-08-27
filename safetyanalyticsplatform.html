@@ -9453,46 +9453,49 @@ function generatePDFReport(type) {
             currentPage++;
             addHeader(currentPage);
             yPos = 40;
-            
-            yPos = addSectionHeader('Executive Summary Dashboard', yPos);
-            
-            // Create executive metrics
-            const execMetrics = calculateExecutiveMetrics();
-            
-            // Monthly trend summary
-            doc.setFillColor(240, 240, 240);
-            doc.rect(margin, yPos, contentWidth, 45, 'F');
-            
-            doc.setTextColor(...hexToRgb(AMAZON_COLORS.darkBlue));
-            doc.setFontSize(10);
-            const trendText = `Safety Performance Trend:\n`;
-            const trendAnalysis = analyzeTrend(execMetrics);
-            const trendLines = doc.splitTextToSize(trendText + trendAnalysis, contentWidth - 10);
-            doc.text(trendLines, margin + 5, yPos + 8);
-            
-            yPos += 50;
-            
-            // Site ranking
-            yPos = addSectionHeader('Site Performance Ranking', yPos);
-            
-            const siteRanking = calculateSiteRanking();
-            
+
+            yPos = addSectionHeader('Executive Summary', yPos);
+
+            const summary = calculateExecutiveSummaryMetrics();
+            const boxWidth = (contentWidth - 10) / 2;
+            const boxHeight = 20;
+
+            addMetricBox(margin, yPos, boxWidth, boxHeight, 'Total Incidents', summary.total, AMAZON_COLORS.orange);
+            addMetricBox(margin + boxWidth + 10, yPos, boxWidth, boxHeight, 'Recordable Cases', summary.recordable, AMAZON_COLORS.darkBlue);
+
+            yPos += boxHeight + 10;
+            addMetricBox(margin, yPos, boxWidth, boxHeight, 'High Severity', summary.highSeverity, AMAZON_COLORS.lightBlue);
+            addMetricBox(margin + boxWidth + 10, yPos, boxWidth, boxHeight, 'Days Since Recordable', summary.daysSinceRecordable, AMAZON_COLORS.gray);
+
+            yPos += boxHeight + 15;
+
+            yPos = addSectionHeader('Incident Trend (Last 6 Months)', yPos);
+
             doc.autoTable({
                 startY: yPos,
-                head: [['Rank', 'Site', 'Total Incidents', 'Risk Score', 'Status']],
-                body: siteRanking.slice(0, 5).map((site, index) => [
-                    index + 1,
-                    site.name,
-                    site.incidents,
-                    site.riskScore.toFixed(1),
-                    site.status
+                head: [['Month', 'Incidents']],
+                body: summary.trend.map(([month, count]) => [month, count]),
+                theme: 'grid',
+                headStyles: { fillColor: hexToRgb(AMAZON_COLORS.darkBlue) },
+                margin: { left: margin, right: margin }
+            });
+
+            yPos = doc.lastAutoTable.finalY + 10;
+
+            yPos = addSectionHeader('Top Root Causes', yPos);
+
+            doc.autoTable({
+                startY: yPos,
+                head: [['Cause', 'Count']],
+                body: summary.topRootCauses.map(([cause, count]) => [
+                    cause.substring(0, 50) + (cause.length > 50 ? '...' : ''),
+                    count
                 ]),
                 theme: 'grid',
                 headStyles: { fillColor: hexToRgb(AMAZON_COLORS.darkBlue) },
-                bodyStyles: { cellPadding: 3 },
                 margin: { left: margin, right: margin }
             });
-            
+
             addFooter();
         }
         
@@ -9619,105 +9622,44 @@ function calculateRiskMatrixSummary(data) {
     };
 }
 
-function calculateExecutiveMetrics() {
+function calculateExecutiveSummaryMetrics() {
     const allData = [...state.injury.filteredData, ...state.nearMiss.filteredData];
-    const monthlyData = {};
-    
+    const total = allData.length;
+    const recordable = allData.filter(r => r.recordable === 1).length;
+    const highSeverity = allData.filter(r => r.severity === 'A' || r.severity === 'B').length;
+    const lastRecordable = allData
+        .filter(r => r.recordable === 1 && r.parsedDate && !isNaN(r.parsedDate))
+        .sort((a, b) => b.parsedDate - a.parsedDate)[0];
+    const daysSinceRecordable = lastRecordable
+        ? Math.floor((Date.now() - lastRecordable.parsedDate) / (1000 * 60 * 60 * 24))
+        : 'N/A';
+
+    const monthly = {};
+    const rootCauseCounts = {};
     allData.forEach(row => {
         if (row.parsedDate && !isNaN(row.parsedDate)) {
-            const monthKey = `${row.parsedDate.getFullYear()}-${String(row.parsedDate.getMonth() + 1).padStart(2, '0')}`;
-            if (!monthlyData[monthKey]) {
-                monthlyData[monthKey] = {
-                    total: 0,
-                    injury: 0,
-                    nearMiss: 0,
-                    recordable: 0,
-                    highSeverity: 0
-                };
-            }
-            monthlyData[monthKey].total++;
-            if (row.case_number) {
-                monthlyData[monthKey].injury++;
-                if (row.recordable === 1) monthlyData[monthKey].recordable++;
-            } else {
-                monthlyData[monthKey].nearMiss++;
-            }
-            if (row.severity === 'A' || row.severity === 'B') {
-                monthlyData[monthKey].highSeverity++;
-            }
+            const key = `${row.parsedDate.getFullYear()}-${String(row.parsedDate.getMonth() + 1).padStart(2, '0')}`;
+            monthly[key] = (monthly[key] || 0) + 1;
         }
+        const cause = row.rootCause || 'Unknown';
+        rootCauseCounts[cause] = (rootCauseCounts[cause] || 0) + 1;
     });
-    
-    return monthlyData;
-}
 
-function analyzeTrend(monthlyData) {
-    const months = Object.keys(monthlyData).sort();
-    if (months.length < 2) return 'Insufficient data for trend analysis';
-    
-    const recent = months.slice(-3);
-    const older = months.slice(-6, -3);
-    
-    const recentAvg = recent.reduce((sum, m) => sum + monthlyData[m].total, 0) / recent.length;
-    const olderAvg = older.length > 0 ? 
-        older.reduce((sum, m) => sum + monthlyData[m].total, 0) / older.length : 
-        recentAvg;
-    
-    const trend = ((recentAvg - olderAvg) / olderAvg * 100).toFixed(0);
-    
-    let analysis = `Recent 3-month average: ${recentAvg.toFixed(1)} incidents/month\n`;
-    
-    if (trend > 10) {
-        analysis += `⚠️ Upward trend of ${trend}% - Enhanced safety measures recommended`;
-    } else if (trend < -10) {
-        analysis += `✅ Downward trend of ${Math.abs(trend)}% - Safety improvements showing results`;
-    } else {
-        analysis += `➡️ Stable trend (${trend > 0 ? '+' : ''}${trend}%) - Maintain current safety protocols`;
-    }
-    
-    return analysis;
-}
+    const trend = Object.entries(monthly)
+        .sort((a, b) => a[0].localeCompare(b[0]))
+        .slice(-6);
+    const topRootCauses = Object.entries(rootCauseCounts)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5);
 
-function calculateSiteRanking() {
-    const siteData = {};
-    
-    [...state.injury.filteredData, ...state.nearMiss.filteredData].forEach(row => {
-        const site = row.site || 'Unknown';
-        if (!siteData[site]) {
-            siteData[site] = {
-                name: site,
-                incidents: 0,
-                injuries: 0,
-                nearMisses: 0,
-                highSeverity: 0,
-                totalRisk: 0
-            };
-        }
-        
-        siteData[site].incidents++;
-        if (row.case_number) {
-            siteData[site].injuries++;
-        } else {
-            siteData[site].nearMisses++;
-        }
-        
-        if (row.severity === 'A' || row.severity === 'B') {
-            siteData[site].highSeverity++;
-        }
-        
-        const risk = row.risk ? parseFloat(row.risk) : calculateRiskScore(row);
-        siteData[site].totalRisk += parseFloat(risk);
-    });
-    
-    return Object.values(siteData)
-        .map(site => ({
-            ...site,
-            riskScore: site.incidents > 0 ? site.totalRisk / site.incidents : 0,
-            status: site.highSeverity > 2 ? '🔴 Critical' : 
-                   site.highSeverity > 0 ? '🟡 Warning' : 
-                   '🟢 Good'
-        }))
-        .sort((a, b) => b.riskScore - a.riskScore);
+    return {
+        total,
+        recordable,
+        highSeverity,
+        daysSinceRecordable,
+        trend,
+        topRootCauses
+    };
 }
 
 function addToReportHistory(type, fileName) {
