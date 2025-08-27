@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Safety Analytics Platform - Amazon WHS Austria | Developed by Erwin Esener @eeesener</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.js"></script>
@@ -14,6 +15,7 @@
         :root {
             --amazon-orange: #FF9900;
             --amazon-orange-dark: #e88600;
+            --amazon-dark: #232F3E;
             --amazon-blue: #232F3E;
             --amazon-blue-dark: #37475A;
             --amazon-yellow: #FFD814;
@@ -965,6 +967,135 @@
             transform: rotate(90deg);
         }
 
+        /* Help Modal */
+        .help-modal-content {
+            width: 90%;
+            max-width: 800px;
+            padding: var(--spacing-lg);
+        }
+        .help-body {
+            max-height: 60vh;
+            overflow-y: auto;
+            padding-right: var(--spacing-sm);
+        }
+        .help-tabs {
+            display: flex;
+            gap: var(--spacing-sm);
+            border-bottom: 1px solid var(--bg-secondary);
+            margin-bottom: var(--spacing-md);
+            overflow-x: auto;
+        }
+        .help-tab {
+            background: none;
+            border: none;
+            padding: var(--spacing-sm) var(--spacing-md);
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: var(--transition);
+            white-space: nowrap;
+        }
+        .help-tab.active {
+            color: var(--amazon-orange);
+            border-bottom: 2px solid var(--amazon-orange);
+        }
+        .help-section {
+            display: none;
+            animation: fadeIn 0.3s ease-out;
+        }
+        .help-section.active {
+            display: block;
+        }
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            margin-bottom: var(--spacing-md);
+        }
+        .section-title i {
+            color: var(--amazon-orange);
+        }
+        .text-muted {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        .help-card {
+            background: var(--bg-primary);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            padding: var(--spacing-md);
+            transition: var(--transition);
+            margin-bottom: var(--spacing-md);
+        }
+        .help-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 24px rgba(0,0,0,0.2);
+        }
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--spacing-md);
+        }
+        .feature-card i {
+            font-size: 2rem;
+            color: var(--amazon-orange);
+            margin-bottom: var(--spacing-sm);
+        }
+        .quick-step {
+            display: flex;
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-md);
+        }
+        .quick-step-number {
+            flex-shrink: 0;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--amazon-orange);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        .quick-step-content {
+            flex: 1;
+        }
+        .progress {
+            height: 4px;
+            background: var(--bg-secondary);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-top: var(--spacing-sm);
+        }
+        .progress-bar {
+            height: 100%;
+            background: var(--amazon-orange);
+            width: 0;
+            animation: progress 1s forwards;
+        }
+        @keyframes progress {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+        .try-btn {
+            margin-top: var(--spacing-sm);
+        }
+        .demo-image {
+            width: 100%;
+            border-radius: 12px;
+            margin-top: var(--spacing-md);
+        }
+        .help-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-sm);
+            margin-left: 1.2rem;
+        }
+        .help-list kbd {
+            background: var(--bg-secondary);
+            padding: 2px 4px;
+            border-radius: 4px;
+        }
         /* Pagination */
         .pagination {
             display: flex;
@@ -2280,24 +2411,147 @@
 
     <!-- Help Modal -->
     <div id="helpModal" class="modal">
-        <div class="modal-content">
+        <div class="modal-content help-modal-content">
             <div class="modal-header">
-                <h3>Welcome to Safety Analytics</h3>
+                <h3>Safety Analytics Help</h3>
                 <button class="modal-close" onclick="closeHelpModal()">&times;</button>
             </div>
-            <div>
-                <p>First steps:</p>
-                <ol>
-                    <li>Upload Injury or Near Miss CSV files using the respective upload sections.</li>
-                    <li>Use filters to focus on specific sites, processes, or time frames.</li>
-                    <li>Explore dashboards, charts, and reports for deeper insights.</li>
-                </ol>
-                <p>Key features:</p>
-                <ul>
-                    <li>Interactive dashboards for Injuries & Illness and Near Misses.</li>
-                    <li>Risk matrices, timelines, and quality metrics.</li>
-                    <li>Export capabilities to Excel and PDF.</li>
-                </ul>
+            <div class="help-tabs">
+                <button class="help-tab active" data-section="welcome">Welcome</button>
+                <button class="help-tab" data-section="quickstart">Quick Start</button>
+                <button class="help-tab" data-section="features">Features</button>
+                <button class="help-tab" data-section="modules">Modules</button>
+                <button class="help-tab" data-section="tips">Tips &amp; Shortcuts</button>
+            </div>
+            <div class="help-body">
+                <section id="welcome" class="help-section active">
+                    <h2 class="section-title"><i class="fa-solid fa-handshake"></i> Welcome</h2>
+                    <p><strong>Welcome to Safety Analytics Platform v2.0</strong></p>
+                    <p>Your comprehensive tool for tracking workplace safety incidents and near misses</p>
+                    <p class="text-muted">Developed by Erwin Esener | Amazon WHS Austria</p>
+                    <img src="https://via.placeholder.com/600x300?text=Dashboard+Demo" alt="Platform demo" class="demo-image">
+                </section>
+
+                <section id="quickstart" class="help-section">
+                    <h2 class="section-title"><i class="fa-solid fa-bolt"></i> Quick Start Guide</h2>
+                    <div class="quick-step">
+                        <div class="quick-step-number">1</div>
+                        <div class="quick-step-content">
+                            <h4>Upload Data</h4>
+                            <p>Import your CSV files using the upload buttons</p>
+                            <div class="progress"><div class="progress-bar" style="animation-delay:0s"></div></div>
+                            <button class="btn btn-primary try-btn" onclick="tryNow('injury','injuryUploadArea')">Try Now</button>
+                        </div>
+                    </div>
+                    <div class="quick-step">
+                        <div class="quick-step-number">2</div>
+                        <div class="quick-step-content">
+                            <h4>Navigate Modules</h4>
+                            <p>Use the sidebar to switch between different analytics views</p>
+                            <div class="progress"><div class="progress-bar" style="animation-delay:0.2s"></div></div>
+                            <button class="btn btn-primary try-btn" onclick="tryNow('injury')">Try Now</button>
+                        </div>
+                    </div>
+                    <div class="quick-step">
+                        <div class="quick-step-number">3</div>
+                        <div class="quick-step-content">
+                            <h4>Apply Filters</h4>
+                            <p>Filter data by date, site, severity to focus your analysis</p>
+                            <div class="progress"><div class="progress-bar" style="animation-delay:0.4s"></div></div>
+                        </div>
+                    </div>
+                    <div class="quick-step">
+                        <div class="quick-step-number">4</div>
+                        <div class="quick-step-content">
+                            <h4>View Insights</h4>
+                            <p>Explore charts, tables, and KPIs for actionable insights</p>
+                            <div class="progress"><div class="progress-bar" style="animation-delay:0.6s"></div></div>
+                        </div>
+                    </div>
+                    <div class="quick-step">
+                        <div class="quick-step-number">5</div>
+                        <div class="quick-step-content">
+                            <h4>Generate Reports</h4>
+                            <p>Export PDF reports or Excel files for sharing</p>
+                            <div class="progress"><div class="progress-bar" style="animation-delay:0.8s"></div></div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="features" class="help-section">
+                    <h2 class="section-title"><i class="fa-solid fa-star"></i> Key Features</h2>
+                    <div class="features-grid">
+                        <div class="feature-card help-card">
+                            <i class="fa-solid fa-chart-line"></i>
+                            <h4>Interactive Dashboards</h4>
+                            <p>Real-time KPIs and trend analysis</p>
+                        </div>
+                        <div class="feature-card help-card">
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+                            <h4>Injury &amp; Illness Tracking</h4>
+                            <p>OSHA compliance and recordkeeping</p>
+                        </div>
+                        <div class="feature-card help-card">
+                            <i class="fa-solid fa-exclamation-circle"></i>
+                            <h4>Near Miss Analysis</h4>
+                            <p>Proactive risk identification</p>
+                        </div>
+                        <div class="feature-card help-card">
+                            <i class="fa-solid fa-table-cells-large"></i>
+                            <h4>Risk Matrix</h4>
+                            <p>Visual risk assessment and scoring</p>
+                        </div>
+                        <div class="feature-card help-card">
+                            <i class="fa-solid fa-file-export"></i>
+                            <h4>Report Generation</h4>
+                            <p>Professional PDF and Excel exports</p>
+                        </div>
+                        <div class="feature-card help-card">
+                            <i class="fa-solid fa-filter"></i>
+                            <h4>Advanced Filtering</h4>
+                            <p>Multi-dimensional data exploration</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="modules" class="help-section">
+                    <h2 class="section-title"><i class="fa-solid fa-layer-group"></i> Module Overview</h2>
+                    <div class="help-card">
+                        <h4>Overview</h4>
+                        <p>Main dashboard with key metrics</p>
+                        <button class="btn btn-secondary try-btn" onclick="tryNow('overview')">Try Now</button>
+                    </div>
+                    <div class="help-card">
+                        <h4>Injury &amp; Illness</h4>
+                        <p>Detailed incident tracking and analysis</p>
+                        <button class="btn btn-secondary try-btn" onclick="tryNow('injury')">Try Now</button>
+                    </div>
+                    <div class="help-card">
+                        <h4>Near Miss</h4>
+                        <p>Proactive safety event monitoring</p>
+                        <button class="btn btn-secondary try-btn" onclick="tryNow('nearmiss')">Try Now</button>
+                    </div>
+                    <div class="help-card">
+                        <h4>Combined Analytics</h4>
+                        <p>Cross-module insights and comparisons</p>
+                        <button class="btn btn-secondary try-btn" onclick="tryNow('combined')">Try Now</button>
+                    </div>
+                    <div class="help-card">
+                        <h4>Reports</h4>
+                        <p>Professional report generation tools</p>
+                        <button class="btn btn-secondary try-btn" onclick="tryNow('reports')">Try Now</button>
+                    </div>
+                </section>
+
+                <section id="tips" class="help-section">
+                    <h2 class="section-title"><i class="fa-solid fa-lightbulb"></i> Tips &amp; Shortcuts</h2>
+                    <ul class="help-list">
+                        <li>Use keyboard shortcuts (<kbd>Ctrl</kbd>+<kbd>S</kbd> to export, <kbd>Ctrl</kbd>+<kbd>P</kbd> for PDF)</li>
+                        <li>Toggle dark/light mode</li>
+                        <li>Export data anytime</li>
+                        <li>Filter combinations for deeper insights</li>
+                    </ul>
+                </section>
             </div>
         </div>
     </div>
@@ -8248,10 +8502,31 @@ function closeModal() {
 
 function openHelpModal() {
     document.getElementById('helpModal').style.display = 'block';
+    switchHelpSection('welcome');
 }
 
 function closeHelpModal() {
     document.getElementById('helpModal').style.display = 'none';
+}
+
+function switchHelpSection(section) {
+    document.querySelectorAll('.help-tab').forEach(tab => {
+        tab.classList.toggle('active', tab.dataset.section === section);
+    });
+    document.querySelectorAll('.help-section').forEach(sec => {
+        sec.classList.toggle('active', sec.id === section);
+    });
+}
+
+function tryNow(module, targetId) {
+    closeHelpModal();
+    switchModule(module);
+    if (targetId) {
+        const el = document.getElementById(targetId);
+        if (el) {
+            el.scrollIntoView({ behavior: 'smooth' });
+        }
+    }
 }
 
 // Export Functions
@@ -9703,6 +9978,10 @@ function setupEventListeners() {
         // Remove print-specific classes
         document.body.classList.remove('printing');
     });
+
+    document.querySelectorAll('.help-tab').forEach(tab => {
+        tab.addEventListener('click', () => switchHelpSection(tab.dataset.section));
+    });
 }
 
 // Initialize tooltips and other UI enhancements
@@ -9794,6 +10073,8 @@ window.showDuplicateDetails = showDuplicateDetails;
 window.showAllDuplicates = showAllDuplicates;
 window.openHelpModal = openHelpModal;
 window.closeHelpModal = closeHelpModal;
+window.switchHelpSection = switchHelpSection;
+window.tryNow = tryNow;
 
 // Expose combined filter handler so it can be invoked from the HTML
 window.applyCombinedFilters = applyCombinedFilters;
