@@ -8900,13 +8900,147 @@ function generatePDFReport(type) {
             doc.setTextColor(...hexToRgb(AMAZON_COLORS.gray));
             doc.text(label, x + width/2, y + height - 5, { align: 'center' });
         };
-        
         let currentPage = 1;
+
+        if (type === 'executive') {
+            const injuryData = state.injury.filteredData || [];
+            const nearMissData = state.nearMiss.filteredData || [];
+
+            function calculateSafetyScore(inj, near) {
+                const recordable = inj.filter(r => r.recordable === 1).length;
+                const highRisk = near.filter(r => r.severity === 'A' || r.severity === 'B').length;
+                const penalty = (recordable * 5) + (highRisk * 3);
+                return Math.max(0, 100 - penalty);
+            }
+
+            function calculateIncidentTrend(current, previous = 0) {
+                if (!previous) return 'N/A';
+                if (current > previous) return 'Increasing';
+                if (current < previous) return 'Decreasing';
+                return 'Stable';
+            }
+
+            function calculateRiskExposure(near) {
+                const high = near.filter(r => r.severity === 'A' || r.severity === 'B').length;
+                if (high === 0) return 'Low';
+                if (high <= 2) return 'Medium';
+                return 'High';
+            }
+
+            function buildNarrative(inj, near, trend) {
+                const total = inj.length + near.length;
+                const direction = trend === 'Decreasing' ? 'decreasing' : trend === 'Increasing' ? 'increasing' : 'stable';
+                return `Your station recorded ${total} incidents this period with ${direction} trends compared to the previous period. Review high-risk areas for targeted improvements.`;
+            }
+
+            const totalIncidents = injuryData.length + nearMissData.length;
+            const safetyScore = calculateSafetyScore(injuryData, nearMissData);
+            const incidentTrend = calculateIncidentTrend(totalIncidents, state.previousMetrics?.totalIncidents);
+            const riskExposure = calculateRiskExposure(nearMissData);
+            const compliance = state.compliance?.rate !== undefined ? `${state.compliance.rate}%` : 'N/A';
+            const narrative = buildNarrative(injuryData, nearMissData, incidentTrend);
+
+            const addExecHeader = (pageNum) => {
+                doc.setTextColor(...hexToRgb(AMAZON_COLORS.darkBlue));
+                doc.setFontSize(16);
+                doc.setFont('helvetica', 'bold');
+                doc.text('Safety Performance Executive Briefing', pageWidth / 2, 20, { align: 'center' });
+                doc.setFontSize(10);
+                doc.setFont('helvetica', 'normal');
+                doc.text(`${getSelectedSites('executive')} | ${getReportPeriod()}`, pageWidth / 2, 26, { align: 'center' });
+                doc.setFontSize(9);
+                doc.text(`Page ${pageNum}`, pageWidth - margin, 26, { align: 'right' });
+            };
+
+            addExecHeader(currentPage);
+
+            let y = 40;
+            doc.setFontSize(12);
+            doc.setFont('helvetica', 'bold');
+            doc.text('At-a-Glance Performance Metrics', margin, y);
+            y += 6;
+
+            const boxWidth = 40;
+            const boxHeight = 28;
+            const boxGap = 8;
+            const metrics = [
+                { label: 'Safety Score', value: `${safetyScore}/100`, color: AMAZON_COLORS.darkBlue },
+                { label: 'Incident Trend', value: incidentTrend, color: AMAZON_COLORS.orange },
+                { label: 'Risk Exposure', value: riskExposure, color: 'rgb(255, 87, 34)' },
+                { label: 'Compliance', value: compliance, color: 'rgb(0, 128, 0)' }
+            ];
+            metrics.forEach((metric, index) => {
+                const x = margin + (index * (boxWidth + boxGap));
+                addMetricBox(x, y, boxWidth, boxHeight, metric.label, metric.value, metric.color);
+            });
+            y += boxHeight + 15;
+
+            doc.setFontSize(12);
+            doc.setFont('helvetica', 'bold');
+            doc.text('Narrative Insights', margin, y);
+            y += 6;
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'normal');
+            const narrativeLines = doc.splitTextToSize(narrative, contentWidth);
+            doc.text(narrativeLines, margin, y);
+
+            addFooter();
+
+            doc.addPage();
+            currentPage++;
+            addExecHeader(currentPage);
+            y = 40;
+
+            doc.setFontSize(14);
+            doc.setFont('helvetica', 'bold');
+            doc.text('Your Safety Story This Period', margin, y);
+            y += 10;
+            doc.setFontSize(11);
+            doc.setFont('helvetica', 'bold');
+            doc.text('What Happened', margin, y);
+            y += 6;
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'normal');
+
+            const categories = new Set([...injuryData.map(r => r.category).filter(Boolean), ...nearMissData.map(r => r.category).filter(Boolean)]);
+            const previousNearMiss = state.previousMetrics?.nearMisses || 0;
+            const nearMissIncrease = previousNearMiss ? (((nearMissData.length - previousNearMiss) / previousNearMiss) * 100).toFixed(1) : '0';
+            const areaCounts = {};
+            [...injuryData, ...nearMissData].forEach(r => {
+                const area = r.area || 'Unknown';
+                areaCounts[area] = (areaCounts[area] || 0) + 1;
+            });
+            const sortedAreas = Object.entries(areaCounts).sort((a, b) => b[1] - a[1]);
+            const highestRiskArea = sortedAreas[0] || ['N/A', 0];
+            const bestArea = sortedAreas[sortedAreas.length - 1] || ['N/A', 0];
+
+            const bullets = [
+                `- ${totalIncidents} total incidents reported across ${categories.size} categories`,
+                `- ${nearMissIncrease}% increase in proactive near-miss reporting`,
+                `- Highest risk area: ${highestRiskArea[0]} - ${highestRiskArea[1]} incidents`,
+                `- Best performing area: ${bestArea[0]} - ${bestArea[1]} incidents`
+            ];
+            doc.text(bullets, margin, y);
+            y += bullets.length * 6 + 8;
+
+            doc.setFont('helvetica', 'bold');
+            doc.text('How You Compare', margin, y);
+            y += 6;
+            doc.setFont('helvetica', 'normal');
+            const ranking = state.ranking || {};
+            doc.text(`Regional Ranking: #${ranking.position || 'N/A'} of ${ranking.total || 'N/A'} stations`, margin, y);
+
+            addFooter();
+            doc.save(`executive_report_${Date.now()}.pdf`);
+            showStatus('Executive PDF report generated successfully', 'success');
+            return;
+        }
+
         let yPos = 40;
-        
+
         // Page 1 - Executive Summary
         addHeader(currentPage);
-        
+
         // Report info
         doc.setTextColor(...hexToRgb(AMAZON_COLORS.darkBlue));
         doc.setFontSize(10);
@@ -8918,10 +9052,10 @@ function generatePDFReport(type) {
         doc.text(`Sites: ${getSelectedSites(type)}`, margin, yPos + 18);
 
         yPos = 70;
-        
+
         // Executive Summary
         yPos = addSectionHeader('Executive Summary', yPos);
-        
+
         doc.setFillColor(255, 249, 240);
         // Use a proper RGB value for the border colour
         doc.setDrawColor(...hexToRgb(AMAZON_COLORS.orange));
