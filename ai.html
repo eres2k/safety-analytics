@@ -1,0 +1,2312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inspection & Action Tracking Platform | Amazon WHS</title>
+    
+    <!-- External Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #FF9900;
+            --secondary: #232F3E;
+            --success: #4CAF50;
+            --warning: #FFC107;
+            --danger: #FF5722;
+            --critical: #B71C1C;
+            --info: #2196F3;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f5f5f5;
+            --text-primary: #232F3E;
+            --text-secondary: #666;
+            --border: #ddd;
+            --shadow: rgba(0,0,0,0.1);
+            --upcoming: #FF6B6B;
+            --overdue: #B71C1C;
+            --completed: #4CAF50;
+            --in-progress: #2196F3;
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #1a1a1a;
+            --bg-secondary: #2d2d2d;
+            --text-primary: #ffffff;
+            --text-secondary: #b0b0b0;
+            --border: #444;
+            --shadow: rgba(0,0,0,0.3);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--secondary) 0%, #37475A 100%);
+            color: white;
+            padding: 1.5rem 2rem;
+            box-shadow: 0 2px 10px var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--primary);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        /* Navigation */
+        .nav-tabs {
+            background: var(--bg-primary);
+            padding: 0 2rem;
+            border-bottom: 2px solid var(--border);
+            display: flex;
+            gap: 2rem;
+            overflow-x: auto;
+            position: sticky;
+            top: 80px;
+            z-index: 50;
+        }
+
+        .nav-tab {
+            padding: 1rem 1.5rem;
+            border: none;
+            background: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .nav-tab:hover {
+            color: var(--primary);
+        }
+
+        .nav-tab.active {
+            color: var(--primary);
+        }
+
+        .nav-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--primary);
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        /* Upload Section */
+        .upload-section {
+            background: var(--bg-primary);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 10px var(--shadow);
+        }
+
+        .upload-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 1rem;
+        }
+
+        .upload-box {
+            border: 2px dashed var(--border);
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .upload-box:hover {
+            border-color: var(--primary);
+            background: rgba(255, 153, 0, 0.05);
+        }
+
+        .upload-box.active {
+            border-color: var(--success);
+            background: rgba(76, 175, 80, 0.05);
+        }
+
+        .upload-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: var(--text-secondary);
+        }
+
+        /* Dashboard */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .kpi-card {
+            background: var(--bg-primary);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px var(--shadow);
+            transition: transform 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .kpi-card.critical {
+            border-left-color: var(--overdue);
+        }
+
+        .kpi-card.warning {
+            border-left-color: var(--upcoming);
+        }
+
+        .kpi-card.info {
+            border-left-color: var(--in-progress);
+        }
+
+        .kpi-card.success {
+            border-left-color: var(--completed);
+        }
+
+        .kpi-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .kpi-title {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .kpi-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .kpi-value {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .kpi-change {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        /* Timeline View */
+        .timeline-container {
+            background: var(--bg-primary);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 10px var(--shadow);
+        }
+
+        .timeline-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .timeline-controls {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .timeline-view {
+            position: relative;
+            padding: 2rem 0;
+            overflow-x: auto;
+        }
+
+        .timeline-line {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--border);
+            z-index: 1;
+        }
+
+        .timeline-items {
+            display: flex;
+            gap: 2rem;
+            position: relative;
+            z-index: 2;
+            min-width: max-content;
+        }
+
+        .timeline-item {
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            padding: 1rem;
+            min-width: 200px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .timeline-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px var(--shadow);
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            bottom: -2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--bg-primary);
+            border: 3px solid var(--primary);
+        }
+
+        .timeline-date {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .timeline-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .timeline-type {
+            font-size: 0.85rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            display: inline-block;
+        }
+
+        /* Calendar View */
+        .calendar-container {
+            background: var(--bg-primary);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 10px var(--shadow);
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 1px;
+            background: var(--border);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .calendar-day-header {
+            background: var(--bg-secondary);
+            padding: 1rem;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .calendar-day {
+            background: var(--bg-primary);
+            min-height: 100px;
+            padding: 0.5rem;
+            position: relative;
+        }
+
+        .calendar-day-number {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .calendar-day.other-month .calendar-day-number {
+            opacity: 0.3;
+        }
+
+        .calendar-day.today {
+            background: rgba(255, 153, 0, 0.1);
+        }
+
+        .calendar-events {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .calendar-event {
+            font-size: 0.75rem;
+            padding: 0.25rem;
+            border-radius: 3px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            cursor: pointer;
+        }
+
+        .calendar-event.inspection {
+            background: rgba(33, 150, 243, 0.2);
+            color: var(--info);
+        }
+
+        .calendar-event.action {
+            background: rgba(255, 152, 0, 0.2);
+            color: var(--warning);
+        }
+
+        /* Priority Matrix */
+        .matrix-container {
+            background: var(--bg-primary);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 10px var(--shadow);
+        }
+
+        .matrix-grid {
+            display: grid;
+            grid-template-columns: 60px 1fr 1fr 1fr;
+            grid-template-rows: 60px 1fr 1fr 1fr;
+            gap: 1px;
+            background: var(--border);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+            height: 500px;
+        }
+
+        .matrix-cell {
+            background: var(--bg-primary);
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            overflow-y: auto;
+        }
+
+        .matrix-label {
+            background: var(--bg-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .matrix-cell.low-low {
+            background: rgba(76, 175, 80, 0.1);
+        }
+
+        .matrix-cell.low-medium {
+            background: rgba(255, 193, 7, 0.1);
+        }
+
+        .matrix-cell.low-high {
+            background: rgba(255, 152, 0, 0.1);
+        }
+
+        .matrix-cell.medium-low {
+            background: rgba(255, 193, 7, 0.1);
+        }
+
+        .matrix-cell.medium-medium {
+            background: rgba(255, 152, 0, 0.1);
+        }
+
+        .matrix-cell.medium-high {
+            background: rgba(255, 87, 34, 0.1);
+        }
+
+        .matrix-cell.high-low {
+            background: rgba(255, 152, 0, 0.1);
+        }
+
+        .matrix-cell.high-medium {
+            background: rgba(255, 87, 34, 0.1);
+        }
+
+        .matrix-cell.high-high {
+            background: rgba(183, 28, 28, 0.1);
+        }
+
+        .matrix-item {
+            background: var(--bg-primary);
+            padding: 0.5rem;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .matrix-item:hover {
+            transform: scale(1.05);
+            box-shadow: 0 2px 5px var(--shadow);
+        }
+
+        /* Data Table */
+        .table-container {
+            background: var(--bg-primary);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 10px var(--shadow);
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .table-controls {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .search-box {
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            min-width: 250px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: var(--bg-secondary);
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        tr:hover {
+            background: var(--bg-secondary);
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            display: inline-block;
+        }
+
+        .status-badge.overdue {
+            background: rgba(183, 28, 28, 0.1);
+            color: var(--overdue);
+        }
+
+        .status-badge.upcoming {
+            background: rgba(255, 107, 107, 0.1);
+            color: var(--upcoming);
+        }
+
+        .status-badge.in-progress {
+            background: rgba(33, 150, 243, 0.1);
+            color: var(--in-progress);
+        }
+
+        .status-badge.completed {
+            background: rgba(76, 175, 80, 0.1);
+            color: var(--completed);
+        }
+
+        /* Charts */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .chart-card {
+            background: var(--bg-primary);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px var(--shadow);
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .chart-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #E88A00;
+        }
+
+        .btn-secondary {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+        }
+
+        /* Filters */
+        .filters-container {
+            background: var(--bg-primary);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 10px var(--shadow);
+        }
+
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .filter-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        select {
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            cursor: pointer;
+        }
+
+        /* Status Messages */
+        .status-message {
+            position: fixed;
+            top: 100px;
+            right: 2rem;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            background: white;
+            box-shadow: 0 4px 20px var(--shadow);
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+        }
+
+        .status-message.success {
+            background: var(--success);
+            color: white;
+        }
+
+        .status-message.error {
+            background: var(--danger);
+            color: white;
+        }
+
+        .status-message.warning {
+            background: var(--warning);
+            color: white;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--bg-primary);
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+        }
+
+        /* Hidden file inputs */
+        input[type="file"] {
+            display: none;
+        }
+
+        /* Loading spinner */
+        .spinner {
+            border: 3px solid var(--border);
+            border-top: 3px solid var(--primary);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 2rem auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .filters-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .table-container {
+                overflow-x: auto;
+            }
+
+            table {
+                min-width: 600px;
+            }
+        }
+
+        /* Theme toggle */
+        .theme-toggle {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 8px;
+            transition: background 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Tab content */
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-icon">IA</div>
+                <div>
+                    <h1>Inspection & Action Tracking</h1>
+                    <div style="font-size: 0.9rem; opacity: 0.8;">Amazon WHS Austria</div>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-primary" onclick="generatePDFReport()">
+                    📄 Export PDF
+                </button>
+                <button class="btn btn-secondary" onclick="exportToExcel()">
+                    📊 Export Excel
+                </button>
+                <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="nav-tabs">
+        <button class="nav-tab active" onclick="switchTab('dashboard')">📊 Dashboard</button>
+        <button class="nav-tab" onclick="switchTab('timeline')">📅 Timeline</button>
+        <button class="nav-tab" onclick="switchTab('calendar')">📆 Calendar</button>
+        <button class="nav-tab" onclick="switchTab('matrix')">⚡ Priority Matrix</button>
+        <button class="nav-tab" onclick="switchTab('inspections')">🔍 Inspections</button>
+        <button class="nav-tab" onclick="switchTab('actions')">✅ Actions</button>
+        <button class="nav-tab" onclick="switchTab('analytics')">📈 Analytics</button>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Upload Section -->
+        <div class="upload-section">
+            <h2 style="margin-bottom: 1rem;">📁 Data Upload</h2>
+            <div class="upload-grid">
+                <div class="upload-box" onclick="document.getElementById('inspectionFile').click()">
+                    <div class="upload-icon">🔍</div>
+                    <h3>Upload Inspections</h3>
+                    <p style="color: var(--text-secondary); font-size: 0.9rem;">Inspection Deep Dive CSV</p>
+                    <div id="inspectionStatus" style="margin-top: 1rem; font-size: 0.9rem;"></div>
+                    <input type="file" id="inspectionFile" accept=".csv" onchange="handleFileUpload(event, 'inspection')">
+                </div>
+                <div class="upload-box" onclick="document.getElementById('actionFile').click()">
+                    <div class="upload-icon">✅</div>
+                    <h3>Upload Actions</h3>
+                    <p style="color: var(--text-secondary); font-size: 0.9rem;">Action Data CSV</p>
+                    <div id="actionStatus" style="margin-top: 1rem; font-size: 0.9rem;"></div>
+                    <input type="file" id="actionFile" accept=".csv" onchange="handleFileUpload(event, 'action')">
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard Tab -->
+        <div id="dashboard-tab" class="tab-content active">
+            <!-- KPI Dashboard -->
+            <div class="dashboard-grid">
+                <div class="kpi-card critical">
+                    <div class="kpi-header">
+                        <div class="kpi-title">Overdue Items</div>
+                        <div class="kpi-icon" style="background: rgba(183, 28, 28, 0.1); color: var(--overdue);">⚠️</div>
+                    </div>
+                    <div class="kpi-value" id="overdueCount">0</div>
+                    <div class="kpi-change">Requires immediate attention</div>
+                </div>
+                <div class="kpi-card warning">
+                    <div class="kpi-header">
+                        <div class="kpi-title">Due This Week</div>
+                        <div class="kpi-icon" style="background: rgba(255, 107, 107, 0.1); color: var(--upcoming);">⏰</div>
+                    </div>
+                    <div class="kpi-value" id="weekCount">0</div>
+                    <div class="kpi-change">Next 7 days</div>
+                </div>
+                <div class="kpi-card info">
+                    <div class="kpi-header">
+                        <div class="kpi-title">In Progress</div>
+                        <div class="kpi-icon" style="background: rgba(33, 150, 243, 0.1); color: var(--in-progress);">🔄</div>
+                    </div>
+                    <div class="kpi-value" id="progressCount">0</div>
+                    <div class="kpi-change">Currently being worked on</div>
+                </div>
+                <div class="kpi-card success">
+                    <div class="kpi-header">
+                        <div class="kpi-title">Completed</div>
+                        <div class="kpi-icon" style="background: rgba(76, 175, 80, 0.1); color: var(--completed);">✅</div>
+                    </div>
+                    <div class="kpi-value" id="completedCount">0</div>
+                    <div class="kpi-change">This month</div>
+                </div>
+            </div>
+
+            <!-- Charts -->
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3 class="chart-title">Status Distribution</h3>
+                        <select onchange="updateChart('status', this.value)">
+                            <option value="all">All Items</option>
+                            <option value="inspections">Inspections</option>
+                            <option value="actions">Actions</option>
+                        </select>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="statusChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3 class="chart-title">Weekly Trend</h3>
+                        <select onchange="updateChart('trend', this.value)">
+                            <option value="due">Due Items</option>
+                            <option value="completed">Completed</option>
+                            <option value="created">Created</option>
+                        </select>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="trendChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3 class="chart-title">Site Performance</h3>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="siteChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3 class="chart-title">Type Breakdown</h3>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="typeChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Timeline Tab -->
+        <div id="timeline-tab" class="tab-content">
+            <div class="timeline-container">
+                <div class="timeline-header">
+                    <h2>📅 Upcoming Timeline</h2>
+                    <div class="timeline-controls">
+                        <select id="timelineFilter" onchange="updateTimeline()">
+                            <option value="all">All Items</option>
+                            <option value="inspections">Inspections</option>
+                            <option value="actions">Actions</option>
+                            <option value="overdue">Overdue</option>
+                            <option value="thisWeek">This Week</option>
+                            <option value="nextWeek">Next Week</option>
+                        </select>
+                        <button class="btn btn-secondary btn-sm" onclick="scrollTimeline('left')">←</button>
+                        <button class="btn btn-secondary btn-sm" onclick="scrollTimeline('right')">→</button>
+                    </div>
+                </div>
+                <div class="timeline-view">
+                    <div class="timeline-line"></div>
+                    <div class="timeline-items" id="timelineItems">
+                        <!-- Timeline items will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Calendar Tab -->
+        <div id="calendar-tab" class="tab-content">
+            <div class="calendar-container">
+                <div class="calendar-header">
+                    <h2>📆 Calendar View</h2>
+                    <div class="timeline-controls">
+                        <button class="btn btn-secondary btn-sm" onclick="changeMonth(-1)">←</button>
+                        <span id="currentMonth" style="min-width: 150px; text-align: center; font-weight: 600;">November 2024</span>
+                        <button class="btn btn-secondary btn-sm" onclick="changeMonth(1)">→</button>
+                    </div>
+                </div>
+                <div class="calendar-grid" id="calendarGrid">
+                    <!-- Calendar will be populated here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Priority Matrix Tab -->
+        <div id="matrix-tab" class="tab-content">
+            <div class="matrix-container">
+                <div class="chart-header">
+                    <h2>⚡ Priority Matrix</h2>
+                    <select onchange="updateMatrix(this.value)">
+                        <option value="all">All Items</option>
+                        <option value="inspections">Inspections</option>
+                        <option value="actions">Actions</option>
+                    </select>
+                </div>
+                <div class="matrix-grid" id="priorityMatrix">
+                    <!-- Matrix will be populated here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Inspections Tab -->
+        <div id="inspections-tab" class="tab-content">
+            <div class="filters-container">
+                <div class="filters-grid">
+                    <div class="filter-group">
+                        <label class="filter-label">Site</label>
+                        <select id="inspectionSiteFilter" onchange="applyFilters('inspection')">
+                            <option value="">All Sites</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Status</label>
+                        <select id="inspectionStatusFilter" onchange="applyFilters('inspection')">
+                            <option value="">All Status</option>
+                            <option value="overdue">Overdue</option>
+                            <option value="upcoming">Upcoming</option>
+                            <option value="completed">Completed</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Type</label>
+                        <select id="inspectionTypeFilter" onchange="applyFilters('inspection')">
+                            <option value="">All Types</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Assignee</label>
+                        <select id="inspectionAssigneeFilter" onchange="applyFilters('inspection')">
+                            <option value="">All Assignees</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <div class="table-header">
+                    <h2>🔍 Inspections</h2>
+                    <div class="table-controls">
+                        <input type="text" class="search-box" placeholder="Search inspections..." onkeyup="searchTable('inspection')">
+                        <span id="inspectionCount">0 items</span>
+                    </div>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table id="inspectionTable">
+                        <thead>
+                            <tr>
+                                <th onclick="sortTable('inspection', 'id')">ID ↕</th>
+                                <th onclick="sortTable('inspection', 'type')">Type ↕</th>
+                                <th onclick="sortTable('inspection', 'site')">Site ↕</th>
+                                <th onclick="sortTable('inspection', 'area')">Area ↕</th>
+                                <th onclick="sortTable('inspection', 'assignee')">Assignee ↕</th>
+                                <th onclick="sortTable('inspection', 'dueDate')">Due Date ↕</th>
+                                <th onclick="sortTable('inspection', 'status')">Status ↕</th>
+                                <th>Findings</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inspectionTableBody">
+                            <!-- Table rows will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions Tab -->
+        <div id="actions-tab" class="tab-content">
+            <div class="filters-container">
+                <div class="filters-grid">
+                    <div class="filter-group">
+                        <label class="filter-label">Site</label>
+                        <select id="actionSiteFilter" onchange="applyFilters('action')">
+                            <option value="">All Sites</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Status</label>
+                        <select id="actionStatusFilter" onchange="applyFilters('action')">
+                            <option value="">All Status</option>
+                            <option value="overdue">Overdue</option>
+                            <option value="upcoming">Upcoming</option>
+                            <option value="completed">Completed</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Priority</label>
+                        <select id="actionPriorityFilter" onchange="applyFilters('action')">
+                            <option value="">All Priorities</option>
+                            <option value="high">High</option>
+                            <option value="medium">Medium</option>
+                            <option value="low">Low</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Owner</label>
+                        <select id="actionOwnerFilter" onchange="applyFilters('action')">
+                            <option value="">All Owners</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <div class="table-header">
+                    <h2>✅ Actions</h2>
+                    <div class="table-controls">
+                        <input type="text" class="search-box" placeholder="Search actions..." onkeyup="searchTable('action')">
+                        <span id="actionCount">0 items</span>
+                    </div>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table id="actionTable">
+                        <thead>
+                            <tr>
+                                <th onclick="sortTable('action', 'id')">ID ↕</th>
+                                <th onclick="sortTable('action', 'title')">Title ↕</th>
+                                <th onclick="sortTable('action', 'site')">Site ↕</th>
+                                <th onclick="sortTable('action', 'owner')">Owner ↕</th>
+                                <th onclick="sortTable('action', 'priority')">Priority ↕</th>
+                                <th onclick="sortTable('action', 'dueDate')">Due Date ↕</th>
+                                <th onclick="sortTable('action', 'status')">Status ↕</th>
+                                <th>Progress</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="actionTableBody">
+                            <!-- Table rows will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Analytics Tab -->
+        <div id="analytics-tab" class="tab-content">
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3 class="chart-title">Completion Rate by Site</h3>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="completionChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3 class="chart-title">Average Resolution Time</h3>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="resolutionChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3 class="chart-title">Monthly Performance</h3>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="performanceChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3 class="chart-title">Risk Heat Map</h3>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="heatmapChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Details -->
+    <div id="detailModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">Item Details</h2>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <div id="modalBody">
+                <!-- Modal content will be populated here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global State Management
+        const state = {
+            inspections: {
+                rawData: [],
+                filteredData: [],
+                currentPage: 1
+            },
+            actions: {
+                rawData: [],
+                filteredData: [],
+                currentPage: 1
+            },
+            currentTab: 'dashboard',
+            currentMonth: new Date(),
+            charts: {},
+            theme: 'light'
+        };
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCharts();
+            generateCalendar();
+            generatePriorityMatrix();
+            updateDashboard();
+        });
+
+        // File Upload Handler
+        function handleFileUpload(event, type) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const statusElement = document.getElementById(type + 'Status');
+            statusElement.innerHTML = '<div class="spinner"></div>';
+
+            Papa.parse(file, {
+                header: true,
+                dynamicTyping: true,
+                skipEmptyLines: true,
+                complete: function(results) {
+                    if (type === 'inspection') {
+                        processInspectionData(results.data);
+                        statusElement.innerHTML = `✅ ${results.data.length} inspections loaded`;
+                        event.target.parentElement.classList.add('active');
+                    } else if (type === 'action') {
+                        processActionData(results.data);
+                        statusElement.innerHTML = `✅ ${results.data.length} actions loaded`;
+                        event.target.parentElement.classList.add('active');
+                    }
+                    
+                    updateDashboard();
+                    updateAllCharts();
+                    updateTables();
+                    updateFilters();
+                    updateTimeline();
+                    generateCalendar();
+                    generatePriorityMatrix();
+                    
+                    showStatus('Data loaded successfully!', 'success');
+                },
+                error: function(error) {
+                    statusElement.innerHTML = '❌ Error loading file';
+                    showStatus('Error loading file: ' + error.message, 'error');
+                }
+            });
+        }
+
+        // Process Inspection Data
+        function processInspectionData(data) {
+            state.inspections.rawData = data.map(row => {
+                const dueDate = row['Due By'] ? new Date(row['Due By']) : null;
+                const status = calculateStatus(dueDate, row['Status']);
+                
+                return {
+                    id: row['ID'] || '',
+                    site: row['Site'] || '',
+                    type: row['Type'] || '',
+                    area: row['Area'] || '',
+                    assignee: row['Assignee'] || '',
+                    dueDate: dueDate,
+                    status: status,
+                    findings: row['# of Findings'] || 0,
+                    lastUpdate: row['Last Update'] ? new Date(row['Last Update']) : null,
+                    org: row['Org'] || '',
+                    subOrg: row['SubOrg'] || '',
+                    country: row['Country'] || '',
+                    state: row['State'] || '',
+                    link: row['Link'] || '',
+                    rawStatus: row['Status'] || ''
+                };
+            });
+            
+            state.inspections.filteredData = [...state.inspections.rawData];
+        }
+
+        // Process Action Data
+        function processActionData(data) {
+            // Generate sample action data if CSV is empty
+            if (!data || data.length === 0) {
+                data = generateSampleActionData();
+            }
+            
+            state.actions.rawData = data.map(row => {
+                const dueDate = row['dueDate'] ? new Date(row['dueDate']) : null;
+                const status = calculateStatus(dueDate, row['status']);
+                
+                return {
+                    id: row['id'] || Math.random().toString(36).substr(2, 9),
+                    title: row['title'] || 'Action Item',
+                    site: row['site'] || '',
+                    owner: row['owner'] || '',
+                    priority: row['priority'] || 'medium',
+                    dueDate: dueDate,
+                    status: status,
+                    progress: row['progress'] || 0,
+                    description: row['description'] || '',
+                    createdDate: row['createdDate'] ? new Date(row['createdDate']) : new Date(),
+                    rawStatus: row['status'] || ''
+                };
+            });
+            
+            state.actions.filteredData = [...state.actions.rawData];
+        }
+
+        // Generate Sample Action Data
+        function generateSampleActionData() {
+            const sites = ['VIE1', 'VIE2', 'VIE3', 'VIE4'];
+            const priorities = ['high', 'medium', 'low'];
+            const owners = ['John Doe', 'Jane Smith', 'Mike Johnson', 'Sarah Williams'];
+            const actions = [];
+            
+            for (let i = 0; i < 50; i++) {
+                const daysOffset = Math.floor(Math.random() * 60) - 30;
+                const dueDate = new Date();
+                dueDate.setDate(dueDate.getDate() + daysOffset);
+                
+                actions.push({
+                    id: 'ACT-' + (1000 + i),
+                    title: `Action Item ${i + 1}`,
+                    site: sites[Math.floor(Math.random() * sites.length)],
+                    owner: owners[Math.floor(Math.random() * owners.length)],
+                    priority: priorities[Math.floor(Math.random() * priorities.length)],
+                    dueDate: dueDate.toISOString(),
+                    status: daysOffset < -7 ? 'overdue' : daysOffset < 0 ? 'completed' : 'pending',
+                    progress: Math.floor(Math.random() * 100),
+                    description: `Description for action item ${i + 1}`
+                });
+            }
+            
+            return actions;
+        }
+
+        // Calculate Status
+        function calculateStatus(dueDate, rawStatus) {
+            if (!dueDate) return 'pending';
+            
+            if (rawStatus && rawStatus.toLowerCase().includes('complete')) {
+                return 'completed';
+            }
+            
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const due = new Date(dueDate);
+            due.setHours(0, 0, 0, 0);
+            
+            const diffDays = Math.ceil((due - today) / (1000 * 60 * 60 * 24));
+            
+            if (diffDays < 0) return 'overdue';
+            if (diffDays <= 7) return 'upcoming';
+            if (rawStatus && rawStatus.toLowerCase().includes('progress')) return 'in-progress';
+            return 'pending';
+        }
+
+        // Update Dashboard KPIs
+        function updateDashboard() {
+            const allItems = [...state.inspections.filteredData, ...state.actions.filteredData];
+            
+            const overdue = allItems.filter(item => item.status === 'overdue').length;
+            const upcoming = allItems.filter(item => item.status === 'upcoming').length;
+            const inProgress = allItems.filter(item => item.status === 'in-progress').length;
+            const completed = allItems.filter(item => item.status === 'completed').length;
+            
+            document.getElementById('overdueCount').textContent = overdue;
+            document.getElementById('weekCount').textContent = upcoming;
+            document.getElementById('progressCount').textContent = inProgress;
+            document.getElementById('completedCount').textContent = completed;
+        }
+
+        // Initialize Charts
+        function initializeCharts() {
+            // Status Distribution Chart
+            const statusCtx = document.getElementById('statusChart').getContext('2d');
+            state.charts.status = new Chart(statusCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Overdue', 'Due This Week', 'In Progress', 'Completed'],
+                    datasets: [{
+                        data: [0, 0, 0, 0],
+                        backgroundColor: [
+                            'rgba(183, 28, 28, 0.8)',
+                            'rgba(255, 107, 107, 0.8)',
+                            'rgba(33, 150, 243, 0.8)',
+                            'rgba(76, 175, 80, 0.8)'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+
+            // Trend Chart
+            const trendCtx = document.getElementById('trendChart').getContext('2d');
+            state.charts.trend = new Chart(trendCtx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Items',
+                        data: [],
+                        borderColor: 'rgba(255, 153, 0, 1)',
+                        backgroundColor: 'rgba(255, 153, 0, 0.1)',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+
+            // Site Chart
+            const siteCtx = document.getElementById('siteChart').getContext('2d');
+            state.charts.site = new Chart(siteCtx, {
+                type: 'bar',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Open Items',
+                        data: [],
+                        backgroundColor: 'rgba(255, 153, 0, 0.8)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+
+            // Type Chart
+            const typeCtx = document.getElementById('typeChart').getContext('2d');
+            state.charts.type = new Chart(typeCtx, {
+                type: 'pie',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        data: [],
+                        backgroundColor: [
+                            'rgba(255, 153, 0, 0.8)',
+                            'rgba(35, 47, 62, 0.8)',
+                            'rgba(76, 175, 80, 0.8)',
+                            'rgba(33, 150, 243, 0.8)',
+                            'rgba(255, 87, 34, 0.8)'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+
+            updateAllCharts();
+        }
+
+        // Update All Charts
+        function updateAllCharts() {
+            const allItems = [...state.inspections.filteredData, ...state.actions.filteredData];
+            
+            // Update Status Chart
+            const statusCounts = {
+                overdue: allItems.filter(item => item.status === 'overdue').length,
+                upcoming: allItems.filter(item => item.status === 'upcoming').length,
+                inProgress: allItems.filter(item => item.status === 'in-progress').length,
+                completed: allItems.filter(item => item.status === 'completed').length
+            };
+            
+            state.charts.status.data.datasets[0].data = [
+                statusCounts.overdue,
+                statusCounts.upcoming,
+                statusCounts.inProgress,
+                statusCounts.completed
+            ];
+            state.charts.status.update();
+            
+            // Update Site Chart
+            const siteCounts = {};
+            allItems.forEach(item => {
+                if (item.site) {
+                    siteCounts[item.site] = (siteCounts[item.site] || 0) + 1;
+                }
+            });
+            
+            state.charts.site.data.labels = Object.keys(siteCounts);
+            state.charts.site.data.datasets[0].data = Object.values(siteCounts);
+            state.charts.site.update();
+            
+            // Update Type Chart
+            const typeCounts = {};
+            state.inspections.filteredData.forEach(item => {
+                if (item.type) {
+                    typeCounts[item.type] = (typeCounts[item.type] || 0) + 1;
+                }
+            });
+            
+            state.charts.type.data.labels = Object.keys(typeCounts);
+            state.charts.type.data.datasets[0].data = Object.values(typeCounts);
+            state.charts.type.update();
+            
+            // Update Trend Chart
+            updateTrendChart();
+        }
+
+        // Update Trend Chart
+        function updateTrendChart() {
+            const weeks = [];
+            const counts = [];
+            
+            for (let i = 6; i >= 0; i--) {
+                const weekStart = new Date();
+                weekStart.setDate(weekStart.getDate() - (i * 7));
+                const weekEnd = new Date(weekStart);
+                weekEnd.setDate(weekEnd.getDate() + 7);
+                
+                const weekLabel = `Week ${weekStart.getDate()}/${weekStart.getMonth() + 1}`;
+                weeks.push(weekLabel);
+                
+                const weekItems = [...state.inspections.filteredData, ...state.actions.filteredData].filter(item => {
+                    if (!item.dueDate) return false;
+                    return item.dueDate >= weekStart && item.dueDate < weekEnd;
+                });
+                
+                counts.push(weekItems.length);
+            }
+            
+            state.charts.trend.data.labels = weeks;
+            state.charts.trend.data.datasets[0].data = counts;
+            state.charts.trend.update();
+        }
+
+        // Switch Tab
+        function switchTab(tabName) {
+            // Update active tab
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Update tab content
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(tabName + '-tab').classList.add('active');
+            
+            state.currentTab = tabName;
+        }
+
+        // Update Timeline
+        function updateTimeline() {
+            const filter = document.getElementById('timelineFilter')?.value || 'all';
+            let items = [];
+            
+            if (filter === 'all' || filter === 'inspections') {
+                items = items.concat(state.inspections.filteredData);
+            }
+            if (filter === 'all' || filter === 'actions') {
+                items = items.concat(state.actions.filteredData);
+            }
+            
+            // Apply additional filters
+            if (filter === 'overdue') {
+                items = items.filter(item => item.status === 'overdue');
+            } else if (filter === 'thisWeek') {
+                const weekEnd = new Date();
+                weekEnd.setDate(weekEnd.getDate() + 7);
+                items = items.filter(item => item.dueDate && item.dueDate <= weekEnd);
+            } else if (filter === 'nextWeek') {
+                const weekStart = new Date();
+                weekStart.setDate(weekStart.getDate() + 7);
+                const weekEnd = new Date();
+                weekEnd.setDate(weekEnd.getDate() + 14);
+                items = items.filter(item => item.dueDate && item.dueDate >= weekStart && item.dueDate <= weekEnd);
+            }
+            
+            // Sort by due date
+            items.sort((a, b) => {
+                if (!a.dueDate) return 1;
+                if (!b.dueDate) return -1;
+                return a.dueDate - b.dueDate;
+            });
+            
+            // Generate timeline HTML
+            const timelineContainer = document.getElementById('timelineItems');
+            if (!timelineContainer) return;
+            
+            timelineContainer.innerHTML = items.slice(0, 20).map(item => {
+                const dateStr = item.dueDate ? item.dueDate.toLocaleDateString() : 'No date';
+                const isInspection = item.hasOwnProperty('findings');
+                const typeColor = isInspection ? 'var(--info)' : 'var(--warning)';
+                const statusColor = getStatusColor(item.status);
+                
+                return `
+                    <div class="timeline-item" onclick="showItemDetails('${item.id}', '${isInspection ? 'inspection' : 'action'}')">
+                        <div class="timeline-date">${dateStr}</div>
+                        <div class="timeline-title">${item.title || item.type || 'Item'}</div>
+                        <div class="timeline-type" style="background: ${typeColor}20; color: ${typeColor}">
+                            ${isInspection ? 'Inspection' : 'Action'}
+                        </div>
+                        <div style="margin-top: 0.5rem;">
+                            <span class="status-badge ${item.status}">${item.status}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Generate Calendar
+        function generateCalendar() {
+            const calendarGrid = document.getElementById('calendarGrid');
+            if (!calendarGrid) return;
+            
+            const year = state.currentMonth.getFullYear();
+            const month = state.currentMonth.getMonth();
+            
+            // Update month display
+            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+                              'July', 'August', 'September', 'October', 'November', 'December'];
+            document.getElementById('currentMonth').textContent = `${monthNames[month]} ${year}`;
+            
+            // Generate calendar
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const daysInPrevMonth = new Date(year, month, 0).getDate();
+            
+            let html = '';
+            
+            // Day headers
+            const dayHeaders = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            dayHeaders.forEach(day => {
+                html += `<div class="calendar-day-header">${day}</div>`;
+            });
+            
+            // Previous month days
+            for (let i = firstDay - 1; i >= 0; i--) {
+                html += `<div class="calendar-day other-month">
+                    <div class="calendar-day-number">${daysInPrevMonth - i}</div>
+                </div>`;
+            }
+            
+            // Current month days
+            const today = new Date();
+            for (let day = 1; day <= daysInMonth; day++) {
+                const currentDate = new Date(year, month, day);
+                const isToday = currentDate.toDateString() === today.toDateString();
+                
+                // Get items for this day
+                const dayItems = [...state.inspections.filteredData, ...state.actions.filteredData].filter(item => {
+                    if (!item.dueDate) return false;
+                    return item.dueDate.toDateString() === currentDate.toDateString();
+                });
+                
+                html += `<div class="calendar-day ${isToday ? 'today' : ''}">
+                    <div class="calendar-day-number">${day}</div>
+                    <div class="calendar-events">`;
+                
+                dayItems.slice(0, 3).forEach(item => {
+                    const isInspection = item.hasOwnProperty('findings');
+                    html += `<div class="calendar-event ${isInspection ? 'inspection' : 'action'}" 
+                             onclick="showItemDetails('${item.id}', '${isInspection ? 'inspection' : 'action'}')">
+                             ${item.title || item.type || 'Item'}
+                    </div>`;
+                });
+                
+                if (dayItems.length > 3) {
+                    html += `<div style="font-size: 0.75rem; color: var(--text-secondary);">+${dayItems.length - 3} more</div>`;
+                }
+                
+                html += `</div></div>`;
+            }
+            
+            // Next month days
+            const totalCells = firstDay + daysInMonth;
+            const nextMonthDays = totalCells % 7 === 0 ? 0 : 7 - (totalCells % 7);
+            for (let day = 1; day <= nextMonthDays; day++) {
+                html += `<div class="calendar-day other-month">
+                    <div class="calendar-day-number">${day}</div>
+                </div>`;
+            }
+            
+            calendarGrid.innerHTML = html;
+        }
+
+        // Change Calendar Month
+        function changeMonth(direction) {
+            state.currentMonth.setMonth(state.currentMonth.getMonth() + direction);
+            generateCalendar();
+        }
+
+        // Generate Priority Matrix
+        function generatePriorityMatrix() {
+            const matrix = document.getElementById('priorityMatrix');
+            if (!matrix) return;
+            
+            const priorities = ['High', 'Medium', 'Low'];
+            const urgencies = ['High', 'Medium', 'Low'];
+            
+            let html = '<div class="matrix-label"></div>';
+            
+            // Column headers
+            urgencies.forEach(urgency => {
+                html += `<div class="matrix-label">${urgency} Urgency</div>`;
+            });
+            
+            // Rows
+            priorities.forEach(priority => {
+                html += `<div class="matrix-label">${priority} Priority</div>`;
+                
+                urgencies.forEach(urgency => {
+                    const cellClass = `${priority.toLowerCase()}-${urgency.toLowerCase()}`;
+                    const items = getMatrixItems(priority, urgency);
+                    
+                    html += `<div class="matrix-cell ${cellClass}">`;
+                    items.slice(0, 5).forEach(item => {
+                        const isInspection = item.hasOwnProperty('findings');
+                        html += `<div class="matrix-item" onclick="showItemDetails('${item.id}', '${isInspection ? 'inspection' : 'action'}')">
+                            ${item.title || item.type || 'Item'}
+                        </div>`;
+                    });
+                    
+                    if (items.length > 5) {
+                        html += `<div style="font-size: 0.75rem; color: var(--text-secondary);">+${items.length - 5} more</div>`;
+                    }
+                    
+                    html += '</div>';
+                });
+            });
+            
+            matrix.innerHTML = html;
+        }
+
+        // Get Matrix Items
+        function getMatrixItems(priority, urgency) {
+            const allItems = [...state.inspections.filteredData, ...state.actions.filteredData];
+            
+            return allItems.filter(item => {
+                // Calculate priority based on status and due date
+                let itemPriority = 'Medium';
+                let itemUrgency = 'Medium';
+                
+                if (item.status === 'overdue') {
+                    itemPriority = 'High';
+                    itemUrgency = 'High';
+                } else if (item.status === 'upcoming') {
+                    itemPriority = 'High';
+                    itemUrgency = 'Medium';
+                } else if (item.status === 'completed') {
+                    itemPriority = 'Low';
+                    itemUrgency = 'Low';
+                }
+                
+                if (item.priority) {
+                    itemPriority = item.priority.charAt(0).toUpperCase() + item.priority.slice(1);
+                }
+                
+                return itemPriority === priority && itemUrgency === urgency;
+            });
+        }
+
+        // Update Tables
+        function updateTables() {
+            updateInspectionTable();
+            updateActionTable();
+        }
+
+        // Update Inspection Table
+        function updateInspectionTable() {
+            const tbody = document.getElementById('inspectionTableBody');
+            if (!tbody) return;
+            
+            const inspections = state.inspections.filteredData;
+            document.getElementById('inspectionCount').textContent = `${inspections.length} items`;
+            
+            tbody.innerHTML = inspections.map(item => `
+                <tr>
+                    <td>${item.id}</td>
+                    <td>${item.type}</td>
+                    <td>${item.site}</td>
+                    <td>${item.area}</td>
+                    <td>${item.assignee}</td>
+                    <td>${item.dueDate ? item.dueDate.toLocaleDateString() : '-'}</td>
+                    <td><span class="status-badge ${item.status}">${item.status}</span></td>
+                    <td>${item.findings}</td>
+                    <td>
+                        <button class="btn btn-sm btn-primary" onclick="showItemDetails('${item.id}', 'inspection')">View</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Update Action Table
+        function updateActionTable() {
+            const tbody = document.getElementById('actionTableBody');
+            if (!tbody) return;
+            
+            const actions = state.actions.filteredData;
+            document.getElementById('actionCount').textContent = `${actions.length} items`;
+            
+            tbody.innerHTML = actions.map(item => `
+                <tr>
+                    <td>${item.id}</td>
+                    <td>${item.title}</td>
+                    <td>${item.site}</td>
+                    <td>${item.owner}</td>
+                    <td><span class="status-badge ${item.priority}">${item.priority}</span></td>
+                    <td>${item.dueDate ? item.dueDate.toLocaleDateString() : '-'}</td>
+                    <td><span class="status-badge ${item.status}">${item.status}</span></td>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <div style="flex: 1; background: var(--bg-secondary); border-radius: 4px; height: 8px;">
+                                <div style="width: ${item.progress}%; background: var(--success); height: 100%; border-radius: 4px;"></div>
+                            </div>
+                            <span style="font-size: 0.85rem;">${item.progress}%</span>
+                        </div>
+                    </td>
+                    <td>
+                        <button class="btn btn-sm btn-primary" onclick="showItemDetails('${item.id}', 'action')">View</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Update Filters
+        function updateFilters() {
+            // Update inspection filters
+            const inspectionSites = [...new Set(state.inspections.rawData.map(item => item.site))].filter(Boolean);
+            const inspectionTypes = [...new Set(state.inspections.rawData.map(item => item.type))].filter(Boolean);
+            const inspectionAssignees = [...new Set(state.inspections.rawData.map(item => item.assignee))].filter(Boolean);
+            
+            updateSelectOptions('inspectionSiteFilter', inspectionSites);
+            updateSelectOptions('inspectionTypeFilter', inspectionTypes);
+            updateSelectOptions('inspectionAssigneeFilter', inspectionAssignees);
+            
+            // Update action filters
+            const actionSites = [...new Set(state.actions.rawData.map(item => item.site))].filter(Boolean);
+            const actionOwners = [...new Set(state.actions.rawData.map(item => item.owner))].filter(Boolean);
+            
+            updateSelectOptions('actionSiteFilter', actionSites);
+            updateSelectOptions('actionOwnerFilter', actionOwners);
+        }
+
+        // Update Select Options
+        function updateSelectOptions(selectId, options) {
+            const select = document.getElementById(selectId);
+            if (!select) return;
+            
+            const currentValue = select.value;
+            const firstOption = select.options[0];
+            
+            select.innerHTML = '';
+            select.appendChild(firstOption);
+            
+            options.forEach(option => {
+                const opt = document.createElement('option');
+                opt.value = option;
+                opt.textContent = option;
+                select.appendChild(opt);
+            });
+            
+            select.value = currentValue;
+        }
+
+        // Apply Filters
+        function applyFilters(type) {
+            if (type === 'inspection') {
+                const siteFilter = document.getElementById('inspectionSiteFilter').value;
+                const statusFilter = document.getElementById('inspectionStatusFilter').value;
+                const typeFilter = document.getElementById('inspectionTypeFilter').value;
+                const assigneeFilter = document.getElementById('inspectionAssigneeFilter').value;
+                
+                state.inspections.filteredData = state.inspections.rawData.filter(item => {
+                    if (siteFilter && item.site !== siteFilter) return false;
+                    if (statusFilter && item.status !== statusFilter) return false;
+                    if (typeFilter && item.type !== typeFilter) return false;
+                    if (assigneeFilter && item.assignee !== assigneeFilter) return false;
+                    return true;
+                });
+                
+                updateInspectionTable();
+            } else if (type === 'action') {
+                const siteFilter = document.getElementById('actionSiteFilter').value;
+                const statusFilter = document.getElementById('actionStatusFilter').value;
+                const priorityFilter = document.getElementById('actionPriorityFilter').value;
+                const ownerFilter = document.getElementById('actionOwnerFilter').value;
+                
+                state.actions.filteredData = state.actions.rawData.filter(item => {
+                    if (siteFilter && item.site !== siteFilter) return false;
+                    if (statusFilter && item.status !== statusFilter) return false;
+                    if (priorityFilter && item.priority !== priorityFilter) return false;
+                    if (ownerFilter && item.owner !== ownerFilter) return false;
+                    return true;
+                });
+                
+                updateActionTable();
+            }
+            
+            updateDashboard();
+            updateAllCharts();
+        }
+
+        // Search Table
+        function searchTable(type) {
+            const searchTerm = event.target.value.toLowerCase();
+            
+            if (type === 'inspection') {
+                state.inspections.filteredData = state.inspections.rawData.filter(item => {
+                    return Object.values(item).some(value => 
+                        value && value.toString().toLowerCase().includes(searchTerm)
+                    );
+                });
+                updateInspectionTable();
+            } else if (type === 'action') {
+                state.actions.filteredData = state.actions.rawData.filter(item => {
+                    return Object.values(item).some(value => 
+                        value && value.toString().toLowerCase().includes(searchTerm)
+                    );
+                });
+                updateActionTable();
+            }
+        }
+
+        // Sort Table
+        function sortTable(type, column) {
+            const data = type === 'inspection' ? state.inspections : state.actions;
+            
+            data.filteredData.sort((a, b) => {
+                let aVal = a[column];
+                let bVal = b[column];
+                
+                if (aVal instanceof Date && bVal instanceof Date) {
+                    return aVal - bVal;
+                }
+                
+                if (typeof aVal === 'string') {
+                    return aVal.localeCompare(bVal);
+                }
+                
+                return aVal - bVal;
+            });
+            
+            if (type === 'inspection') {
+                updateInspectionTable();
+            } else {
+                updateActionTable();
+            }
+        }
+
+        // Show Item Details
+        function showItemDetails(itemId, type) {
+            const modal = document.getElementById('detailModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalBody = document.getElementById('modalBody');
+            
+            const data = type === 'inspection' ? state.inspections.rawData : state.actions.rawData;
+            const item = data.find(i => i.id === itemId);
+            
+            if (!item) return;
+            
+            modalTitle.textContent = type === 'inspection' ? 'Inspection Details' : 'Action Details';
+            
+            let html = '<div style="display: flex; flex-direction: column; gap: 1rem;">';
+            
+            Object.entries(item).forEach(([key, value]) => {
+                if (value !== null && value !== undefined && value !== '') {
+                    const label = key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1');
+                    const displayValue = value instanceof Date ? value.toLocaleDateString() : value;
+                    
+                    html += `
+                        <div style="display: flex; gap: 1rem;">
+                            <strong style="min-width: 150px; color: var(--text-secondary);">${label}:</strong>
+                            <span>${displayValue}</span>
+                        </div>
+                    `;
+                }
+            });
+            
+            html += '</div>';
+            
+            modalBody.innerHTML = html;
+            modal.classList.add('active');
+        }
+
+        // Close Modal
+        function closeModal() {
+            document.getElementById('detailModal').classList.remove('active');
+        }
+
+        // Get Status Color
+        function getStatusColor(status) {
+            switch(status) {
+                case 'overdue': return 'var(--overdue)';
+                case 'upcoming': return 'var(--upcoming)';
+                case 'in-progress': return 'var(--in-progress)';
+                case 'completed': return 'var(--completed)';
+                default: return 'var(--text-secondary)';
+            }
+        }
+
+        // Show Status Message
+        function showStatus(message, type) {
+            const status = document.createElement('div');
+            status.className = `status-message ${type}`;
+            status.textContent = message;
+            document.body.appendChild(status);
+            
+            setTimeout(() => {
+                status.remove();
+            }, 3000);
+        }
+
+        // Toggle Theme
+        function toggleTheme() {
+            const currentTheme = document.body.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.body.setAttribute('data-theme', newTheme);
+            state.theme = newTheme;
+            
+            // Update charts for theme
+            Object.values(state.charts).forEach(chart => {
+                if (chart) {
+                    chart.options.plugins.legend.labels.color = newTheme === 'dark' ? '#ffffff' : '#232F3E';
+                    chart.update();
+                }
+            });
+        }
+
+        // Generate PDF Report
+        function generatePDFReport() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            // Title
+            doc.setFontSize(20);
+            doc.text('Inspection & Action Tracking Report', 20, 20);
+            
+            // Date
+            doc.setFontSize(12);
+            doc.text(`Generated: ${new Date().toLocaleDateString()}`, 20, 30);
+            
+            // KPIs
+            doc.setFontSize(16);
+            doc.text('Key Performance Indicators', 20, 45);
+            
+            doc.setFontSize(12);
+            const kpis = [
+                `Overdue Items: ${document.getElementById('overdueCount').textContent}`,
+                `Due This Week: ${document.getElementById('weekCount').textContent}`,
+                `In Progress: ${document.getElementById('progressCount').textContent}`,
+                `Completed: ${document.getElementById('completedCount').textContent}`
+            ];
+            
+            kpis.forEach((kpi, index) => {
+                doc.text(kpi, 30, 55 + (index * 10));
+            });
+            
+            // Inspections Summary
+            if (state.inspections.filteredData.length > 0) {
+                doc.addPage();
+                doc.setFontSize(16);
+                doc.text('Inspections Summary', 20, 20);
+                
+                const inspectionData = state.inspections.filteredData.slice(0, 10).map(item => [
+                    item.id,
+                    item.type,
+                    item.site,
+                    item.dueDate ? item.dueDate.toLocaleDateString() : '-',
+                    item.status
+                ]);
+                
+                doc.autoTable({
+                    head: [['ID', 'Type', 'Site', 'Due Date', 'Status']],
+                    body: inspectionData,
+                    startY: 30
+                });
+            }
+            
+            // Actions Summary
+            if (state.actions.filteredData.length > 0) {
+                doc.addPage();
+                doc.setFontSize(16);
+                doc.text('Actions Summary', 20, 20);
+                
+                const actionData = state.actions.filteredData.slice(0, 10).map(item => [
+                    item.id,
+                    item.title,
+                    item.site,
+                    item.dueDate ? item.dueDate.toLocaleDateString() : '-',
+                    item.status
+                ]);
+                
+                doc.autoTable({
+                    head: [['ID', 'Title', 'Site', 'Due Date', 'Status']],
+                    body: actionData,
+                    startY: 30
+                });
+            }
+            
+            // Save PDF
+            doc.save('inspection-action-report.pdf');
+            showStatus('PDF report generated successfully!', 'success');
+        }
+
+        // Export to Excel
+        function exportToExcel() {
+            const wb = XLSX.utils.book_new();
+            
+            // Create KPI sheet
+            const kpiData = [
+                ['Key Performance Indicators'],
+                ['Metric', 'Value'],
+                ['Overdue Items', parseInt(document.getElementById('overdueCount').textContent)],
+                ['Due This Week', parseInt(document.getElementById('weekCount').textContent)],
+                ['In Progress', parseInt(document.getElementById('progressCount').textContent)],
+                ['Completed', parseInt(document.getElementById('completedCount').textContent)]
+            ];
+            
+            const kpiSheet = XLSX.utils.aoa_to_sheet(kpiData);
+            XLSX.utils.book_append_sheet(wb, kpiSheet, 'KPIs');
+            
+            // Create Inspections sheet
+            if (state.inspections.rawData.length > 0) {
+                const inspectionSheet = XLSX.utils.json_to_sheet(state.inspections.rawData.map(item => ({
+                    ID: item.id,
+                    Type: item.type,
+                    Site: item.site,
+                    Area: item.area,
+                    Assignee: item.assignee,
+                    'Due Date': item.dueDate ? item.dueDate.toLocaleDateString() : '',
+                    Status: item.status,
+                    Findings: item.findings
+                })));
+                XLSX.utils.book_append_sheet(wb, inspectionSheet, 'Inspections');
+            }
+            
+            // Create Actions sheet
+            if (state.actions.rawData.length > 0) {
+                const actionSheet = XLSX.utils.json_to_sheet(state.actions.rawData.map(item => ({
+                    ID: item.id,
+                    Title: item.title,
+                    Site: item.site,
+                    Owner: item.owner,
+                    Priority: item.priority,
+                    'Due Date': item.dueDate ? item.dueDate.toLocaleDateString() : '',
+                    Status: item.status,
+                    Progress: item.progress + '%'
+                })));
+                XLSX.utils.book_append_sheet(wb, actionSheet, 'Actions');
+            }
+            
+            // Save Excel file
+            XLSX.writeFile(wb, 'inspection-action-tracking.xlsx');
+            showStatus('Excel report exported successfully!', 'success');
+        }
+
+        // Scroll Timeline
+        function scrollTimeline(direction) {
+            const container = document.querySelector('.timeline-items');
+            const scrollAmount = 300;
+            
+            if (direction === 'left') {
+                container.scrollLeft -= scrollAmount;
+            } else {
+                container.scrollLeft += scrollAmount;
+            }
+        }
+
+        // Update Chart
+        function updateChart(chartType, filter) {
+            // This function would update specific charts based on filter selection
+            updateAllCharts();
+        }
+
+        // Update Matrix
+        function updateMatrix(filter) {
+            // This function would update the priority matrix based on filter
+            generatePriorityMatrix();
+        }
+    </script>
+</body>
+</html>
