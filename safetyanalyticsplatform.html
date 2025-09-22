@@ -2341,6 +2341,13 @@
                             <small style="font-size: 0.75rem; opacity: 0.8;">High-level overview</small>
                         </div>
                     </button>
+                    <button class="btn btn-primary" onclick="generateWBRReport()">
+                        <span>📊</span>
+                        <div>
+                            <div>Safety WBR Report</div>
+                            <small style="font-size: 0.75rem; opacity: 0.8;">Weekly Business Review</small>
+                        </div>
+                    </button>
                     <button class="btn btn-secondary" onclick="exportToExcel('all')">
                         <span>📊</span>
                         <div>
@@ -9648,6 +9655,375 @@ function generatePDFReport(type) {
     }
 }
 
+function generateWBRReport() {
+    showStatus('Generating Safety WBR Report...', 'info');
+
+    try {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+
+        const REPORT_COLORS = {
+            orange: '#FF9900',
+            darkBlue: '#232F3E',
+            lightBlue: '#146EB4',
+            gray: '#767676',
+            red: '#D13212',
+            green: '#067D62'
+        };
+
+        const injuryData = state.injury.filteredData || [];
+        const nearMissData = state.nearMiss.filteredData || [];
+        const now = new Date();
+        const currentWeek = getReportWeekNumber(now);
+        const currentYear = now.getFullYear();
+
+        function calculateWBRMetrics() {
+            const totalIncidents = injuryData.length + nearMissData.length;
+            const recordableIncidents = injuryData.filter(item => Number(item.recordable) === 1).length;
+            const highRiskNearMiss = nearMissData.filter(item =>
+                item.potential_severity === 'A' || item.potential_severity === 'B' ||
+                item.severity === 'A' || item.severity === 'B'
+            ).length;
+
+            const hoursWorked = 200000;
+            const trirValue = hoursWorked ? ((recordableIncidents / hoursWorked) * 200000) : 0;
+            const trir = trirValue.toFixed(2);
+
+            const nmRatio = injuryData.length > 0 ? (nearMissData.length / injuryData.length).toFixed(1) : 'N/A';
+
+            const siteData = {};
+            [...injuryData, ...nearMissData].forEach(item => {
+                const site = item.site || 'Unknown';
+                if (!siteData[site]) {
+                    siteData[site] = { injuries: 0, nearMisses: 0, total: 0 };
+                }
+                if (item.case_number) {
+                    siteData[site].injuries++;
+                } else {
+                    siteData[site].nearMisses++;
+                }
+                siteData[site].total++;
+            });
+
+            const rootCauses = {};
+            [...injuryData, ...nearMissData].forEach(item => {
+                const cause = item.rca_primary_cause || 'Not Determined';
+                rootCauses[cause] = (rootCauses[cause] || 0) + 1;
+            });
+
+            const topRootCauses = Object.entries(rootCauses)
+                .sort(([, a], [, b]) => b - a)
+                .slice(0, 5);
+
+            const recentIncidents = [...injuryData, ...nearMissData]
+                .filter(item => {
+                    const rawDate = item.incident_date || item.nearmiss_date;
+                    if (!rawDate) return false;
+                    const date = new Date(rawDate);
+                    if (isNaN(date)) return false;
+                    const daysDiff = (now - date) / (1000 * 60 * 60 * 24);
+                    return daysDiff <= 14;
+                })
+                .filter(item =>
+                    item.severity === 'A' || item.severity === 'B' ||
+                    item.potential_severity === 'A' || item.potential_severity === 'B' ||
+                    Number(item.recordable) === 1
+                )
+                .sort((a, b) => {
+                    const aDate = new Date(a.incident_date || a.nearmiss_date);
+                    const bDate = new Date(b.incident_date || b.nearmiss_date);
+                    return bDate - aDate;
+                })
+                .slice(0, 5);
+
+            return {
+                totalIncidents,
+                recordableIncidents,
+                highRiskNearMiss,
+                trir,
+                nmRatio,
+                siteData,
+                topRootCauses,
+                recentIncidents
+            };
+        }
+
+        function getReportWeekNumber(date) {
+            const tmp = new Date(date.valueOf());
+            const dayNum = (tmp.getDay() + 6) % 7;
+            tmp.setDate(tmp.getDate() - dayNum + 3);
+            const firstThursday = tmp.valueOf();
+            tmp.setMonth(0, 1);
+            const firstDay = tmp.getDay();
+            const dayOffset = firstDay === 0 ? -6 : 1;
+            tmp.setMonth(0, 1 + dayOffset);
+            if (tmp.getDay() !== 4) {
+                tmp.setMonth(0, 1 + dayOffset + ((4 - tmp.getDay()) + 7) % 7);
+            }
+            return 1 + Math.round((firstThursday - tmp) / (7 * 24 * 3600 * 1000));
+        }
+
+        function addHeader(pageNum) {
+            doc.setFillColor(...hexToRgb(REPORT_COLORS.darkBlue));
+            doc.rect(0, 0, 210, 25, 'F');
+
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(16);
+            doc.setFont('helvetica', 'bold');
+            doc.text('🇦🇹 Safety WBR Report - Executive Dashboard 📊', 20, 16);
+
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'normal');
+            doc.text(`CW${currentWeek}-${currentYear} | Page ${pageNum}`, 150, 16);
+        }
+
+        function addSectionHeader(title, y) {
+            doc.setFillColor(...hexToRgb(REPORT_COLORS.orange));
+            doc.rect(20, y, 170, 8, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(12);
+            doc.setFont('helvetica', 'bold');
+            doc.text(title, 22, y + 6);
+            return y + 15;
+        }
+
+        function addMetricBox(x, y, width, height, label, value, color, trend = null) {
+            doc.setFillColor(250, 250, 250);
+            doc.setDrawColor(...hexToRgb(color));
+            doc.setLineWidth(2);
+            doc.rect(x, y, width, height, 'FD');
+
+            doc.setFillColor(...hexToRgb(color));
+            doc.rect(x, y, width, 4, 'F');
+
+            doc.setTextColor(...hexToRgb(REPORT_COLORS.darkBlue));
+            doc.setFontSize(18);
+            doc.setFont('helvetica', 'bold');
+            doc.text(value.toString(), x + width / 2, y + height / 2 + 2, { align: 'center' });
+
+            doc.setFontSize(9);
+            doc.setFont('helvetica', 'normal');
+            doc.text(label, x + width / 2, y + height - 4, { align: 'center' });
+
+            if (trend) {
+                doc.setFontSize(8);
+                const trendColor = trend.includes('↑') ? REPORT_COLORS.red : REPORT_COLORS.green;
+                doc.setTextColor(...hexToRgb(trendColor));
+                doc.text(trend, x + width - 5, y + 8, { align: 'right' });
+            }
+        }
+
+        const metrics = calculateWBRMetrics();
+
+        let currentPage = 1;
+        addHeader(currentPage);
+        let yPos = 35;
+
+        doc.setTextColor(...hexToRgb(REPORT_COLORS.darkBlue));
+        doc.setFontSize(10);
+        doc.text(`Report Generated: ${now.toLocaleString()}`, 20, yPos);
+        doc.text(`Period: Last 30 days | Sites: ${Object.keys(metrics.siteData).length}`, 20, yPos + 6);
+        yPos += 20;
+
+        yPos = addSectionHeader('📊 Key Performance Indicators', yPos);
+
+        const boxWidth = 40;
+        const boxHeight = 25;
+        const boxSpacing = 5;
+
+        addMetricBox(20, yPos, boxWidth, boxHeight, 'Total Incidents', metrics.totalIncidents, REPORT_COLORS.orange);
+        addMetricBox(20 + boxWidth + boxSpacing, yPos, boxWidth, boxHeight, 'Recordable Cases', metrics.recordableIncidents, REPORT_COLORS.red);
+        addMetricBox(20 + 2 * (boxWidth + boxSpacing), yPos, boxWidth, boxHeight, 'High Risk Near Miss', metrics.highRiskNearMiss, REPORT_COLORS.lightBlue);
+        addMetricBox(20 + 3 * (boxWidth + boxSpacing), yPos, boxWidth, boxHeight, 'TRIR', metrics.trir, REPORT_COLORS.darkBlue);
+
+        yPos += boxHeight + 15;
+
+        yPos = addSectionHeader('🏭 Site Performance Breakdown', yPos);
+
+        const siteTableData = Object.entries(metrics.siteData)
+            .sort(([, a], [, b]) => b.total - a.total)
+            .slice(0, 8)
+            .map(([site, data]) => {
+                const riskLevel = data.injuries > 2 ? '🔴 High Risk' :
+                    data.injuries > 0 ? '🟡 Medium Risk' : '🟢 On Track';
+                return [
+                    site,
+                    data.injuries.toString(),
+                    data.nearMisses.toString(),
+                    data.total.toString(),
+                    riskLevel
+                ];
+            });
+
+        doc.autoTable({
+            startY: yPos,
+            head: [['Site', 'Injuries', 'Near Miss', 'Total', 'Status']],
+            body: siteTableData,
+            theme: 'grid',
+            headStyles: {
+                fillColor: hexToRgb(REPORT_COLORS.darkBlue),
+                textColor: [255, 255, 255],
+                fontSize: 10
+            },
+            bodyStyles: { fontSize: 9 },
+            columnStyles: {
+                0: { cellWidth: 35 },
+                1: { cellWidth: 25, halign: 'center' },
+                2: { cellWidth: 25, halign: 'center' },
+                3: { cellWidth: 25, halign: 'center' },
+                4: { cellWidth: 40, halign: 'center' }
+            },
+            margin: { left: 20, right: 20 }
+        });
+
+        yPos = doc.lastAutoTable.finalY + 15;
+
+        yPos = addSectionHeader('🔍 Top Contributing Factors', yPos);
+
+        const rootCauseData = metrics.topRootCauses.map(([cause, count]) => [
+            cause.length > 50 ? `${cause.substring(0, 47)}...` : cause,
+            count.toString(),
+            metrics.totalIncidents > 0 ? `${((count / metrics.totalIncidents) * 100).toFixed(1)}%` : '0.0%'
+        ]);
+
+        doc.autoTable({
+            startY: yPos,
+            head: [['Root Cause', 'Count', 'Percentage']],
+            body: rootCauseData,
+            theme: 'grid',
+            headStyles: {
+                fillColor: hexToRgb(REPORT_COLORS.darkBlue),
+                textColor: [255, 255, 255],
+                fontSize: 10
+            },
+            bodyStyles: { fontSize: 9 },
+            columnStyles: {
+                0: { cellWidth: 90 },
+                1: { cellWidth: 30, halign: 'center' },
+                2: { cellWidth: 30, halign: 'center' }
+            },
+            margin: { left: 20, right: 20 }
+        });
+
+        doc.addPage();
+        currentPage++;
+        addHeader(currentPage);
+        yPos = 35;
+
+        yPos = addSectionHeader('🚨 High-Priority Incidents (Last 2 Weeks)', yPos);
+
+        if (metrics.recentIncidents.length > 0) {
+            metrics.recentIncidents.forEach(incident => {
+                const isInjury = Boolean(incident.case_number);
+                const incidentDate = new Date(incident.incident_date || incident.nearmiss_date);
+                const dateLabel = isNaN(incidentDate) ? 'Unknown' : incidentDate.toLocaleDateString();
+                const site = incident.site || 'Unknown';
+                const severity = incident.severity || incident.potential_severity || 'Unknown';
+                const description = incident.initial_info_incident_description ||
+                    incident.initial_info_nearmiss_type ||
+                    incident.description ||
+                    'No description available';
+
+                const riskColor = severity === 'A' ? REPORT_COLORS.red :
+                    severity === 'B' ? REPORT_COLORS.orange :
+                        REPORT_COLORS.lightBlue;
+
+                doc.setFillColor(245, 245, 245);
+                doc.setDrawColor(...hexToRgb(riskColor));
+                doc.setLineWidth(1);
+                doc.rect(20, yPos, 170, 25, 'FD');
+
+                doc.setFillColor(...hexToRgb(riskColor));
+                doc.rect(20, yPos, 5, 25, 'F');
+
+                doc.setTextColor(...hexToRgb(REPORT_COLORS.darkBlue));
+                doc.setFontSize(11);
+                doc.setFont('helvetica', 'bold');
+                doc.text(`${site} - ${isInjury ? 'INJURY' : 'NEAR MISS'} | ${dateLabel}`, 30, yPos + 8);
+
+                doc.setFont('helvetica', 'normal');
+                doc.setFontSize(9);
+                const riskText = severity === 'A' ? '🔴 Critical Risk' : severity === 'B' ? '🟡 High Risk' : '🟢 Medium Risk';
+                doc.text(riskText, 30, yPos + 15);
+
+                const descText = description.length > 80 ? `${description.substring(0, 77)}...` : description;
+                doc.text(`Description: ${descText}`, 30, yPos + 22);
+
+                yPos += 30;
+            });
+        } else {
+            doc.setTextColor(...hexToRgb(REPORT_COLORS.green));
+            doc.setFontSize(12);
+            doc.text('✅ No high-priority incidents in the last 2 weeks', 20, yPos + 20);
+            yPos += 40;
+        }
+
+        yPos = addSectionHeader('📋 Leadership Action Items', yPos);
+
+        const actionItems = [
+            {
+                priority: '🔴 Critical',
+                action: 'Review and approve immediate corrective actions for high-risk sites',
+                owner: 'Site Leadership Team',
+                dueDate: 'Within 48 hours'
+            },
+            {
+                priority: '🟡 High',
+                action: 'Implement enhanced safety training for top contributing factors',
+                owner: 'Training & Development',
+                dueDate: 'Within 1 week'
+            },
+            {
+                priority: '🟢 Medium',
+                action: 'Conduct safety culture assessment at underperforming sites',
+                owner: 'Regional Safety Team',
+                dueDate: 'Within 2 weeks'
+            }
+        ];
+
+        actionItems.forEach(item => {
+            doc.setFillColor(250, 250, 250);
+            doc.setDrawColor(...hexToRgb(REPORT_COLORS.orange));
+            doc.rect(20, yPos, 170, 15, 'FD');
+
+            doc.setTextColor(...hexToRgb(REPORT_COLORS.darkBlue));
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'bold');
+            doc.text(`${item.priority} - ${item.action}`, 22, yPos + 6);
+
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(8);
+            doc.text(`Owner: ${item.owner} | Due: ${item.dueDate}`, 22, yPos + 12);
+
+            yPos += 20;
+        });
+
+        yPos += 10;
+        doc.setFillColor(240, 248, 255);
+        doc.setDrawColor(...hexToRgb(REPORT_COLORS.lightBlue));
+        doc.rect(20, yPos, 170, 25, 'FD');
+
+        doc.setTextColor(...hexToRgb(REPORT_COLORS.darkBlue));
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'bold');
+        doc.text('📈 Key Insight', 22, yPos + 8);
+
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(9);
+        const nmRatioInsight = metrics.nmRatio === 'N/A' ? 'N/A' : `${metrics.nmRatio}:1`;
+        doc.text(`Near Miss to Injury Ratio: ${nmRatioInsight} | Target: 10:1 minimum`, 22, yPos + 15);
+        doc.text('Focus: Increase proactive reporting and address root causes in high-risk sites', 22, yPos + 21);
+
+        const fileName = `Safety_WBR_Report_CW${currentWeek}_${currentYear}.pdf`;
+        doc.save(fileName);
+
+        showStatus('Safety WBR Report generated successfully!', 'success');
+    } catch (error) {
+        console.error('Safety WBR report generation error:', error);
+        showStatus('Error generating Safety WBR Report: ' + error.message, 'error');
+    }
+}
+
 function getReportPeriod() {
     const allData = [...state.injury.filteredData, ...state.nearMiss.filteredData];
     if (allData.length === 0) return 'No data available';
@@ -10113,6 +10489,7 @@ window.SafetyAnalytics = {
     loadSampleData,
     exportToExcel,
     generatePDFReport,
+    generateWBRReport,
     refreshDashboard,
     switchModule,
     toggleTheme
@@ -10129,6 +10506,7 @@ window.toggleTheme = toggleTheme;
 window.loadSampleData = loadSampleData;
 window.exportToExcel = exportToExcel;
 window.generatePDFReport = generatePDFReport;
+window.generateWBRReport = generateWBRReport;
 window.refreshDashboard = refreshDashboard;
 // Functions used by various buttons and interactions
 window.addNewAction = addNewAction;
