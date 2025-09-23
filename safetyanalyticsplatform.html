@@ -878,6 +878,56 @@
             display: none !important;
         }
 
+        /* Capture controls */
+        .injury-view,
+        .nearmiss-view {
+            position: relative;
+        }
+
+        .capture-view-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            padding: 0.35rem 0.75rem;
+            border-radius: 999px;
+            background: rgba(35, 47, 62, 0.85);
+            color: #ffffff;
+            border: none;
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(-4px);
+            transition: var(--transition);
+            box-shadow: 0 2px 8px var(--shadow);
+            z-index: 5;
+        }
+
+        .capture-view-btn:hover {
+            background: var(--amazon-orange);
+            box-shadow: 0 4px 12px var(--shadow-hover);
+        }
+
+        .capture-view-btn.capturing {
+            visibility: hidden;
+        }
+
+        .injury-view:hover .capture-view-btn,
+        .nearmiss-view:hover .capture-view-btn {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0);
+        }
+
+        body.capturing .capture-view-btn {
+            opacity: 0 !important;
+            visibility: hidden !important;
+        }
+
         /* Sub Navigation */
         .sub-nav {
             display: flex;
@@ -2649,6 +2699,7 @@ document.addEventListener('DOMContentLoaded', function() {
     createRiskMatrices();
     setupTableSorting('injury');
     setupTableSorting('nearMiss');
+    initializeAnalysisCaptureButtons();
 
     // Check for saved theme preference
     const savedTheme = localStorage.getItem('theme') || 'light';
@@ -8747,40 +8798,174 @@ function exportChart(chartId) {
         showStatus('Chart not found', 'error');
         return;
     }
-    
+
     const url = chart.toBase64Image();
     const link = document.createElement('a');
     link.download = `${chartId}_${new Date().toISOString().split('T')[0]}.png`;
     link.href = url;
     link.click();
-    
+
     showStatus('Chart exported successfully!', 'success');
 }
 
-// Export Dashboard
-function exportDashboard() {
-    showStatus('Capturing dashboard...', 'info');
-    
-    const dashboardElement = document.querySelector('.container');
-    if (!dashboardElement) {
-        showStatus('Dashboard element not found', 'error');
+function deriveViewLabel(id) {
+    if (!id) return 'analysis-view';
+    return id
+        .replace(/([a-z])([A-Z])/g, '$1 $2')
+        .replace(/_/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+}
+
+function slugifyLabel(label) {
+    if (!label) return 'analysis-view';
+    return label
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '')
+        .trim() || 'analysis-view';
+}
+
+function formatCaptureFileName(slug) {
+    const datePart = new Date().toISOString().split('T')[0];
+    return `${slug}_${datePart}.png`;
+}
+
+async function captureHTMLElement(element, filename) {
+    if (!element) {
+        throw new Error('Element not found');
+    }
+
+    document.body.classList.add('capturing');
+
+    try {
+        await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+        const canvas = await html2canvas(element, {
+            scale: 2,
+            useCORS: true,
+            logging: false,
+            backgroundColor: state.theme === 'dark' ? '#1a1a1a' : '#ffffff'
+        });
+
+        const link = document.createElement('a');
+        link.download = filename;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+        return canvas;
+    } finally {
+        document.body.classList.remove('capturing');
+    }
+}
+
+async function captureAnalysisView(viewId, customLabel, triggerButton) {
+    const element = document.getElementById(viewId);
+    if (!element) {
+        showStatus('Analysis view not found', 'error');
         return;
     }
-    
-    html2canvas(dashboardElement, {
-        scale: 2,
-        useCORS: true,
-        logging: false,
-        backgroundColor: state.theme === 'dark' ? '#1a1a1a' : '#ffffff'
-    }).then(canvas => {
-        const link = document.createElement('a');
-        link.download = `safety_dashboard_${new Date().toISOString().split('T')[0]}.png`;
-        link.href = canvas.toDataURL();
-        link.click();
-        showStatus('Dashboard exported as image!', 'success');
-    }).catch(error => {
-        console.error('Dashboard export error:', error);
-        showStatus('Error exporting dashboard: ' + error.message, 'error');
+
+    const viewLabel = customLabel || deriveViewLabel(viewId);
+    const fileSlug = slugifyLabel(viewLabel || viewId);
+    const filename = formatCaptureFileName(fileSlug);
+
+    showStatus(`Capturing ${viewLabel}...`, 'info');
+
+    if (triggerButton) {
+        triggerButton.classList.add('capturing');
+    }
+
+    try {
+        await captureHTMLElement(element, filename);
+        showStatus(`${viewLabel} captured successfully!`, 'success');
+    } catch (error) {
+        console.error('View capture error:', error);
+        showStatus(`Error capturing ${viewLabel}: ${error.message}`, 'error');
+    } finally {
+        if (triggerButton) {
+            triggerButton.classList.remove('capturing');
+        }
+    }
+}
+
+// Export Dashboard
+async function exportDashboard() {
+    showStatus('Capturing analysis views...', 'info');
+
+    const modulesToCapture = [
+        { moduleId: 'injury', selector: '.injury-view:not(.hidden)', fallbackId: 'injuryDashboard' },
+        { moduleId: 'nearmiss', selector: '.nearmiss-view:not(.hidden)', fallbackId: 'nearMissDashboard' }
+    ];
+
+    let capturedAny = false;
+
+    for (const config of modulesToCapture) {
+        const moduleEl = document.getElementById(config.moduleId);
+        if (!moduleEl) {
+            continue;
+        }
+
+        const wasActive = moduleEl.classList.contains('active');
+        if (!wasActive) {
+            moduleEl.classList.add('active');
+        }
+
+        await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+
+        let viewElement = moduleEl.querySelector(config.selector);
+        if (!viewElement && config.fallbackId) {
+            viewElement = document.getElementById(config.fallbackId);
+        }
+
+        if (viewElement) {
+            const label = deriveViewLabel(viewElement.id);
+            const fileSlug = slugifyLabel(label);
+            const filename = formatCaptureFileName(fileSlug);
+            try {
+                await captureHTMLElement(viewElement, filename);
+                capturedAny = true;
+            } catch (error) {
+                console.error('Dashboard export error:', error);
+                showStatus(`Error capturing ${label}: ${error.message}`, 'error');
+            }
+        }
+
+        if (!wasActive) {
+            moduleEl.classList.remove('active');
+        }
+    }
+
+    if (capturedAny) {
+        showStatus('Analysis views exported as images!', 'success');
+    } else {
+        showStatus('No analysis views available to capture.', 'warning');
+    }
+}
+
+function initializeAnalysisCaptureButtons() {
+    const views = document.querySelectorAll('.injury-view, .nearmiss-view');
+
+    views.forEach(view => {
+        if (!view.id) {
+            return;
+        }
+
+        if (view.querySelector('.capture-view-btn')) {
+            return;
+        }
+
+        const friendlyLabel = deriveViewLabel(view.id);
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'capture-view-btn';
+        button.innerHTML = '<span>📸</span><span>Capture</span>';
+        button.title = `Capture ${friendlyLabel}`;
+        button.setAttribute('aria-label', `Capture ${friendlyLabel}`);
+        button.addEventListener('click', event => {
+            event.stopPropagation();
+            captureAnalysisView(view.id, friendlyLabel, event.currentTarget);
+        });
+
+        view.appendChild(button);
     });
 }
 
@@ -10609,6 +10794,7 @@ window.exportInjuryData = exportInjuryData;
 window.exportNearMissData = exportNearMissData;
 window.exportTable = exportTable;
 window.exportNearMissDuplicatesPDF = exportNearMissDuplicatesPDF;
+window.captureAnalysisView = captureAnalysisView;
 window.markActionComplete = markActionComplete;
 window.switchInjuryView = switchInjuryView;
 window.switchNearMissView = switchNearMissView;
