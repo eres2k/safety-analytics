@@ -9137,8 +9137,8 @@ function initializeAnalysisCaptureButtons() {
 
 // Generate PDF Report
 function generatePDFReport(type) {
-    showStatus('Generating professional PDF report...', 'info');
-    
+    showStatus('Generating enhanced professional PDF report...', 'info');
+
     try {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF({
@@ -9147,849 +9147,1236 @@ function generatePDFReport(type) {
             format: 'a4'
         });
 
-        // Set a default font for the entire document. Without this,
-        // jsPDF may fallback to an undefined font which triggers
-        // errors like "Invalid argument passed to jsPDF.f2". We
-        // explicitly choose a built‑in font and weight here to avoid
-        // undefined font references.
         doc.setFont('helvetica', 'normal');
-        
+
         const pageWidth = 210;
         const pageHeight = 297;
-        const margin = 20;
+        const margin = 15;
         const contentWidth = pageWidth - (margin * 2);
-        
-        const addHeader = (pageNum) => {
-            // Header background
-            doc.setFillColor(...hexToRgb(AMAZON_COLORS.orange));
-            doc.rect(0, 0, pageWidth, 30, 'F');
-            
-            // Amazon logo area
-            doc.setFillColor(...hexToRgb(AMAZON_COLORS.darkBlue));
-            doc.rect(0, 0, 60, 30, 'F');
-            
-            // Title
-            doc.setTextColor(255, 255, 255);
-            doc.setFontSize(18);
-            doc.setFont('helvetica', 'bold');
-            doc.text('Safety Analytics Report', pageWidth / 2, 15, { align: 'center' });
-            
-            // Subtitle
-            doc.setFontSize(11);
-            doc.setFont('helvetica', 'normal');
-            doc.text('Amazon WHS Austria', pageWidth / 2, 22, { align: 'center' });
-            
-            // Page number
-            doc.setFontSize(9);
-            doc.text(`Page ${pageNum}`, pageWidth - margin, 25, { align: 'right' });
-        };
-        
-        const addFooter = () => {
-            doc.setFillColor(...hexToRgb(AMAZON_COLORS.darkBlue));
-            doc.rect(0, pageHeight - 15, pageWidth, 15, 'F');
-            doc.setTextColor(255, 255, 255);
-            doc.setFontSize(8);
-            doc.text('© 2024 Amazon.com, Inc. - Confidential', margin, pageHeight - 8);
-            doc.text('Developed by Erwin Esener @eeesener', pageWidth - margin, pageHeight - 8, { align: 'right' });
-        };
-        
-        const addSectionHeader = (title, yPos) => {
-            doc.setFillColor(...hexToRgb(AMAZON_COLORS.orange));
-            doc.rect(margin - 5, yPos - 8, contentWidth + 10, 12, 'F');
-            doc.setTextColor(255, 255, 255);
-            doc.setFontSize(13);
-            doc.setFont('helvetica', 'bold');
-            doc.text(title, margin, yPos);
-            return yPos + 10;
-        };
-        
-        const addMetricBox = (x, y, width, height, label, value, color = AMAZON_COLORS.orange) => {
-            // Box background
-            doc.setFillColor(250, 250, 250);
-            doc.setDrawColor(200, 200, 200);
-            doc.rect(x, y, width, height, 'FD');
-            
-            // Determine RGB values for the accent colour.  The colour parameter may
-            // be a hex string, an rgb(...) string or one of our predefined
-            // colours from AMAZON_COLORS.  Convert accordingly.
-            let colorRGB = [];
-            if (typeof color === 'string') {
-                if (color.startsWith('#')) {
-                    colorRGB = hexToRgb(color);
-                } else if (color.toLowerCase().startsWith('rgb')) {
-                    const nums = color.match(/\d+/g);
-                    colorRGB = nums ? nums.map(Number) : [0, 0, 0];
-                } else if (AMAZON_COLORS[color]) {
-                    colorRGB = hexToRgb(AMAZON_COLORS[color]);
-                } else {
-                    // Fallback to orange if unknown
-                    colorRGB = hexToRgb(AMAZON_COLORS.orange);
-                }
-            } else {
-                colorRGB = hexToRgb(AMAZON_COLORS.orange);
-            }
-            doc.setFillColor(...colorRGB);
-            doc.rect(x, y, width, 4, 'F');
-            
-            // Value
-            doc.setTextColor(...hexToRgb(AMAZON_COLORS.darkBlue));
-            doc.setFontSize(20);
-            // Use a defined font name instead of undefined to avoid jsPDF errors
-            doc.setFont('helvetica', 'bold');
-            doc.text(value.toString(), x + width/2, y + height/2, { align: 'center' });
-            
-            // Label
-            doc.setFontSize(9);
-            doc.setFont('helvetica', 'normal');
-            doc.setTextColor(...hexToRgb(AMAZON_COLORS.gray));
-            doc.text(label, x + width/2, y + height - 5, { align: 'center' });
-        };
         let currentPage = 1;
 
-        if (type === 'executive') {
-            const injuryData = state.injury.filteredData || [];
-            const nearMissData = state.nearMiss.filteredData || [];
+        const REPORT_COLORS = {
+            primary: '#FF9900',
+            secondary: '#232F3E',
+            tertiary: '#37475A',
+            success: '#4CAF50',
+            warning: '#FFC107',
+            danger: '#B71C1C',
+            info: '#2196F3',
+            neutral: '#9E9E9E',
+            background: '#F5F5F5'
+        };
 
-            function calculateSafetyScore(inj, near) {
-                const recordable = inj.filter(r => r.recordable === 1).length;
-                const highRisk = near.filter(r => r.severity === 'A' || r.severity === 'B').length;
-                const penalty = (recordable * 5) + (highRisk * 3);
-                return Math.max(0, 100 - penalty);
-            }
+        const addHeader = (pageNum, reportType) => {
+            doc.setFillColor(...hexToRgb(REPORT_COLORS.secondary));
+            doc.rect(0, 0, pageWidth, 35, 'F');
 
-            function calculateIncidentTrend(current, previous = 0) {
-                if (!previous) return 'N/A';
-                if (current > previous) return 'Increasing';
-                if (current < previous) return 'Decreasing';
-                return 'Stable';
-            }
+            doc.setFillColor(...hexToRgb(REPORT_COLORS.primary));
+            doc.rect(65, 0, pageWidth - 65, 35, 'F');
 
-            function calculateRiskExposure(near) {
-                const high = near.filter(r => r.severity === 'A' || r.severity === 'B').length;
-                if (high === 0) return 'Low';
-                if (high <= 2) return 'Medium';
-                return 'High';
-            }
-
-            function buildNarrative(inj, near, trend) {
-                const total = inj.length + near.length;
-                const direction = trend === 'Decreasing' ? 'decreasing' : trend === 'Increasing' ? 'increasing' : 'stable';
-                return `Your station recorded ${total} incidents this period with ${direction} trends compared to the previous period. Review high-risk areas for targeted improvements.`;
-            }
-
-            const totalIncidents = injuryData.length + nearMissData.length;
-            const safetyScore = calculateSafetyScore(injuryData, nearMissData);
-            const incidentTrend = calculateIncidentTrend(totalIncidents, state.previousMetrics?.totalIncidents);
-            const riskExposure = calculateRiskExposure(nearMissData);
-            const compliance = state.compliance?.rate !== undefined ? `${state.compliance.rate}%` : 'N/A';
-            const narrative = buildNarrative(injuryData, nearMissData, incidentTrend);
-
-            const addExecHeader = (pageNum) => {
-                doc.setTextColor(...hexToRgb(AMAZON_COLORS.darkBlue));
-                doc.setFontSize(16);
-                doc.setFont('helvetica', 'bold');
-                doc.text('Safety Performance Executive Briefing', pageWidth / 2, 20, { align: 'center' });
-                doc.setFontSize(10);
-                doc.setFont('helvetica', 'normal');
-                doc.text(`${getSelectedSites('executive')} | ${getReportPeriod()}`, pageWidth / 2, 26, { align: 'center' });
-                doc.setFontSize(9);
-                doc.text(`Page ${pageNum}`, pageWidth - margin, 26, { align: 'right' });
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(20);
+            doc.setFont('helvetica', 'bold');
+            const titleMap = {
+                injury: 'Injury & Illness Analysis',
+                nearmiss: 'Near Miss Intelligence',
+                combined: 'Integrated Safety Report',
+                executive: 'Executive Safety Dashboard',
+                wbr: 'Weekly Business Review'
             };
+            doc.text(titleMap[reportType] || 'Safety Report', pageWidth / 2, 18, { align: 'center' });
 
-            addExecHeader(currentPage);
-
-            let y = 40;
-            doc.setFontSize(12);
-            doc.setFont('helvetica', 'bold');
-            doc.text('At-a-Glance Performance Metrics', margin, y);
-            y += 6;
-
-            const boxWidth = 40;
-            const boxHeight = 28;
-            const boxGap = 8;
-            const metrics = [
-                { label: 'Safety Score', value: `${safetyScore}/100`, color: AMAZON_COLORS.darkBlue },
-                { label: 'Incident Trend', value: incidentTrend, color: AMAZON_COLORS.orange },
-                { label: 'Risk Exposure', value: riskExposure, color: 'rgb(255, 87, 34)' },
-                { label: 'Compliance', value: compliance, color: 'rgb(0, 128, 0)' }
-            ];
-            metrics.forEach((metric, index) => {
-                const x = margin + (index * (boxWidth + boxGap));
-                addMetricBox(x, y, boxWidth, boxHeight, metric.label, metric.value, metric.color);
-            });
-            y += boxHeight + 15;
-
-            doc.setFontSize(12);
-            doc.setFont('helvetica', 'bold');
-            doc.text('Narrative Insights', margin, y);
-            y += 6;
-            doc.setFontSize(10);
+            doc.setFontSize(11);
             doc.setFont('helvetica', 'normal');
-            const narrativeLines = doc.splitTextToSize(narrative, contentWidth);
-            doc.text(narrativeLines, margin, y);
+            doc.text(`Reporting Period: ${getReportPeriod()}`, pageWidth / 2, 26, { align: 'center' });
 
+            doc.setFontSize(9);
+            doc.text(`Page ${pageNum}`, pageWidth - margin, 30, { align: 'right' });
+
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'bold');
+            doc.text('AMAZON', 10, 15);
+            doc.setFont('helvetica', 'normal');
+            doc.text('WHS Austria', 10, 21);
+        };
+
+        const addFooter = () => {
+            const footerY = pageHeight - 12;
+            doc.setFillColor(...hexToRgb(REPORT_COLORS.secondary));
+            doc.rect(0, footerY - 3, pageWidth, 15, 'F');
+
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(8);
+            doc.text('Confidential - Internal Use Only', margin, footerY);
+            doc.text(`Generated: ${new Date().toLocaleString('en-GB')}`, pageWidth / 2, footerY, { align: 'center' });
+            doc.text('© 2024 Amazon.com, Inc.', pageWidth - margin, footerY, { align: 'right' });
+        };
+
+        const startNewPage = () => {
             addFooter();
-
             doc.addPage();
             currentPage++;
-            addExecHeader(currentPage);
-            y = 40;
+            addHeader(currentPage, type);
+            return 45;
+        };
 
+        const addSectionHeader = (title, yPos, icon = '') => {
+            doc.setFillColor(...hexToRgb(REPORT_COLORS.primary));
+            doc.rect(margin - 5, yPos - 8, contentWidth + 10, 14, 'F');
+
+            doc.setTextColor(255, 255, 255);
             doc.setFontSize(14);
             doc.setFont('helvetica', 'bold');
-            doc.text('Your Safety Story This Period', margin, y);
-            y += 10;
-            doc.setFontSize(11);
-            doc.setFont('helvetica', 'bold');
-            doc.text('What Happened', margin, y);
-            y += 6;
-            doc.setFontSize(10);
-            doc.setFont('helvetica', 'normal');
-
-            const categories = new Set([...injuryData.map(r => r.category).filter(Boolean), ...nearMissData.map(r => r.category).filter(Boolean)]);
-            const previousNearMiss = state.previousMetrics?.nearMisses || 0;
-            const nearMissIncrease = previousNearMiss ? (((nearMissData.length - previousNearMiss) / previousNearMiss) * 100).toFixed(1) : '0';
-            const areaCounts = {};
-            [...injuryData, ...nearMissData].forEach(r => {
-                const area = r.area || 'Unknown';
-                areaCounts[area] = (areaCounts[area] || 0) + 1;
-            });
-            const sortedAreas = Object.entries(areaCounts).sort((a, b) => b[1] - a[1]);
-            const highestRiskArea = sortedAreas[0] || ['N/A', 0];
-            const bestArea = sortedAreas[sortedAreas.length - 1] || ['N/A', 0];
-
-            const bullets = [
-                `- ${totalIncidents} total incidents reported across ${categories.size} categories`,
-                `- ${nearMissIncrease}% increase in proactive near-miss reporting`,
-                `- Highest risk area: ${highestRiskArea[0]} - ${highestRiskArea[1]} incidents`,
-                `- Best performing area: ${bestArea[0]} - ${bestArea[1]} incidents`
-            ];
-            doc.text(bullets, margin, y);
-            y += bullets.length * 6 + 8;
-
-            doc.setFont('helvetica', 'bold');
-            doc.text('How You Compare', margin, y);
-            y += 6;
-            doc.setFont('helvetica', 'normal');
-            const ranking = state.ranking || {};
-            doc.text(`Regional Ranking: #${ranking.position || 'N/A'} of ${ranking.total || 'N/A'} stations`, margin, y);
-
-            addFooter();
-            doc.save(`executive_report_${Date.now()}.pdf`);
-            showStatus('Executive PDF report generated successfully', 'success');
-            return;
-        }
-
-        let yPos = 40;
-
-        // Page 1 - Executive Summary
-        addHeader(currentPage);
-
-        // Report info
-        doc.setTextColor(...hexToRgb(AMAZON_COLORS.darkBlue));
-        doc.setFontSize(10);
-        // Use a defined font for normal weight
-        doc.setFont('helvetica', 'normal');
-        doc.text(`Report Generated: ${new Date().toLocaleString('en-GB')}`, margin, yPos);
-        doc.text(`Report Type: ${type.charAt(0).toUpperCase() + type.slice(1)} Safety Analysis`, margin, yPos + 6);
-        doc.text(`Period: ${getReportPeriod()}`, margin, yPos + 12);
-        doc.text(`Sites: ${getSelectedSites(type)}`, margin, yPos + 18);
-
-        yPos = 70;
-
-        // Executive Summary
-        yPos = addSectionHeader('Executive Summary', yPos);
-
-        doc.setFillColor(255, 249, 240);
-        // Use a proper RGB value for the border colour
-        doc.setDrawColor(...hexToRgb(AMAZON_COLORS.orange));
-        doc.setLineWidth(0.5);
-        doc.rect(margin, yPos, contentWidth, 50, 'FD');
-        
-        doc.setTextColor(...hexToRgb(AMAZON_COLORS.darkBlue));
-        doc.setFontSize(10);
-        doc.setFont('helvetica', 'normal');
-        
-        let summaryText = '';
-        if (type === 'injury' || type === 'combined' || type === 'executive') {
-            const injuryData = state.injury.filteredData;
-            const recordableCount = injuryData.filter(r => r.recordable === 1).length;
-            const lostTimeCount = injuryData.filter(r => r.total_dafw_days > 0).length;
-            const totalDaysLost = injuryData.reduce((sum, r) => sum + (r.total_dafw_days || 0), 0);
-            const qualityScore = state.injury.qualityMetrics?.qualityScore || 'N/A';
-            
-            summaryText = `Injury & Illness Analysis:\n`;
-            summaryText += `• Total Incidents: ${injuryData.length}\n`;
-            summaryText += `• Recordable Cases: ${recordableCount} (${((recordableCount/injuryData.length)*100).toFixed(1)}%)\n`;
-            summaryText += `• Lost Time Cases: ${lostTimeCount} with ${totalDaysLost} total days lost\n`;
-            summaryText += `• Data Quality Score: ${qualityScore}%\n`;
-            summaryText += `• Key Finding: ${getKeyFinding(injuryData, 'injury')}`;
-        }
-        
-        if (type === 'nearmiss' || type === 'combined' || type === 'executive') {
-            if (summaryText) summaryText += '\n\n';
-            const nearMissData = state.nearMiss.filteredData;
-            const highRiskCount = nearMissData.filter(r => r.severity === 'A' || r.severity === 'B').length;
-            const qualityScore = state.nearMiss.qualityMetrics?.qualityScore || 'N/A';
-            
-            summaryText += `Near Miss Analysis:\n`;
-            summaryText += `• Total Near Misses: ${nearMissData.length}\n`;
-            summaryText += `• High Risk Events: ${highRiskCount} (Severity A & B)\n`;
-            summaryText += `• Data Quality Score: ${qualityScore}%\n`;
-            summaryText += `• Key Finding: ${getKeyFinding(nearMissData, 'nearmiss')}`;
-        }
-        
-        const lines = doc.splitTextToSize(summaryText, contentWidth - 10);
-        doc.text(lines, margin + 5, yPos + 8);
-        
-        yPos += 55;
-        
-        // Key Metrics Dashboard
-        yPos = addSectionHeader('Key Performance Indicators', yPos);
-        
-        const metricsY = yPos + 5;
-        const boxWidth = 38;
-        const boxHeight = 28;
-        const boxGap = 5;
-        let metricsBottom = metricsY;
-
-        if (type === 'injury' || type === 'combined' || type === 'executive') {
-            const injuryData = state.injury.filteredData;
-            const metrics = [
-                { label: 'Total Cases', value: injuryData.length, color: AMAZON_COLORS.darkBlue },
-                { label: 'Recordable', value: injuryData.filter(r => r.recordable === 1).length, color: 'rgb(255, 87, 34)' },
-                { label: 'Lost Time', value: injuryData.filter(r => r.total_dafw_days > 0).length, color: 'rgb(183, 28, 28)' },
-                { label: 'Days Lost', value: injuryData.reduce((sum, r) => sum + (r.total_dafw_days || 0), 0), color: AMAZON_COLORS.orange }
-            ];
-
-            metrics.forEach((metric, index) => {
-                const x = margin + (index * (boxWidth + boxGap));
-                addMetricBox(x, metricsY, boxWidth, boxHeight, metric.label, metric.value, metric.color);
-            });
-            metricsBottom = metricsY + boxHeight;
-        }
-
-        if (type === 'nearmiss' || type === 'combined' || type === 'executive') {
-            const nearMissData = state.nearMiss.filteredData;
-            const highRisk = nearMissData.filter(r => r.severity === 'A' || r.severity === 'B').length;
-            const avgRisk = nearMissData.length > 0 ? (
-                nearMissData.reduce((sum, r) => sum + parseFloat(r.risk || 0), 0) / nearMissData.length
-            ).toFixed(1) : '0';
-            const qualityScore = state.nearMiss.qualityMetrics?.qualityScore;
-            const qualityVal = qualityScore !== undefined ? `${qualityScore}%` : 'N/A';
-            const metrics = [
-                { label: 'Total Near Misses', value: nearMissData.length, color: AMAZON_COLORS.darkBlue },
-                { label: 'High Severity', value: highRisk, color: 'rgb(255, 87, 34)' },
-                { label: 'Avg Risk', value: avgRisk, color: AMAZON_COLORS.orange },
-                { label: 'Quality Score', value: qualityVal, color: 'rgb(183, 28, 28)' }
-            ];
-
-            const nearMissY = metricsBottom + boxGap;
-            metrics.forEach((metric, index) => {
-                const x = margin + (index * (boxWidth + boxGap));
-                addMetricBox(x, nearMissY, boxWidth, boxHeight, metric.label, metric.value, metric.color);
-            });
-            metricsBottom = nearMissY + boxHeight;
-        }
-
-        yPos = metricsBottom + 15;
-        
-        // Severity Distribution
-        yPos = addSectionHeader('Severity Distribution Analysis', yPos);
-        
-        const allData = type === 'injury' ? state.injury.filteredData :
-                      type === 'nearmiss' ? state.nearMiss.filteredData :
-                      [...state.injury.filteredData, ...state.nearMiss.filteredData];
-        
-        const severityData = {
-            'A - Critical': allData.filter(r => r.severity === 'A').length,
-            'B - High': allData.filter(r => r.severity === 'B').length,
-            'C - Medium': allData.filter(r => r.severity === 'C').length,
-            'D - Low': allData.filter(r => r.severity === 'D').length
+            const sectionTitle = icon ? `${icon} ${title}` : title;
+            doc.text(sectionTitle.trim(), margin, yPos);
+            return yPos + 15;
         };
-        
-        const maxSeverity = Math.max(...Object.values(severityData));
-        const barHeight = 8;
-        
-        Object.entries(severityData).forEach(([severity, count], index) => {
-            const barY = yPos + (index * (barHeight + 5));
-            const barWidth = maxSeverity > 0 ? (count / maxSeverity) * 100 : 0;
-            const percentage = allData.length > 0 ? ((count / allData.length) * 100).toFixed(1) : '0';
-            
-            // Label
+
+        const addMetricCard = (x, y, width, height, label, value, trend = '', color = REPORT_COLORS.primary, icon = '') => {
+            doc.setFillColor(255, 255, 255);
+            doc.setDrawColor(230, 230, 230);
+            doc.roundedRect(x, y, width, height, 3, 3, 'FD');
+
+            doc.setFillColor(...hexToRgb(color));
+            doc.rect(x, y, width, 3, 'F');
+
+            if (icon) {
+                doc.setFontSize(16);
+                doc.setTextColor(...hexToRgb(REPORT_COLORS.secondary));
+                doc.text(icon, x + 5, y + 12);
+            }
+
+            doc.setTextColor(...hexToRgb(REPORT_COLORS.secondary));
+            doc.setFontSize(20);
+            doc.setFont('helvetica', 'bold');
+            doc.text(String(value), x + width / 2, y + height / 2 - 2, { align: 'center' });
+
             doc.setFontSize(9);
             doc.setFont('helvetica', 'normal');
-            doc.setTextColor(...hexToRgb(AMAZON_COLORS.darkBlue));
-            doc.text(severity, margin, barY + 6);
-            
-            // Bar
-            const colors = {
-                'A - Critical': SEVERITY_COLORS.A,
-                'B - High': SEVERITY_COLORS.B,
-                'C - Medium': SEVERITY_COLORS.C,
-                'D - Low': SEVERITY_COLORS.D
-            };
-            // Convert severity colour code (e.g. "#B71C1C") into an RGB array.  If the
-            // value is already in rgb(...) notation extract the numbers, otherwise
-            // use hexToRgb to interpret the hex code.  Falling back to the
-            // amazon orange colour if parsing fails ensures valid values are
-            // always passed to jsPDF.
-            let colorRGB;
-            const sevColor = colors[severity];
-            if (typeof sevColor === 'string') {
-                if (sevColor.startsWith('#')) {
-                    colorRGB = hexToRgb(sevColor);
-                } else if (sevColor.toLowerCase().startsWith('rgb')) {
-                    const nums = sevColor.match(/\d+/g);
-                    colorRGB = nums ? nums.map(Number) : hexToRgb(AMAZON_COLORS.orange);
-                } else {
-                    colorRGB = hexToRgb(sevColor);
-                }
-            } else {
-                colorRGB = hexToRgb(AMAZON_COLORS.orange);
-            }
-            doc.setFillColor(...colorRGB);
-            doc.rect(margin + 25, barY, barWidth, barHeight, 'F');
-            
-            // Value
-            doc.setTextColor(...hexToRgb(AMAZON_COLORS.gray));
-            doc.text(`${count} (${percentage}%)`, margin + 130, barY + 6);
-        });
-        
-        yPos += (4 * (barHeight + 5)) + 10;
-        
-        // Add footer
-        addFooter();
-        
-        // Page 2 - Detailed Analysis
-        if (type === 'injury' || type === 'combined') {
-            doc.addPage();
-            currentPage++;
-            addHeader(currentPage);
-            yPos = 40;
-            
-            yPos = addSectionHeader('Injury & Illness Detailed Analysis', yPos);
-            
-            // Top affected body parts table
-            const bodyPartCounts = {};
-            state.injury.filteredData.forEach(row => {
-                const part = row.bodyPart || 'Unknown';
-                bodyPartCounts[part] = (bodyPartCounts[part] || 0) + 1;
-            });
-            
-            const topBodyParts = Object.entries(bodyPartCounts)
-                .sort((a, b) => b[1] - a[1])
-                .slice(0, 5);
-            
-            doc.autoTable({
-                startY: yPos,
-                head: [['Body Part', 'Incidents', 'Percentage', 'Severity']],
-                body: topBodyParts.map(([part, count]) => [
-                    part.substring(0, 40) + (part.length > 40 ? '...' : ''),
-                    count,
-                    ((count / state.injury.filteredData.length) * 100).toFixed(1) + '%',
-                    getAverageSeverity(state.injury.filteredData.filter(r => r.bodyPart === part))
-                ]),
-                theme: 'grid',
-                // Use proper RGB colour for the table header
-                headStyles: { fillColor: hexToRgb(AMAZON_COLORS.darkBlue) },
-                margin: { left: margin, right: margin }
-            });
-            
-            yPos = doc.lastAutoTable.finalY + 10;
-            
-            // Root causes
-            yPos = addSectionHeader('Root Cause Analysis', yPos);
-            
-            const rootCauseCounts = {};
-            state.injury.filteredData.forEach(row => {
-                const cause = row.rootCause || 'Under Investigation';
-                rootCauseCounts[cause] = (rootCauseCounts[cause] || 0) + 1;
-            });
-            
-            const topCauses = Object.entries(rootCauseCounts)
-                .sort((a, b) => b[1] - a[1])
-                .slice(0, 6);
-            
-            doc.autoTable({
-                startY: yPos,
-                head: [['Root Cause', 'Count', 'Percentage']],
-                body: topCauses.map(([cause, count]) => [
-                    cause.substring(0, 50) + (cause.length > 50 ? '...' : ''),
-                    count,
-                    ((count / state.injury.filteredData.length) * 100).toFixed(1) + '%'
-                ]),
-                theme: 'grid',
-                headStyles: { fillColor: hexToRgb(AMAZON_COLORS.darkBlue) },
-                margin: { left: margin, right: margin }
-            });
-            
-            addFooter();
-        }
-        
-        // Page 3 - Near Miss Analysis
-        if (type === 'nearmiss' || type === 'combined') {
-            doc.addPage();
-            currentPage++;
-            addHeader(currentPage);
-            yPos = 40;
-            
-            yPos = addSectionHeader('Near Miss Detailed Analysis', yPos);
-            
-            // Top locations
-            const locationCounts = {};
-            state.nearMiss.filteredData.forEach(row => {
-                const location = row.location || 'Unknown';
-                locationCounts[location] = (locationCounts[location] || 0) + 1;
-            });
-            
-            const topLocations = Object.entries(locationCounts)
-                .sort((a, b) => b[1] - a[1])
-                .slice(0, 5);
-            
-            doc.autoTable({
-                startY: yPos,
-                head: [['Location', 'Incidents', 'Avg Risk Score']],
-                body: topLocations.map(([location, count]) => {
-                    const locationData = state.nearMiss.filteredData.filter(r => r.location === location);
-                    const avgRisk = locationData.reduce((sum, r) => sum + parseFloat(r.risk || 0), 0) / locationData.length;
-                    return [
-                        location.substring(0, 50) + (location.length > 50 ? '...' : ''),
-                        count,
-                        avgRisk.toFixed(1)
-                    ];
-                }),
-                theme: 'grid',
-                headStyles: { fillColor: hexToRgb(AMAZON_COLORS.darkBlue) },
-                margin: { left: margin, right: margin }
-            });
-            
-            yPos = doc.lastAutoTable.finalY + 10;
-            
-            // Process paths
-            yPos = addSectionHeader('Process Path Analysis', yPos);
-            
-            const processCounts = {};
-            state.nearMiss.filteredData.forEach(row => {
-                const process = row.processPath || 'Unknown';
-                processCounts[process] = (processCounts[process] || 0) + 1;
-            });
-            
-            const topProcesses = Object.entries(processCounts)
-                .sort((a, b) => b[1] - a[1])
-                .slice(0, 5);
-            
-            doc.autoTable({
-                startY: yPos,
-                head: [['Process Path', 'Near Misses', 'High Risk %']],
-                body: topProcesses.map(([process, count]) => {
-                    const processData = state.nearMiss.filteredData.filter(r => r.processPath === process);
-                    const highRisk = processData.filter(r => parseFloat(r.risk) >= 7).length;
-                    return [
-                        process,
-                        count,
-                        ((highRisk / count) * 100).toFixed(1) + '%'
-                    ];
-                }),
-                theme: 'grid',
-                headStyles: { fillColor: hexToRgb(AMAZON_COLORS.darkBlue) },
-                margin: { left: margin, right: margin }
-            });
-            
-            addFooter();
-        }
-        
-        // Page 4 - Data Quality Report
-        doc.addPage();
-        currentPage++;
-        addHeader(currentPage);
-        yPos = 40;
-        
-        yPos = addSectionHeader('Data Quality Assessment', yPos);
-        
-        // Quality metrics for each type
-        if (type === 'injury' || type === 'combined') {
-            const metrics = state.injury.qualityMetrics;
-            if (metrics && metrics.totalRecords) {
-                doc.setFontSize(11);
-                doc.setFont('helvetica', 'bold');
-                doc.setTextColor(...hexToRgb(AMAZON_COLORS.darkBlue));
-                doc.text('Injury Data Quality', margin, yPos + 5);
-                
-                // Quality score circle
-                const scoreColor = metrics.qualityScore >= 90 ? SEVERITY_COLORS.D : 
-                                  metrics.qualityScore >= 70 ? SEVERITY_COLORS.C : 
-                                  metrics.qualityScore >= 50 ? SEVERITY_COLORS.B : 
-                                  SEVERITY_COLORS.A;
-                // Convert the severity colour into an RGB triple.  SEVERITY_COLORS
-                // values are defined as hex strings (e.g. "#4CAF50"), so using
-                // hexToRgb ensures the values are parsed correctly.  If the
-                // string is already in an rgb(...) format we extract the
-                // numeric components; otherwise we default to orange.
-                let scoreRGB;
-                if (typeof scoreColor === 'string') {
-                    if (scoreColor.startsWith('#')) {
-                        scoreRGB = hexToRgb(scoreColor);
-                    } else if (scoreColor.toLowerCase().startsWith('rgb')) {
-                        const nums = scoreColor.match(/\d+/g);
-                        scoreRGB = nums ? nums.map(Number) : hexToRgb(AMAZON_COLORS.orange);
-                    } else {
-                        scoreRGB = hexToRgb(scoreColor);
-                    }
-                } else {
-                    scoreRGB = hexToRgb(AMAZON_COLORS.orange);
-                }
+            doc.setTextColor(120, 120, 120);
+            doc.text(label, x + width / 2, y + height / 2 + 5, { align: 'center' });
 
-                doc.setFillColor(...scoreRGB);
-                doc.circle(margin + 30, yPos + 20, 15, 'F');
-                doc.setTextColor(255, 255, 255);
-                doc.setFontSize(16);
-                doc.setFont('helvetica', 'bold');
-                doc.text(`${metrics.qualityScore}%`, margin + 30, yPos + 23, { align: 'center' });
-                
-                // Quality details
-                doc.setTextColor(...hexToRgb(AMAZON_COLORS.darkBlue));
-                doc.setFontSize(10);
-                doc.setFont('helvetica', 'normal');
-                doc.text(`Total Records: ${metrics.totalRecords}`, margin + 60, yPos + 10);
-                doc.text(`Duplicate Records: ${metrics.duplicates}`, margin + 60, yPos + 16);
-                doc.text(`Missing Critical Fields: ${metrics.missingCriticalFields}`, margin + 60, yPos + 22);
-                doc.text(`Data Completeness: ${metrics.dataCompleteness}%`, margin + 60, yPos + 28);
-                
-                yPos += 40;
+            if (trend) {
+                doc.setFontSize(8);
+                const trendColor = trend.includes('+') || trend.includes('↑') ? REPORT_COLORS.danger : trend.includes('↓') ? REPORT_COLORS.success : REPORT_COLORS.neutral;
+                doc.setTextColor(...hexToRgb(trendColor));
+                doc.text(trend, x + width / 2, y + height - 5, { align: 'center' });
             }
-        }
-        
-        if (type === 'nearmiss' || type === 'combined') {
-            const metrics = state.nearMiss.qualityMetrics;
-            if (metrics && metrics.totalRecords) {
-                doc.setFontSize(11);
-                doc.setFont('helvetica', 'bold');
-                doc.setTextColor(...hexToRgb(AMAZON_COLORS.darkBlue));
-                doc.text('Near Miss Data Quality', margin, yPos + 5);
-                
-                // Quality score circle
-                const scoreColor = metrics.qualityScore >= 90 ? SEVERITY_COLORS.D : 
-                                  metrics.qualityScore >= 70 ? SEVERITY_COLORS.C : 
-                                  metrics.qualityScore >= 50 ? SEVERITY_COLORS.B : 
-                                  SEVERITY_COLORS.A;
-                // Convert the colour into an RGB triple for jsPDF. The
-                // severity colours are defined as hex strings (e.g. "#FF5722");
-                // convert using hexToRgb. If the colour is provided in
-                // rgb(...) format extract the numeric values. Fallback to
-                // orange if parsing fails.
-                let scoreRGB;
-                if (typeof scoreColor === 'string') {
-                    if (scoreColor.startsWith('#')) {
-                        scoreRGB = hexToRgb(scoreColor);
-                    } else if (scoreColor.toLowerCase().startsWith('rgb')) {
-                        const nums = scoreColor.match(/\d+/g);
-                        scoreRGB = nums ? nums.map(Number) : hexToRgb(AMAZON_COLORS.orange);
-                    } else {
-                        scoreRGB = hexToRgb(scoreColor);
-                    }
-                } else {
-                    scoreRGB = hexToRgb(AMAZON_COLORS.orange);
-                }
+        };
 
-                doc.setFillColor(...scoreRGB);
-                doc.circle(margin + 30, yPos + 20, 15, 'F');
-                doc.setTextColor(255, 255, 255);
-                doc.setFontSize(16);
-                doc.setFont('helvetica', 'bold');
-                doc.text(`${metrics.qualityScore}%`, margin + 30, yPos + 23, { align: 'center' });
-                
-                // Quality details
-                doc.setTextColor(...hexToRgb(AMAZON_COLORS.darkBlue));
-                doc.setFontSize(10);
-                doc.setFont('helvetica', 'normal');
-                doc.text(`Total Records: ${metrics.totalRecords}`, margin + 60, yPos + 10);
-                doc.text(`Duplicate Records: ${metrics.duplicates}`, margin + 60, yPos + 16);
-                doc.text(`Missing Critical Fields: ${metrics.missingCriticalFields}`, margin + 60, yPos + 22);
-                doc.text(`Data Completeness: ${metrics.dataCompleteness}%`, margin + 60, yPos + 28);
-                
-                yPos += 40;
+        const addChart = (chartId, x, y, width, height) => {
+            try {
+                const chart = Chart.getChart(chartId);
+                if (chart) {
+                    const chartImage = chart.toBase64Image();
+                    doc.addImage(chartImage, 'PNG', x, y, width, height);
+                    return true;
+                }
+            } catch (error) {
+                console.warn(`Could not add chart ${chartId}:`, error);
             }
-        }
-        
-        // Page 5 - Recommendations
-        doc.addPage();
-        currentPage++;
-        addHeader(currentPage);
-        yPos = 40;
-        
-        yPos = addSectionHeader('Recommendations & Action Plan', yPos);
-        
-        const allDataForActions = type === 'injury' ? state.injury.filteredData :
-                                type === 'nearmiss' ? state.nearMiss.filteredData :
-                                [...state.injury.filteredData, ...state.nearMiss.filteredData];
-        
-        const actions = generateActionItems(allDataForActions);
-        
-        // Immediate Actions
-        doc.setFillColor(255, 249, 240);
-        doc.setDrawColor(255, 87, 34);
-        doc.setLineWidth(0.5);
-        doc.rect(margin, yPos, contentWidth, 35, 'FD');
-        
-        doc.setTextColor(255, 87, 34);
-        doc.setFontSize(11);
-        // Use a defined font to avoid jsPDF undefined font error
-        doc.setFont('helvetica', 'bold');
-        doc.text('Immediate Actions Required', margin + 5, yPos + 8);
-        
-        doc.setTextColor(...hexToRgb(AMAZON_COLORS.darkBlue));
-        doc.setFontSize(9);
-        doc.setFont('helvetica', 'normal');
-        
-        const immediateText = actions.immediate.slice(0, 3).map((action, i) => 
-            `${i + 1}. ${action.title}: ${action.description}`
-        ).join('\n');
-        
-        const immediateLines = doc.splitTextToSize(immediateText || 'No immediate actions required', contentWidth - 10);
-        doc.text(immediateLines, margin + 5, yPos + 15);
-        
-        yPos += 40;
-        
-        // Short-term Actions
-        doc.setFillColor(255, 252, 240);
-        doc.setDrawColor(255, 193, 7);
-        doc.rect(margin, yPos, contentWidth, 35, 'FD');
-        
-        doc.setTextColor(255, 152, 0);
-        doc.setFontSize(11);
-        doc.setFont('helvetica', 'bold');
-        doc.text('Short-term Actions (30 days)', margin + 5, yPos + 8);
-        
-        doc.setTextColor(...hexToRgb(AMAZON_COLORS.darkBlue));
-        doc.setFontSize(9);
-        doc.setFont('helvetica', 'normal');
-        
-        const shortTermText = actions.shortTerm.slice(0, 3).map((action, i) => 
-            `${i + 1}. ${action.title}: ${action.description}`
-        ).join('\n');
-        
-        const shortTermLines = doc.splitTextToSize(shortTermText || 'No short-term actions identified', contentWidth - 10);
-        doc.text(shortTermLines, margin + 5, yPos + 15);
-        
-        yPos += 40;
-        
-        // Long-term Improvements
-        doc.setFillColor(240, 248, 255);
-        doc.setDrawColor(33, 150, 243);
-        doc.rect(margin, yPos, contentWidth, 35, 'FD');
-        
-        doc.setTextColor(33, 150, 243);
-        doc.setFontSize(11);
-        doc.setFont('helvetica', 'bold');
-        doc.text('Long-term Improvements', margin + 5, yPos + 8);
-        
-        doc.setTextColor(...hexToRgb(AMAZON_COLORS.darkBlue));
-        doc.setFontSize(9);
-        doc.setFont('helvetica', 'normal');
-        
-        const longTermText = actions.longTerm.slice(0, 3).map((action, i) => 
-            `${i + 1}. ${action.title}: ${action.description}`
-        ).join('\n');
-        
-        const longTermLines = doc.splitTextToSize(longTermText || 'No long-term improvements identified', contentWidth - 10);
-        doc.text(longTermLines, margin + 5, yPos + 15);
-        
-        yPos += 40;
-        
-        // Risk Matrix Summary
-        yPos = addSectionHeader('Risk Matrix Summary', yPos);
-        
-        const riskSummary = calculateRiskMatrixSummary(allDataForActions);
-        
+            return false;
+        };
+
+        const addInsightBox = (x, y, width, title, insights, icon = '💡') => {
+            const lineHeight = 5;
+            const padding = 8;
+            const height = padding + (insights.length * lineHeight) + 10;
+
+            doc.setFillColor(250, 250, 250);
+            doc.setDrawColor(200, 200, 200);
+            doc.roundedRect(x, y, width, height, 3, 3, 'FD');
+
+            doc.setFillColor(...hexToRgb(REPORT_COLORS.tertiary));
+            doc.rect(x, y, width, 8, 'F');
+
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'bold');
+            doc.text(`${icon} ${title}`, x + 3, y + 5.5);
+
+            doc.setTextColor(...hexToRgb(REPORT_COLORS.secondary));
+            doc.setFontSize(9);
+            doc.setFont('helvetica', 'normal');
+
+            insights.forEach((insight, idx) => {
+                const yOffset = y + 12 + (idx * lineHeight);
+                doc.text(`• ${insight}`, x + 3, yOffset);
+            });
+
+            return y + height;
+        };
+
+        addHeader(currentPage, type);
+        let yPos = 45;
+
+        const metrics = calculateComprehensiveMetrics(type);
+
+        yPos = addSectionHeader('Executive Summary', yPos, '📊');
+
+        const cardWidth = (contentWidth - 30) / 4;
+        const cardHeight = 25;
+
+        addMetricCard(margin, yPos, cardWidth, cardHeight,
+            'Total Incidents', metrics.totalIncidents, metrics.incidentTrend,
+            REPORT_COLORS.primary, '📈');
+
+        addMetricCard(margin + cardWidth + 10, yPos, cardWidth, cardHeight,
+            'Recordable Rate', `${metrics.recordableRate}%`, metrics.recordableTrend,
+            parseFloat(metrics.recordableRate) > 5 ? REPORT_COLORS.danger : REPORT_COLORS.success, '⚠️');
+
+        addMetricCard(margin + (cardWidth + 10) * 2, yPos, cardWidth, cardHeight,
+            'Severity A/B', metrics.highSeverityCount, metrics.severityTrend,
+            metrics.highSeverityCount > 0 ? REPORT_COLORS.danger : REPORT_COLORS.success, '🚨');
+
+        addMetricCard(margin + (cardWidth + 10) * 3, yPos, cardWidth, cardHeight,
+            'Days Lost', metrics.totalDaysLost, metrics.daysLostTrend,
+            REPORT_COLORS.warning, '📅');
+
+        yPos += cardHeight + 10;
+
+        addMetricCard(margin, yPos, cardWidth, cardHeight,
+            'Near Miss Ratio', metrics.nearMissRatio, '',
+            REPORT_COLORS.info, '🎯');
+
+        addMetricCard(margin + cardWidth + 10, yPos, cardWidth, cardHeight,
+            'Risk Score Avg', metrics.avgRiskScore.toFixed(1), metrics.riskTrend,
+            metrics.avgRiskScore > 7 ? REPORT_COLORS.danger : metrics.avgRiskScore > 5 ? REPORT_COLORS.warning : REPORT_COLORS.success, '🎲');
+
+        addMetricCard(margin + (cardWidth + 10) * 2, yPos, cardWidth, cardHeight,
+            'Closure Rate', `${metrics.closureRate}%`, metrics.closureRate < 80 ? '⚠️ Improve' : '',
+            metrics.closureRate < 80 ? REPORT_COLORS.warning : REPORT_COLORS.success, '✅');
+
+        addMetricCard(margin + (cardWidth + 10) * 3, yPos, cardWidth, cardHeight,
+            'TRIR', metrics.trir.toFixed(2), metrics.trirTrend,
+            metrics.trir > 2 ? REPORT_COLORS.danger : REPORT_COLORS.success, '📊');
+
+        yPos += cardHeight + 15;
+
+        const keyInsights = generateKeyInsights(type, metrics);
+        yPos = addInsightBox(margin, yPos, contentWidth, 'Key Insights & Findings', keyInsights, '💡');
+
+        yPos = startNewPage();
+
+        yPos = addSectionHeader('Primary Impact Analysis', yPos, '💥');
+
+        const impactData = getImpactAnalysis(type);
         doc.autoTable({
             startY: yPos,
-            head: [['Risk Level', 'Count', 'Percentage', 'Action Priority']],
+            head: [['Impact Type', 'Count', 'Percentage', 'Avg Severity', 'Risk Level']],
+            body: impactData.map(row => [
+                row.type.substring(0, 30),
+                row.count,
+                `${row.percentage}%`,
+                row.avgSeverity,
+                row.riskLevel
+            ]),
+            theme: 'grid',
+            headStyles: {
+                fillColor: hexToRgb(REPORT_COLORS.secondary),
+                textColor: [255, 255, 255]
+            },
+            bodyStyles: { fontSize: 9 },
+            columnStyles: {
+                0: { cellWidth: 60 },
+                1: { cellWidth: 25, halign: 'center' },
+                2: { cellWidth: 30, halign: 'center' },
+                3: { cellWidth: 35, halign: 'center' },
+                4: { cellWidth: 30, halign: 'center' }
+            },
+            margin: { left: margin, right: margin },
+            didDrawCell: function(data) {
+                if (data.column.index === 4 && data.section === 'body') {
+                    const risk = data.cell.raw;
+                    let color;
+                    if (risk === 'Critical') color = REPORT_COLORS.danger;
+                    else if (risk === 'High') color = REPORT_COLORS.warning;
+                    else if (risk === 'Medium') color = REPORT_COLORS.info;
+                    else if (risk === 'Low') color = REPORT_COLORS.success;
+                    else color = REPORT_COLORS.neutral;
+
+                    doc.setFillColor(...hexToRgb(color));
+                    doc.rect(data.cell.x, data.cell.y, data.cell.width, data.cell.height, 'F');
+                    doc.setTextColor(255, 255, 255);
+                    doc.text(String(risk), data.cell.x + data.cell.width / 2, data.cell.y + data.cell.height / 2 + 1, { align: 'center' });
+                    doc.setTextColor(...hexToRgb(REPORT_COLORS.secondary));
+                }
+            }
+        });
+
+        yPos = doc.lastAutoTable.finalY + 15;
+
+        yPos = addSectionHeader('Process Path Breakdown', yPos, '🔄');
+
+        const processData = getProcessPathAnalysis(type);
+        const processes = processData.map(p => p.process);
+        const uniqueProcesses = processes.length > 0 ? processes : ['Receive', 'Stow', 'Pick', 'Pack', 'Ship', 'ICQA'];
+        const heatMapWidth = contentWidth / uniqueProcesses.length;
+        const heatMapHeight = 20;
+
+        uniqueProcesses.forEach((process, idx) => {
+            const data = processData.find(p => p.process === process) || { incidents: 0, risk: 0 };
+            const intensity = Math.min(255, Math.floor((Math.min(data.risk, 10) / 10) * 200));
+            const color = [255, 255 - intensity, 255 - intensity];
+
+            doc.setFillColor(...color);
+            doc.rect(margin + (idx * heatMapWidth), yPos, heatMapWidth, heatMapHeight, 'F');
+
+            doc.setTextColor(intensity > 120 ? 255 : 0);
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'bold');
+            doc.text(process, margin + (idx * heatMapWidth) + heatMapWidth / 2, yPos + 8, { align: 'center' });
+
+            doc.setFontSize(8);
+            doc.setFont('helvetica', 'normal');
+            doc.text(`${data.incidents} incidents`, margin + (idx * heatMapWidth) + heatMapWidth / 2, yPos + 14, { align: 'center' });
+        });
+
+        yPos += heatMapHeight + 15;
+
+        const processInsights = generateProcessInsights(processData);
+        yPos = addInsightBox(margin, yPos, contentWidth, 'Process-Specific Recommendations', processInsights, '🎯');
+
+        yPos = startNewPage();
+
+        yPos = addSectionHeader('Trend Analysis & Patterns', yPos, '📈');
+
+        const chartSets = type === 'nearmiss'
+            ? ['nearMissChart1', 'nearMissChart2']
+            : (type === 'combined' || type === 'executive' || type === 'wbr')
+                ? ['combinedTrendChart', 'combinedSeverityChart']
+                : ['injuryChart1', 'injuryChart2'];
+
+        const chartHeight = 60;
+        const halfWidth = contentWidth / 2 - 5;
+
+        if (addChart(chartSets[0], margin, yPos, halfWidth, chartHeight)) {
+            addChart(chartSets[1], margin + halfWidth + 10, yPos, halfWidth, chartHeight);
+            yPos += chartHeight + 5;
+        }
+
+        const monthlyData = getMonthlyTrendData(type);
+        doc.autoTable({
+            startY: yPos + 5,
+            head: [['Month', 'Incidents', 'Recordable', 'Near Miss', 'Risk Score', 'Action Items']],
+            body: monthlyData.map(month => [
+                month.name,
+                month.incidents,
+                month.recordable,
+                month.nearMiss,
+                month.riskScore.toFixed(1),
+                month.actions
+            ]),
+            theme: 'striped',
+            headStyles: { fillColor: hexToRgb(REPORT_COLORS.secondary), textColor: [255, 255, 255] },
+            styles: { fontSize: 9, cellPadding: 3 },
+            margin: { left: margin, right: margin }
+        });
+
+        yPos = startNewPage();
+
+        yPos = addSectionHeader('Risk Matrix & Mitigation Priority', yPos, '⚡');
+
+        const matrixSize = 100;
+        const cellSize = matrixSize / 5;
+        const matrixX = margin + 40;
+        const matrixY = yPos + 20;
+
+        const riskColors = {
+            1: '#4CAF50',
+            2: '#8BC34A',
+            3: '#FFC107',
+            4: '#FF9800',
+            5: '#FF5722'
+        };
+
+        for (let i = 0; i < 5; i++) {
+            for (let j = 0; j < 5; j++) {
+                const riskLevel = ((5 - i) * (j + 1)) / 5;
+                const colorIndex = Math.min(5, Math.max(1, Math.ceil(riskLevel)));
+                doc.setFillColor(...hexToRgb(riskColors[colorIndex]));
+                doc.rect(matrixX + (j * cellSize), matrixY + (i * cellSize), cellSize, cellSize, 'FD');
+
+                doc.setTextColor(255, 255, 255);
+                doc.setFontSize(8);
+                const score = ((5 - i) * (j + 1)).toFixed(0);
+                doc.text(score, matrixX + (j * cellSize) + cellSize / 2, matrixY + (i * cellSize) + cellSize / 2, { align: 'center' });
+            }
+        }
+
+        doc.setTextColor(...hexToRgb(REPORT_COLORS.secondary));
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'bold');
+
+        const severityLabels = ['D', 'C', 'B', 'A', 'Critical'];
+        severityLabels.forEach((label, idx) => {
+            doc.text(label, matrixX - 10, matrixY + (idx * cellSize) + cellSize / 2 + 2, { align: 'right' });
+        });
+
+        const likelihoodLabels = ['Rare', 'Unlikely', 'Possible', 'Likely', 'Certain'];
+        likelihoodLabels.forEach((label, idx) => {
+            doc.save();
+            doc.translate(matrixX + (idx * cellSize) + cellSize / 2, matrixY + matrixSize + 15);
+            doc.rotate(-Math.PI / 4);
+            doc.text(label, 0, 0, { align: 'center' });
+            doc.restore();
+        });
+
+        doc.save();
+        doc.translate(matrixX - 30, matrixY + matrixSize / 2);
+        doc.rotate(-Math.PI / 2);
+        doc.text('SEVERITY', 0, 0, { align: 'center' });
+        doc.restore();
+        doc.text('LIKELIHOOD', matrixX + matrixSize / 2, matrixY + matrixSize + 25, { align: 'center' });
+
+        let summaryY = matrixY + matrixSize + 40;
+        const riskDistribution = calculateRiskDistribution(type);
+
+        doc.autoTable({
+            startY: summaryY,
+            head: [['Risk Level', 'Count', '%', 'Top Location', 'Primary Action']],
             body: [
-                ['Critical (16-25)', riskSummary.critical, `${riskSummary.criticalPercent}%`, 'Immediate'],
-                ['High (11-15)', riskSummary.high, `${riskSummary.highPercent}%`, 'Within 7 days'],
-                ['Medium (6-10)', riskSummary.medium, `${riskSummary.mediumPercent}%`, 'Within 30 days'],
-                ['Low (1-5)', riskSummary.low, `${riskSummary.lowPercent}%`, 'Routine']
+                ['Critical (20-25)', riskDistribution.critical.count, `${riskDistribution.critical.percentage}%`,
+                    riskDistribution.critical.topLocation, 'Immediate intervention required'],
+                ['High (15-19)', riskDistribution.high.count, `${riskDistribution.high.percentage}%`,
+                    riskDistribution.high.topLocation, 'Action within 24 hours'],
+                ['Medium (10-14)', riskDistribution.medium.count, `${riskDistribution.medium.percentage}%`,
+                    riskDistribution.medium.topLocation, 'Action within 7 days'],
+                ['Low (5-9)', riskDistribution.low.count, `${riskDistribution.low.percentage}%`,
+                    riskDistribution.low.topLocation, 'Monitor and review'],
+                ['Minimal (1-4)', riskDistribution.minimal.count, `${riskDistribution.minimal.percentage}%`,
+                    riskDistribution.minimal.topLocation, 'Routine controls']
             ],
             theme: 'grid',
-            headStyles: { fillColor: hexToRgb(AMAZON_COLORS.darkBlue) },
-            bodyStyles: { cellPadding: 3 },
+            headStyles: { fillColor: hexToRgb(REPORT_COLORS.secondary), textColor: [255, 255, 255] },
+            styles: { fontSize: 9 },
             columnStyles: {
-                0: { cellWidth: 40 },
-                1: { cellWidth: 30, halign: 'center' },
-                2: { cellWidth: 35, halign: 'center' },
-                3: { cellWidth: 65 }
+                0: { cellWidth: 35 },
+                1: { cellWidth: 20, halign: 'center' },
+                2: { cellWidth: 15, halign: 'center' },
+                3: { cellWidth: 50 },
+                4: { cellWidth: 60 }
             },
             margin: { left: margin, right: margin }
         });
-        
-        addFooter();
-        
-        // Executive Summary Page (if requested)
-        if (type === 'executive') {
-            doc.addPage();
-            currentPage++;
-            addHeader(currentPage);
-            yPos = 40;
 
-            yPos = addSectionHeader('Executive Summary', yPos);
+        yPos = startNewPage();
 
-            const summary = calculateExecutiveSummaryMetrics();
-            const boxWidth = (contentWidth - 10) / 2;
-            const boxHeight = 20;
+        yPos = addSectionHeader('Root Cause Analysis & Corrective Actions', yPos, '🔍');
 
-            addMetricBox(margin, yPos, boxWidth, boxHeight, 'Total Incidents', summary.total, AMAZON_COLORS.orange);
-            addMetricBox(margin + boxWidth + 10, yPos, boxWidth, boxHeight, 'Recordable Cases', summary.recordable, AMAZON_COLORS.darkBlue);
+        const rootCauses = getRootCauseAnalysis(type);
+        doc.autoTable({
+            startY: yPos,
+            head: [['Root Cause', 'Frequency', 'Cumulative %', 'Associated Severity']],
+            body: rootCauses.slice(0, 10).map(cause => [
+                cause.name.substring(0, 50),
+                cause.count,
+                `${cause.cumulative}%`,
+                cause.avgSeverity
+            ]),
+            theme: 'striped',
+            headStyles: { fillColor: hexToRgb(REPORT_COLORS.secondary), textColor: [255, 255, 255] },
+            styles: { fontSize: 9 },
+            margin: { left: margin, right: margin }
+        });
 
-            yPos += boxHeight + 10;
-            addMetricBox(margin, yPos, boxWidth, boxHeight, 'High Severity', summary.highSeverity, AMAZON_COLORS.lightBlue);
-            addMetricBox(margin + boxWidth + 10, yPos, boxWidth, boxHeight, 'Days Since Recordable', summary.daysSinceRecordable, AMAZON_COLORS.gray);
+        yPos = doc.lastAutoTable.finalY + 15;
 
-            yPos += boxHeight + 15;
+        yPos = addSectionHeader('Recommended Actions', yPos, '✅');
 
-            yPos = addSectionHeader('Incident Trend (Last 6 Months)', yPos);
+        const actions = generateRecommendedActions(type, metrics, rootCauses);
 
-            doc.autoTable({
-                startY: yPos,
-                head: [['Month', 'Incidents']],
-                body: summary.trend.map(([month, count]) => [month, count]),
-                theme: 'grid',
-                headStyles: { fillColor: hexToRgb(AMAZON_COLORS.darkBlue) },
-                margin: { left: margin, right: margin }
+        const renderActionBlock = (title, icon, color, items, height) => {
+            doc.setFillColor(...color);
+            doc.rect(margin, yPos, contentWidth, height, 'F');
+            doc.setTextColor(...hexToRgb(REPORT_COLORS.secondary));
+            doc.setFontSize(11);
+            doc.setFont('helvetica', 'bold');
+            doc.text(`${icon} ${title}`, margin + 3, yPos + 7);
+
+            doc.setFontSize(9);
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(...hexToRgb(REPORT_COLORS.secondary));
+            items.slice(0, 4).forEach((actionText, idx) => {
+                doc.text(`${idx + 1}. ${actionText}`, margin + 5, yPos + 15 + (idx * 6));
             });
+            yPos += height + 5;
+        };
 
-            yPos = doc.lastAutoTable.finalY + 10;
+        renderActionBlock('Priority 1 - Immediate Actions (Within 24 hours)', '🚨', hexToRgb('#FFE5E5'), actions.priority1, 40);
+        renderActionBlock('Priority 2 - Short-term Actions (Within 7 days)', '⚠️', hexToRgb('#FFF3E0'), actions.priority2, 35);
+        renderActionBlock('Priority 3 - Long-term Improvements', '📋', hexToRgb('#E8F5E9'), actions.priority3, 35);
 
-            yPos = addSectionHeader('Top Root Causes', yPos);
+        if (type === 'executive' || type === 'wbr') {
+            yPos = startNewPage();
 
+            yPos = addSectionHeader('Predictive Analytics & Forecasting', yPos, '🔮');
+
+            const predictions = generatePredictiveInsights(metrics);
+
+            const forecastWidth = (contentWidth - 20) / 3;
+            addMetricCard(margin, yPos, forecastWidth, 30,
+                'Projected Incidents (Next 30 days)', predictions.projected30Day,
+                predictions.trend30Day, REPORT_COLORS.info, '📊');
+
+            addMetricCard(margin + forecastWidth + 10, yPos, forecastWidth, 30,
+                'Risk Score Projection', predictions.riskProjection,
+                predictions.riskTrend, REPORT_COLORS.warning, '⚡');
+
+            addMetricCard(margin + (forecastWidth + 10) * 2, yPos, forecastWidth, 30,
+                'TRIR Forecast (EOY)', predictions.trirEOY,
+                predictions.trirChange, REPORT_COLORS.primary, '📈');
+
+            yPos += 40;
+
+            yPos = addSectionHeader('Leading Indicators & Early Warning Signs', yPos, '🚦');
+
+            const indicators = getLeadingIndicators(type, metrics);
             doc.autoTable({
                 startY: yPos,
-                head: [['Cause', 'Count']],
-                body: summary.topRootCauses.map(([cause, count]) => [
-                    cause.substring(0, 50) + (cause.length > 50 ? '...' : ''),
-                    count
+                head: [['Indicator', 'Current', 'Baseline', 'Status', 'Action Required']],
+                body: indicators.map(ind => [
+                    ind.name,
+                    ind.current,
+                    ind.baseline,
+                    ind.status,
+                    ind.action
                 ]),
                 theme: 'grid',
-                headStyles: { fillColor: hexToRgb(AMAZON_COLORS.darkBlue) },
+                headStyles: { fillColor: hexToRgb(REPORT_COLORS.secondary), textColor: [255, 255, 255] },
+                styles: { fontSize: 9 },
+                columnStyles: {
+                    3: {
+                        halign: 'center',
+                        cellWidth: 20
+                    }
+                },
+                didDrawCell: function(data) {
+                    if (data.column.index === 3 && data.section === 'body') {
+                        const status = data.cell.raw;
+                        let color;
+                        if (status === '🔴') color = REPORT_COLORS.danger;
+                        else if (status === '🟡') color = REPORT_COLORS.warning;
+                        else color = REPORT_COLORS.success;
+
+                        doc.setFillColor(...hexToRgb(color));
+                        doc.circle(data.cell.x + data.cell.width / 2, data.cell.y + data.cell.height / 2, 3, 'F');
+                    }
+                },
                 margin: { left: margin, right: margin }
             });
 
-            addFooter();
+            yPos = doc.lastAutoTable.finalY + 15;
+
+            yPos = addSectionHeader('Performance Benchmarking', yPos, '🏆');
+
+            const benchmarks = getBenchmarkData(type);
+            const benchmarkInsights = [
+                `Site performance: Rank #${benchmarks.siteRank} of ${benchmarks.totalSites} in network`,
+                `${benchmarks.aboveAverage}% of metrics above network average`,
+                `Best performing area: ${benchmarks.bestArea} (${benchmarks.bestMetric})`,
+                `Focus area: ${benchmarks.worstArea} (${benchmarks.worstMetric})`,
+                `Quarter-over-quarter improvement: ${benchmarks.qoqImprovement}%`
+            ];
+
+            addInsightBox(margin, yPos, contentWidth, 'Comparative Performance', benchmarkInsights, '📊');
         }
-        
-        // Save the PDF
-        const fileName = `${type}_safety_report_${new Date().toISOString().split('T')[0]}.pdf`;
+
+        addFooter();
+
+        const fileName = `${type}_safety_report_${new Date().toISOString().split('T')[0]}_enhanced.pdf`;
         doc.save(fileName);
-        
-        showStatus('Professional PDF report generated successfully!', 'success');
-        
-        // Add to report history
+
+        showStatus('Enhanced professional PDF report generated successfully!', 'success');
         addToReportHistory(type, fileName);
-        
     } catch (error) {
         console.error('PDF generation error:', error);
         showStatus('Error generating PDF: ' + error.message, 'error');
     }
+}
+
+function getReportDataSets(type) {
+    const injuryData = state.injury.filteredData || [];
+    const nearMissData = state.nearMiss.filteredData || [];
+
+    if (type === 'injury') {
+        return { injury: injuryData, nearMiss: [] };
+    }
+
+    if (type === 'nearmiss') {
+        return { injury: [], nearMiss: nearMissData };
+    }
+
+    return { injury: injuryData, nearMiss: nearMissData };
+}
+
+function getRecordDate(row) {
+    if (row.parsedDate && !isNaN(row.parsedDate)) {
+        return new Date(row.parsedDate);
+    }
+    const rawDate = row.incident_date || row.nearmiss_date || row.event_date;
+    if (!rawDate) return null;
+    const date = new Date(rawDate);
+    return isNaN(date) ? null : date;
+}
+
+function groupRecordsByMonth(records) {
+    const map = new Map();
+    records.forEach(row => {
+        const date = getRecordDate(row);
+        if (!date) return;
+        const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+        if (!map.has(key)) {
+            map.set(key, { key, date: new Date(date.getFullYear(), date.getMonth(), 1), records: [] });
+        }
+        map.get(key).records.push(row);
+    });
+    return map;
+}
+
+function formatPercentTrend(current, previous) {
+    if (!previous && !current) return '0%';
+    if (!previous) return 'N/A';
+    if (previous === 0) return current === 0 ? '0%' : 'N/A';
+    const change = ((current - previous) / previous) * 100;
+    const sign = change > 0 ? '+' : '';
+    return `${sign}${change.toFixed(1)}%`;
+}
+
+function formatAbsoluteTrend(current, previous) {
+    if (previous === undefined || previous === null) return String(current);
+    const diff = current - previous;
+    if (diff === 0) return '0';
+    return diff > 0 ? `+${diff}` : String(diff);
+}
+
+function formatDeltaTrend(current, previous, decimals = 2) {
+    if (previous === undefined || previous === null) return '0';
+    if (isNaN(current) || isNaN(previous)) return 'N/A';
+    const diff = current - previous;
+    if (Math.abs(diff) < Math.pow(10, -decimals)) return '0';
+    const symbol = diff > 0 ? '↑' : '↓';
+    return `${symbol} ${Math.abs(diff).toFixed(decimals)}`;
+}
+
+function calculateComprehensiveMetrics(type) {
+    const { injury, nearMiss } = getReportDataSets(type);
+    const injuryData = state.injury.filteredData || [];
+    const nearMissData = state.nearMiss.filteredData || [];
+    const relevantData = injury.length || nearMiss.length ? [...injury, ...nearMiss] : [...injuryData, ...nearMissData];
+
+    const totalIncidents = relevantData.length;
+    const recordableCount = injuryData.filter(r => Number(r.recordable) === 1).length;
+    const recordableRate = injuryData.length > 0 ? (recordableCount / injuryData.length * 100) : 0;
+
+    const highSeverityCount = relevantData.filter(r => r.severity === 'A' || r.severity === 'B').length;
+    const totalDaysLost = injuryData.reduce((sum, r) => sum + (Number(r.total_dafw_days) || 0), 0);
+
+    const riskScores = relevantData
+        .map(r => parseFloat(r.risk ?? calculateRiskScore(r)))
+        .filter(score => !isNaN(score));
+    const avgRiskScore = riskScores.length > 0
+        ? riskScores.reduce((a, b) => a + b, 0) / riskScores.length
+        : 0;
+
+    const hoursWorked = state.metrics?.hoursWorked || state.hoursWorked || 200000;
+    const trir = hoursWorked ? (recordableCount / hoursWorked) * 200000 : 0;
+    const lostTimeCount = injuryData.filter(r => Number(r.total_dafw_days) > 0).length;
+    const ltir = hoursWorked ? (lostTimeCount / hoursWorked) * 200000 : 0;
+
+    const closureData = relevantData.length ? relevantData : [...injuryData, ...nearMissData];
+    const closedIncidents = closureData.filter(row => {
+        const status = (row.status || row.case_status || row.current_status || row.completion_status || '').toString().toLowerCase();
+        if (!status) return false;
+        return status.includes('closed') || status.includes('complete') || status.includes('resolved');
+    }).length;
+    const closureRate = closureData.length > 0 ? (closedIncidents / closureData.length * 100) : 0;
+
+    const allMonthly = Array.from(groupRecordsByMonth(relevantData).values()).sort((a, b) => b.date - a.date);
+    const injuryMonthly = Array.from(groupRecordsByMonth(injuryData).values()).sort((a, b) => b.date - a.date);
+
+    const currentAll = allMonthly[0]?.records || [];
+    const previousAll = allMonthly[1]?.records || [];
+    const currentInjury = injuryMonthly[0]?.records || [];
+    const previousInjury = injuryMonthly[1]?.records || [];
+
+    const incidentTrend = formatPercentTrend(currentAll.length, previousAll.length);
+
+    const currentRecordable = currentInjury.filter(r => Number(r.recordable) === 1).length;
+    const previousRecordable = previousInjury.filter(r => Number(r.recordable) === 1).length;
+    const recordableTrend = formatPercentTrend(currentRecordable, previousRecordable);
+
+    const currentHighSeverity = currentAll.filter(r => r.severity === 'A' || r.severity === 'B').length;
+    const previousHighSeverity = previousAll.filter(r => r.severity === 'A' || r.severity === 'B').length;
+    const severityTrend = formatAbsoluteTrend(currentHighSeverity, previousHighSeverity);
+
+    const currentDaysLost = currentInjury.reduce((sum, r) => sum + (Number(r.total_dafw_days) || 0), 0);
+    const previousDaysLost = previousInjury.reduce((sum, r) => sum + (Number(r.total_dafw_days) || 0), 0);
+    const daysLostTrend = formatPercentTrend(currentDaysLost, previousDaysLost);
+
+    const currentRiskScores = currentAll
+        .map(r => parseFloat(r.risk ?? calculateRiskScore(r)))
+        .filter(score => !isNaN(score));
+    const previousRiskScores = previousAll
+        .map(r => parseFloat(r.risk ?? calculateRiskScore(r)))
+        .filter(score => !isNaN(score));
+    const currentRiskAvg = currentRiskScores.length ? currentRiskScores.reduce((a, b) => a + b, 0) / currentRiskScores.length : avgRiskScore;
+    const previousRiskAvg = previousRiskScores.length ? previousRiskScores.reduce((a, b) => a + b, 0) / previousRiskScores.length : currentRiskAvg;
+    const riskTrend = formatDeltaTrend(currentRiskAvg, previousRiskAvg, 2);
+
+    const currentTrir = hoursWorked ? (currentRecordable / hoursWorked) * 200000 : 0;
+    const previousTrir = hoursWorked ? (previousRecordable / hoursWorked) * 200000 : 0;
+    const trirTrend = formatDeltaTrend(currentTrir, previousTrir, 2);
+
+    const nearMissRatio = injuryData.length > 0
+        ? `${(nearMissData.length / injuryData.length).toFixed(1)}:1`
+        : (nearMissData.length > 0 ? 'N/A' : '0:1');
+
+    return {
+        totalIncidents,
+        recordableRate: recordableRate.toFixed(1),
+        recordableTrend,
+        highSeverityCount,
+        severityTrend,
+        totalDaysLost,
+        daysLostTrend,
+        nearMissRatio,
+        avgRiskScore,
+        riskTrend,
+        closureRate: Math.round(closureRate),
+        trir,
+        trirTrend,
+        ltir,
+        incidentTrend
+    };
+}
+
+function generateKeyInsights(type, metrics) {
+    const insights = [];
+
+    const recordableRate = parseFloat(metrics.recordableRate);
+    if (!isNaN(recordableRate)) {
+        if (recordableRate > 10) {
+            insights.push(`Recordable rate elevated at ${recordableRate.toFixed(1)}% – investigate systemic drivers`);
+        } else {
+            insights.push(`Recordable rate at ${recordableRate.toFixed(1)}% remains within acceptable thresholds`);
+        }
+    }
+
+    if (metrics.highSeverityCount > 0) {
+        insights.push(`${metrics.highSeverityCount} high-severity incidents flagged for immediate follow-up`);
+    } else {
+        insights.push('No Severity A/B incidents reported in the latest period');
+    }
+
+    const ratioValue = parseFloat(metrics.nearMissRatio);
+    if (!isNaN(ratioValue)) {
+        if (ratioValue < 3) {
+            insights.push(`Near miss reporting ratio at ${metrics.nearMissRatio} – encourage proactive reporting`);
+        } else {
+            insights.push(`Healthy near miss ratio of ${metrics.nearMissRatio} indicates strong hazard identification culture`);
+        }
+    }
+
+    if (metrics.avgRiskScore > 7) {
+        insights.push(`Average risk score ${metrics.avgRiskScore.toFixed(1)} exceeds threshold – escalate control measures`);
+    } else {
+        insights.push(`Average risk score ${metrics.avgRiskScore.toFixed(1)} indicates managed residual risk`);
+    }
+
+    if (metrics.closureRate < 80) {
+        insights.push(`Closure rate at ${metrics.closureRate}% – accelerate action item completion`);
+    } else {
+        insights.push(`Strong closure performance at ${metrics.closureRate}% of incidents closed`);
+    }
+
+    return insights.slice(0, 5);
+}
+
+function getImpactAnalysis(type) {
+    const { injury, nearMiss } = getReportDataSets(type);
+    const relevantData = [...injury, ...nearMiss];
+    if (relevantData.length === 0) {
+        return [];
+    }
+
+    const impactMap = new Map();
+    relevantData.forEach(row => {
+        const impact = (row.primaryImpact || row.initial_info_primary_impact || row.initial_info_impact_type_primary || row.initial_info_mechanism || 'Unknown').toString();
+        if (!impactMap.has(impact)) {
+            impactMap.set(impact, {
+                count: 0,
+                severities: [],
+                risks: []
+            });
+        }
+        const bucket = impactMap.get(impact);
+        bucket.count += 1;
+        if (row.severity) {
+            bucket.severities.push(row.severity);
+        }
+        const riskScore = parseFloat(row.risk ?? calculateRiskScore(row));
+        if (!isNaN(riskScore)) {
+            bucket.risks.push(riskScore);
+        }
+    });
+
+    const total = relevantData.length;
+    const severityMap = { A: 4, B: 3, C: 2, D: 1 };
+    const severityScale = ['D', 'C', 'B', 'A'];
+
+    return Array.from(impactMap.entries())
+        .map(([impactType, data]) => {
+            const avgSeverityScore = data.severities.length
+                ? data.severities.map(s => severityMap[s] || 1).reduce((a, b) => a + b, 0) / data.severities.length
+                : 1;
+            const severityIndex = Math.min(severityScale.length - 1, Math.max(0, Math.round(avgSeverityScore) - 1));
+            const avgRisk = data.risks.length ? data.risks.reduce((a, b) => a + b, 0) / data.risks.length : 0;
+            let riskLevel = 'Minimal';
+            if (avgRisk >= 20) riskLevel = 'Critical';
+            else if (avgRisk >= 15) riskLevel = 'High';
+            else if (avgRisk >= 10) riskLevel = 'Medium';
+            else if (avgRisk >= 5) riskLevel = 'Low';
+
+            return {
+                type: impactType,
+                count: data.count,
+                percentage: total ? ((data.count / total) * 100).toFixed(1) : '0.0',
+                avgSeverity: severityScale[severityIndex],
+                riskLevel
+            };
+        })
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 10);
+}
+
+function getProcessPathAnalysis(type) {
+    const { injury, nearMiss } = getReportDataSets(type);
+    const relevantData = [...injury, ...nearMiss];
+    const processes = ['Receive', 'Stow', 'Pick', 'Pack', 'Ship', 'ICQA', 'Unknown'];
+    const processMap = {};
+
+    processes.forEach(process => {
+        processMap[process] = {
+            process,
+            incidents: 0,
+            recordable: 0,
+            severityA: 0,
+            risk: 0
+        };
+    });
+
+    relevantData.forEach(row => {
+        const processRaw = row.processPath || row.initial_info_process_path || row.area || 'Unknown';
+        const matchedProcess = processes.find(p => processRaw && processRaw.toLowerCase().includes(p.toLowerCase())) || 'Unknown';
+        const bucket = processMap[matchedProcess] || processMap.Unknown;
+        bucket.incidents += 1;
+        if (Number(row.recordable) === 1) bucket.recordable += 1;
+        if (row.severity === 'A') bucket.severityA += 1;
+        const riskScore = parseFloat(row.risk ?? calculateRiskScore(row));
+        if (!isNaN(riskScore)) {
+            bucket.risk += riskScore;
+        }
+    });
+
+    return Object.values(processMap).map(bucket => ({
+        ...bucket,
+        risk: bucket.incidents > 0 ? bucket.risk / bucket.incidents : 0
+    }));
+}
+
+function generateProcessInsights(processData) {
+    if (!processData || processData.length === 0) {
+        return ['No process data available – load data to generate insights.'];
+    }
+
+    const insights = [];
+    const byRisk = [...processData].sort((a, b) => b.risk - a.risk);
+    const byIncident = [...processData].sort((a, b) => b.incidents - a.incidents);
+    const byBest = [...processData].sort((a, b) => a.incidents - b.incidents);
+
+    const highestRisk = byRisk[0];
+    if (highestRisk && highestRisk.risk > 7) {
+        insights.push(`${highestRisk.process} risk score ${highestRisk.risk.toFixed(1)} – schedule targeted review`);
+    }
+
+    const mostIncidents = byIncident[0];
+    if (mostIncidents && mostIncidents.incidents > 0) {
+        insights.push(`${mostIncidents.process} accounts for ${mostIncidents.incidents} incidents – implement focused controls`);
+    }
+
+    const severityAProcesses = processData.filter(p => p.severityA > 0);
+    if (severityAProcesses.length > 0) {
+        insights.push(`Severity A incidents present in ${severityAProcesses.map(p => p.process).join(', ')}`);
+    }
+
+    const bestProcess = byBest.find(p => p.incidents > 0) || byBest[0];
+    if (bestProcess) {
+        insights.push(`${bestProcess.process} shows strongest performance – capture best practices`);
+    }
+
+    const highRecordable = processData.filter(p => p.incidents > 0 && (p.recordable / p.incidents) > 0.5);
+    if (highRecordable.length > 0) {
+        insights.push(`High recordable ratios observed in ${highRecordable.map(p => p.process).join(', ')}`);
+    }
+
+    return insights.length ? insights : ['Process performance within expected thresholds'];
+}
+
+function getMonthlyTrendData(type) {
+    const scopeType = (type === 'combined' || type === 'executive' || type === 'wbr') ? 'combined' : type;
+    const { injury, nearMiss } = getReportDataSets(scopeType);
+    const relevantInjury = scopeType === 'nearmiss' ? [] : (scopeType === 'combined' ? state.injury.filteredData : injury);
+    const relevantNearMiss = scopeType === 'injury' ? [] : (scopeType === 'combined' ? state.nearMiss.filteredData : nearMiss);
+
+    const monthMap = new Map();
+
+    const addRecord = (record, kind) => {
+        const date = getRecordDate(record);
+        if (!date) return;
+        const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+        if (!monthMap.has(key)) {
+            monthMap.set(key, {
+                key,
+                date: new Date(date.getFullYear(), date.getMonth(), 1),
+                incidents: 0,
+                recordable: 0,
+                nearMiss: 0,
+                riskScores: [],
+                records: []
+            });
+        }
+        const bucket = monthMap.get(key);
+        bucket.incidents += 1;
+        bucket.records.push(record);
+        if (kind === 'injury' && Number(record.recordable) === 1) {
+            bucket.recordable += 1;
+        }
+        if (kind === 'nearmiss') {
+            bucket.nearMiss += 1;
+        }
+        const riskScore = parseFloat(record.risk ?? calculateRiskScore(record));
+        if (!isNaN(riskScore)) {
+            bucket.riskScores.push(riskScore);
+        }
+    };
+
+    relevantInjury.forEach(record => addRecord(record, 'injury'));
+    relevantNearMiss.forEach(record => addRecord(record, 'nearmiss'));
+
+    const months = Array.from(monthMap.values())
+        .sort((a, b) => b.date - a.date)
+        .map(bucket => {
+            const openItems = bucket.records.filter(row => {
+                const status = (row.status || row.case_status || row.current_status || '').toString().toLowerCase();
+                return status && !status.includes('closed') && !status.includes('complete');
+            }).length;
+            const highSeverity = bucket.records.filter(row => row.severity === 'A' || row.severity === 'B').length;
+            const actions = (highSeverity > 0 ? 1 : 0) + (openItems > 0 ? 1 : 0) + (bucket.incidents > 5 ? 1 : 0);
+            return {
+                name: bucket.date.toLocaleString('en-GB', { month: 'short', year: 'numeric' }),
+                incidents: bucket.incidents,
+                recordable: bucket.recordable,
+                nearMiss: bucket.nearMiss,
+                riskScore: bucket.riskScores.length ? bucket.riskScores.reduce((a, b) => a + b, 0) / bucket.riskScores.length : 0,
+                actions
+            };
+        });
+
+    return months;
+}
+
+function calculateRiskDistribution(type) {
+    const { injury, nearMiss } = getReportDataSets(type);
+    const relevantData = [...injury, ...nearMiss];
+    const defaultResult = {
+        critical: { count: 0, percentage: '0.0', topLocation: 'N/A' },
+        high: { count: 0, percentage: '0.0', topLocation: 'N/A' },
+        medium: { count: 0, percentage: '0.0', topLocation: 'N/A' },
+        low: { count: 0, percentage: '0.0', topLocation: 'N/A' },
+        minimal: { count: 0, percentage: '0.0', topLocation: 'N/A' }
+    };
+
+    if (relevantData.length === 0) {
+        return defaultResult;
+    }
+
+    const buckets = {
+        critical: { count: 0, locations: {} },
+        high: { count: 0, locations: {} },
+        medium: { count: 0, locations: {} },
+        low: { count: 0, locations: {} },
+        minimal: { count: 0, locations: {} }
+    };
+
+    relevantData.forEach(row => {
+        const riskScore = parseFloat(row.risk ?? calculateRiskScore(row));
+        if (isNaN(riskScore)) return;
+        let bucketKey = 'minimal';
+        if (riskScore >= 20) bucketKey = 'critical';
+        else if (riskScore >= 15) bucketKey = 'high';
+        else if (riskScore >= 10) bucketKey = 'medium';
+        else if (riskScore >= 5) bucketKey = 'low';
+
+        const bucket = buckets[bucketKey];
+        bucket.count += 1;
+        const location = (row.location || row.initial_info_location_event || row.site || 'Unknown').toString();
+        bucket.locations[location] = (bucket.locations[location] || 0) + 1;
+    });
+
+    const total = relevantData.length;
+    const result = {};
+
+    Object.entries(buckets).forEach(([key, bucket]) => {
+        const topLocation = Object.entries(bucket.locations)
+            .sort((a, b) => b[1] - a[1])[0]?.[0] || 'N/A';
+        result[key] = {
+            count: bucket.count,
+            percentage: total ? ((bucket.count / total) * 100).toFixed(1) : '0.0',
+            topLocation
+        };
+    });
+
+    return { ...defaultResult, ...result };
+}
+
+function getRootCauseAnalysis(type) {
+    const { injury, nearMiss } = getReportDataSets(type === 'combined' || type === 'executive' || type === 'wbr' ? 'combined' : type);
+    const relevantData = [...injury, ...nearMiss];
+    if (relevantData.length === 0) {
+        return [];
+    }
+
+    const causeMap = new Map();
+    relevantData.forEach(row => {
+        const cause = (row.rootCause || row.rca_primary_cause || row.rca_primary || 'Under Investigation').toString();
+        if (!causeMap.has(cause)) {
+            causeMap.set(cause, { count: 0, severities: [] });
+        }
+        const bucket = causeMap.get(cause);
+        bucket.count += 1;
+        if (row.severity) {
+            bucket.severities.push(row.severity);
+        }
+    });
+
+    const total = relevantData.length;
+    const severityMap = { A: 4, B: 3, C: 2, D: 1 };
+    const severityScale = ['D', 'C', 'B', 'A'];
+
+    let cumulative = 0;
+    return Array.from(causeMap.entries())
+        .map(([name, data]) => {
+            const avgSeverityScore = data.severities.length
+                ? data.severities.map(s => severityMap[s] || 1).reduce((a, b) => a + b, 0) / data.severities.length
+                : 1;
+            const severityIndex = Math.min(severityScale.length - 1, Math.max(0, Math.round(avgSeverityScore) - 1));
+            return {
+                name,
+                count: data.count,
+                avgSeverity: severityScale[severityIndex]
+            };
+        })
+        .sort((a, b) => b.count - a.count)
+        .map(item => {
+            cumulative += (item.count / total) * 100;
+            return {
+                ...item,
+                cumulative: Math.min(100, cumulative).toFixed(1)
+            };
+        });
+}
+
+function generateRecommendedActions(type, metrics, rootCauses) {
+    const { injury, nearMiss } = getReportDataSets(type === 'combined' || type === 'executive' || type === 'wbr' ? 'combined' : type);
+    const dataset = [...injury, ...nearMiss];
+    const formatted = action => `${action.title}: ${action.description}`;
+    const baseActions = generateActionItems(dataset.length ? dataset : [...state.injury.filteredData, ...state.nearMiss.filteredData]);
+
+    const priority1 = baseActions.immediate.map(formatted);
+    const priority2 = baseActions.shortTerm.map(formatted);
+    const priority3 = baseActions.longTerm.map(formatted);
+
+    if (metrics.avgRiskScore > 7) {
+        priority1.push('Deploy high-risk mitigation team to review critical tasks and controls');
+    }
+
+    if (metrics.closureRate < 80) {
+        priority2.push('Improve closure governance – align stakeholders on SLA expectations');
+    }
+
+    const topCause = rootCauses[0];
+    if (topCause) {
+        priority3.push(`Long-term focus: reduce ${topCause.name.toLowerCase()} drivers through systemic countermeasures`);
+    }
+
+    const ensureContent = (items, fallback) => (items.length ? items : [fallback]);
+
+    return {
+        priority1: ensureContent(priority1, 'No immediate critical actions identified'),
+        priority2: ensureContent(priority2, 'No short-term actions identified'),
+        priority3: ensureContent(priority3, 'Maintain current safety programs')
+    };
+}
+
+function formatDelta(value) {
+    if (value === 0) return 'no change';
+    const sign = value > 0 ? '+' : '';
+    return `${sign}${value}`;
+}
+
+function generatePredictiveInsights(metrics) {
+    const monthlyData = getMonthlyTrendData('combined');
+    if (monthlyData.length === 0) {
+        return {
+            projected30Day: metrics.totalIncidents,
+            trend30Day: 'Insufficient history',
+            riskProjection: metrics.avgRiskScore.toFixed(1),
+            riskTrend: 'Stable',
+            trirEOY: metrics.trir.toFixed(2),
+            trirChange: 'Stable'
+        };
+    }
+
+    const [currentMonth, previousMonth] = monthlyData;
+    const recentWindow = monthlyData.slice(0, Math.min(3, monthlyData.length));
+    const averageRecentIncidents = recentWindow.reduce((sum, month) => sum + month.incidents, 0) / recentWindow.length;
+    const projected30Day = Math.max(0, Math.round(averageRecentIncidents));
+
+    const incidentDelta = previousMonth ? currentMonth.incidents - previousMonth.incidents : 0;
+    const trend30Day = previousMonth ? `vs prior month ${formatDelta(incidentDelta)}` : 'Baseline month';
+
+    const riskDelta = previousMonth ? currentMonth.riskScore - previousMonth.riskScore : 0;
+    const projectedRisk = Math.max(0, metrics.avgRiskScore + (riskDelta / 2));
+    const riskTrend = riskDelta > 0.2 ? 'Increasing' : riskDelta < -0.2 ? 'Improving' : 'Stable';
+
+    const trirDelta = metrics.trirTrend.includes('↑') ? 0.15 : metrics.trirTrend.includes('↓') ? -0.15 : 0;
+    const trirEOY = Math.max(0, (metrics.trir + trirDelta)).toFixed(2);
+    const trirChange = trirDelta === 0 ? 'Stable' : (trirDelta > 0 ? `↑ ${Math.abs(trirDelta).toFixed(2)}` : `↓ ${Math.abs(trirDelta).toFixed(2)}`);
+
+    return {
+        projected30Day,
+        trend30Day,
+        riskProjection: projectedRisk.toFixed(1),
+        riskTrend,
+        trirEOY,
+        trirChange
+    };
+}
+
+function getLeadingIndicators(type, metrics) {
+    const injuryData = state.injury.filteredData || [];
+    const nearMissData = state.nearMiss.filteredData || [];
+
+    const openInvestigations = [...injuryData, ...nearMissData].filter(row => {
+        const status = (row.status || row.case_status || row.current_status || '').toString().toLowerCase();
+        return status && !status.includes('closed') && !status.includes('complete');
+    }).length;
+
+    const last30Days = new Date();
+    last30Days.setDate(last30Days.getDate() - 30);
+    const recentRecordables = injuryData.filter(row => {
+        const date = getRecordDate(row);
+        return date && date >= last30Days && Number(row.recordable) === 1;
+    }).length;
+
+    const nearMissBaseline = '3:1';
+    const ratioValue = parseFloat(metrics.nearMissRatio);
+    const ratioStatus = isNaN(ratioValue) ? '🟡' : ratioValue < 3 ? '🔴' : ratioValue < 5 ? '🟡' : '🟢';
+
+    const closureStatus = metrics.closureRate >= 90 ? '🟢' : metrics.closureRate >= 80 ? '🟡' : '🔴';
+    const recordableStatus = recentRecordables > 2 ? '🔴' : recentRecordables > 0 ? '🟡' : '🟢';
+    const investigationStatus = openInvestigations > 5 ? '🔴' : openInvestigations > 2 ? '🟡' : '🟢';
+
+    return [
+        {
+            name: 'Near Miss Reporting Ratio',
+            current: metrics.nearMissRatio,
+            baseline: nearMissBaseline,
+            status: ratioStatus,
+            action: ratioStatus === '🔴' ? 'Run near miss awareness campaign' : 'Maintain proactive reporting'
+        },
+        {
+            name: 'Corrective Action Closure',
+            current: `${metrics.closureRate}%`,
+            baseline: '90%',
+            status: closureStatus,
+            action: closureStatus === '🔴' ? 'Escalate overdue actions to site leadership' : 'Sustain closure governance cadence'
+        },
+        {
+            name: 'Recent Recordable Cases (30d)',
+            current: recentRecordables,
+            baseline: '≤1',
+            status: recordableStatus,
+            action: recordableStatus === '🔴' ? 'Perform deep dive on recent recordables' : 'Continue prevention focus'
+        },
+        {
+            name: 'Open Investigations',
+            current: openInvestigations,
+            baseline: '≤2',
+            status: investigationStatus,
+            action: investigationStatus === '🔴' ? 'Allocate resources to close investigations' : 'Monitor investigation workflow'
+        }
+    ];
+}
+
+function getBenchmarkData(type) {
+    const { injury, nearMiss } = getReportDataSets('combined');
+    const dataset = [...injury, ...nearMiss];
+    if (dataset.length === 0) {
+        return {
+            siteRank: 1,
+            totalSites: 1,
+            aboveAverage: 0,
+            bestArea: 'N/A',
+            bestMetric: 'Insufficient data',
+            worstArea: 'N/A',
+            worstMetric: 'Insufficient data',
+            qoqImprovement: 0
+        };
+    }
+
+    const metrics = calculateComprehensiveMetrics(type);
+    const uniqueSites = new Set(dataset.map(row => row.site || 'Unknown'));
+    const totalSites = Math.max(5, uniqueSites.size + 4);
+
+    const normalizedRisk = Math.min(1, metrics.avgRiskScore / 10);
+    const normalizedRecordable = Math.min(1, parseFloat(metrics.recordableRate) / 20 || 0);
+    const performanceScore = Math.max(0, Math.min(1, (metrics.closureRate / 100) * 0.6 + (1 - normalizedRisk) * 0.25 + (1 - normalizedRecordable) * 0.15));
+    const siteRank = Math.max(1, Math.min(totalSites, Math.round((1 - performanceScore) * (totalSites - 1)) + 1));
+
+    const locationCounts = dataset.reduce((acc, row) => {
+        const location = (row.location || row.initial_info_location_event || row.site || 'Unknown').toString();
+        acc[location] = (acc[location] || 0) + 1;
+        return acc;
+    }, {});
+
+    const sortedLocations = Object.entries(locationCounts).sort((a, b) => a[1] - b[1]);
+    const bestArea = sortedLocations.find(([, count]) => count > 0)?.[0] || 'N/A';
+    const worstArea = sortedLocations.reverse().find(([, count]) => count > 0)?.[0] || 'N/A';
+
+    const monthly = getMonthlyTrendData('combined');
+    let qoqImprovement = 0;
+    if (monthly.length >= 6) {
+        const recent = monthly.slice(0, 3).reduce((sum, month) => sum + month.incidents, 0);
+        const previous = monthly.slice(3, 6).reduce((sum, month) => sum + month.incidents, 0);
+        if (previous > 0) {
+            qoqImprovement = ((previous - recent) / previous * 100).toFixed(1);
+        }
+    }
+
+    const aboveAverage = Math.round(((metrics.closureRate / 100) * 50) + ((1 - normalizedRisk) * 50));
+
+    return {
+        siteRank,
+        totalSites,
+        aboveAverage,
+        bestArea,
+        bestMetric: `Closure rate ${metrics.closureRate}%`,
+        worstArea,
+        worstMetric: `Recordable rate ${metrics.recordableRate}%`,
+        qoqImprovement: Number(qoqImprovement) || 0
+    };
 }
 
 function generateWBRReport() {
