@@ -1503,6 +1503,11 @@
                     <div class="metric-value" id="riskScore">0.0</div>
                     <div class="metric-label">Overall Risk Score</div>
                 </div>
+                <div class="metric-card">
+                    <div class="metric-icon">⏱️</div>
+                    <div class="metric-value" id="daysSinceRecordable">0</div>
+                    <div class="metric-label">Days Since Last Recordable</div>
+                </div>
             </div>
 
             <!-- Quick Charts -->
@@ -7356,7 +7361,15 @@ function updateOverview() {
         document.getElementById('totalIncidents').textContent = totalIncidents;
         document.getElementById('injuryCount').textContent = state.injury.filteredData.length;
         document.getElementById('nearMissCount').textContent = state.nearMiss.filteredData.length;
-        
+
+        const recordableIncidents = state.injury.filteredData.filter(r => r.recordable === 1 && r.parsedDate);
+        let daysSinceRecordable = 'N/A';
+        if (recordableIncidents.length > 0) {
+            const lastRecordable = new Date(Math.max(...recordableIncidents.map(r => r.parsedDate)));
+            daysSinceRecordable = Math.floor((Date.now() - lastRecordable) / 86400000);
+        }
+        document.getElementById('daysSinceRecordable').textContent = daysSinceRecordable;
+
         const allRisks = [
             ...state.injury.filteredData.map(r => parseFloat(calculateRiskScore(r))),
             ...state.nearMiss.filteredData.map(r => parseFloat(r.risk))
@@ -9448,18 +9461,22 @@ function generatePDFReport(type) {
         yPos = addSectionHeader('Key Performance Indicators', yPos);
         
         const metricsY = yPos + 5;
-        const boxWidth = 38;
+        const boxWidth = 30;
         const boxHeight = 28;
         const boxGap = 5;
         let metricsBottom = metricsY;
 
         if (type === 'injury' || type === 'combined' || type === 'executive') {
             const injuryData = state.injury.filteredData;
+            const recordableCases = injuryData.filter(r => r.recordable === 1 && r.parsedDate);
+            const lastRecordable = recordableCases.length ? new Date(Math.max(...recordableCases.map(r => r.parsedDate))) : null;
+            const daysSince = lastRecordable ? Math.floor((Date.now() - lastRecordable) / 86400000) : 'N/A';
             const metrics = [
                 { label: 'Total Cases', value: injuryData.length, color: AMAZON_COLORS.darkBlue },
-                { label: 'Recordable', value: injuryData.filter(r => r.recordable === 1).length, color: 'rgb(255, 87, 34)' },
+                { label: 'Recordable', value: recordableCases.length, color: 'rgb(255, 87, 34)' },
                 { label: 'Lost Time', value: injuryData.filter(r => r.total_dafw_days > 0).length, color: 'rgb(183, 28, 28)' },
-                { label: 'Days Lost', value: injuryData.reduce((sum, r) => sum + (r.total_dafw_days || 0), 0), color: AMAZON_COLORS.orange }
+                { label: 'Days Lost', value: injuryData.reduce((sum, r) => sum + (r.total_dafw_days || 0), 0), color: AMAZON_COLORS.orange },
+                { label: 'Days Since Recordable', value: daysSince, color: 'rgb(46, 125, 50)' }
             ];
 
             metrics.forEach((metric, index) => {
@@ -9699,18 +9716,22 @@ function generatePDFReport(type) {
             addFooter();
         }
         
-        // Page 4 - Data Quality Report
-        doc.addPage();
-        currentPage++;
-        addHeader(currentPage);
-        yPos = 40;
-        
-        yPos = addSectionHeader('Data Quality Assessment', yPos);
-        
-        // Quality metrics for each type
-        if (type === 'injury' || type === 'combined') {
-            const metrics = state.injury.qualityMetrics;
-            if (metrics && metrics.totalRecords) {
+        const injuryQuality = (type === 'injury' || type === 'combined') &&
+            state.injury.qualityMetrics && state.injury.qualityMetrics.totalRecords;
+        const nearMissQuality = (type === 'nearmiss' || type === 'combined') &&
+            state.nearMiss.qualityMetrics && state.nearMiss.qualityMetrics.totalRecords;
+
+        if (injuryQuality || nearMissQuality) {
+            // Page 4 - Data Quality Report
+            doc.addPage();
+            currentPage++;
+            addHeader(currentPage);
+            yPos = 40;
+
+            yPos = addSectionHeader('Data Quality Assessment', yPos);
+
+            if (injuryQuality) {
+                const metrics = state.injury.qualityMetrics;
                 doc.setFontSize(11);
                 doc.setFont('helvetica', 'bold');
                 doc.setTextColor(...hexToRgb(AMAZON_COLORS.darkBlue));
@@ -9758,11 +9779,9 @@ function generatePDFReport(type) {
                 
                 yPos += 40;
             }
-        }
-        
-        if (type === 'nearmiss' || type === 'combined') {
-            const metrics = state.nearMiss.qualityMetrics;
-            if (metrics && metrics.totalRecords) {
+
+            if (nearMissQuality) {
+                const metrics = state.nearMiss.qualityMetrics;
                 doc.setFontSize(11);
                 doc.setFont('helvetica', 'bold');
                 doc.setTextColor(...hexToRgb(AMAZON_COLORS.darkBlue));
@@ -10700,7 +10719,11 @@ function generateSampleInjuryData() {
             initial_risk_assessment_likeliness: ['Rare', 'Unlikely', 'Possible', 'Likely', 'Almost Certain'][Math.floor(Math.random() * 5)]
         });
     }
-    
+
+    if (!data.some(r => r.recordable === 1)) {
+        data[0].recordable = 1;
+    }
+
     return data;
 }
 
