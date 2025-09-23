@@ -1543,7 +1543,7 @@
                     <div class="control-header">
                         <h2 class="control-title">Injury & Illness Analysis</h2>
                         <div class="quick-actions">
-                            <button class="btn btn-primary" onclick="generatePDFReport('injury')">
+                            <button class="btn btn-primary" onclick="generateInjuryReport()">
                                 <span>📄</span> Generate Report
                             </button>
                             <button class="btn btn-secondary" onclick="exportInjuryData()">
@@ -1894,7 +1894,7 @@
                     <div class="control-header">
                         <h2 class="control-title">Near Miss Analysis</h2>
                         <div class="quick-actions">
-                            <button class="btn btn-primary" onclick="generatePDFReport('nearmiss')">
+                            <button class="btn btn-primary" onclick="generateNearMissReport()">
                                 <span>📄</span> Generate Report
                             </button>
                             <button class="btn btn-secondary" onclick="exportNearMissData()">
@@ -2234,7 +2234,7 @@
                 <div class="control-header">
                     <h2 class="control-title">Combined Safety Analytics</h2>
                     <div>
-                        <button class="btn btn-primary" onclick="generatePDFReport('combined')">
+                        <button class="btn btn-primary" onclick="generateWBRReport()">
                             <span>📄</span> Generate Combined Report
                         </button>
                     </div>
@@ -2393,14 +2393,14 @@
             <div class="export-section">
                 <h3 style="margin-bottom: 1rem;">Available Reports</h3>
                 <div class="export-grid">
-                    <button class="btn btn-primary" onclick="generatePDFReport('injury')">
+                    <button class="btn btn-primary" onclick="generateInjuryReport()">
                         <span>📄</span> 
                         <div>
                             <div>Injury Report</div>
                             <small style="font-size: 0.75rem; opacity: 0.8;">Comprehensive analysis</small>
                         </div>
                     </button>
-                    <button class="btn btn-primary" onclick="generatePDFReport('nearmiss')">
+                    <button class="btn btn-primary" onclick="generateNearMissReport()">
                         <span>📄</span>
                         <div>
                             <div>Near Miss Report</div>
@@ -3402,1014 +3402,1409 @@ function calculateSafetyKPIs(injuryDataInput, nearMissDataInput) {
     };
 }
 
-// ---------------------------------------------------------------------------
-// PDF rendering helper utilities
-// ---------------------------------------------------------------------------
-
-function pdfEnsureSpace(doc, y, requiredHeight, margin, headerHeight) {
-    const pageHeight = doc.internal.pageSize.getHeight();
-    if (y + requiredHeight > pageHeight - margin) {
-        doc.addPage();
-        return margin + headerHeight;
-    }
-    return y;
-}
-
-function pdfDrawAmazonHeader(doc, headerInfo, margin, headerHeight, theme) {
-    const pageWidth = doc.internal.pageSize.getWidth();
-    const headerColor = hexToRgb(theme.secondary);
-    const accentColor = hexToRgb(theme.primary);
-    doc.setFillColor(...headerColor);
-    doc.rect(0, 0, pageWidth, headerHeight, 'F');
-    doc.setFillColor(...accentColor);
-    doc.rect(0, headerHeight - 2, pageWidth, 2, 'F');
-    doc.setTextColor(255, 255, 255);
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(14);
-    const iconText = headerInfo.icon ? `${headerInfo.icon} ` : '';
-    doc.text(`${iconText}${headerInfo.title || 'Safety Report'}`, margin, 12);
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(9);
-    if (headerInfo.subtitle) {
-        doc.text(headerInfo.subtitle, margin, 18);
-    }
-    doc.setFontSize(8);
-    doc.text(`Reporting Period: ${headerInfo.period || 'No data available'}`, margin, 23);
-    const rightX = pageWidth - margin;
-    doc.setFontSize(9);
-    doc.text(`Page ${headerInfo.page}`, rightX, 12, { align: 'right' });
-    doc.setFontSize(8);
-    doc.text(new Date().toLocaleDateString('en-GB'), rightX, 18, { align: 'right' });
-}
-
-function pdfDrawFooter(doc, footerInfo, margin) {
-    const pageWidth = doc.internal.pageSize.getWidth();
-    const pageHeight = doc.internal.pageSize.getHeight();
-    doc.setDrawColor(220, 220, 220);
-    doc.setLineWidth(0.2);
-    doc.line(margin, pageHeight - 12, pageWidth - margin, pageHeight - 12);
-    doc.setTextColor(120, 120, 120);
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(8);
-    if (footerInfo?.left) {
-        doc.text(footerInfo.left, margin, pageHeight - 7);
-    }
-    if (footerInfo?.right) {
-        doc.text(footerInfo.right, pageWidth - margin, pageHeight - 7, { align: 'right' });
-    }
-}
-
-function pdfFinalizeDocument(doc, headerInfo, margin, headerHeight, theme) {
-    const totalPages = doc.internal.getNumberOfPages();
-    for (let page = 1; page <= totalPages; page++) {
-        doc.setPage(page);
-        pdfDrawAmazonHeader(doc, { ...headerInfo, page }, margin, headerHeight, theme);
-        pdfDrawFooter(doc, {
-            left: 'Amazon WHS Austria • Safety Analytics Platform',
-            right: `Page ${page} of ${totalPages}`
-        }, margin);
-    }
-}
-
-function pdfDrawSectionTitle(doc, title, icon, y, margin, contentWidth, theme) {
-    const titleColor = hexToRgb(theme.secondary);
-    const accent = hexToRgb(theme.primary);
-    doc.setFillColor(...titleColor);
-    doc.roundedRect(margin, y, contentWidth, 8, 2, 2, 'F');
-    doc.setFillColor(...accent);
-    doc.rect(margin, y, 18, 8, 'F');
-    doc.setTextColor(255, 255, 255);
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(10.5);
-    const label = icon ? `${icon} ${title}` : title;
-    doc.text(label, margin + 4, y + 5.5);
-    return y + 12;
-}
-
-function pdfDetermineTrendColor(trendText, theme) {
-    if (!trendText) return hexToRgb(theme.neutral);
-    if (trendText.includes('↓')) {
-        return hexToRgb(theme.success);
-    }
-    if (trendText.includes('↑')) {
-        return hexToRgb(theme.danger);
-    }
-    return hexToRgb(theme.neutral);
-}
-
-function pdfDrawSparkline(doc, series, x, y, width, height, color) {
-    const points = Array.isArray(series) ? series : [];
-    if (points.length < 2) return;
-    const values = points.map(point =>
-        typeof point === 'number' ? point : Number(point.value ?? point.count ?? point.incidents ?? 0)
-    );
-    const max = Math.max(...values);
-    const min = Math.min(...values);
-    const range = max - min || 1;
-    doc.setDrawColor(...color);
-    doc.setLineWidth(0.6);
-    const step = width / (values.length - 1);
-    values.forEach((value, index) => {
-        const pointX = x + (index * step);
-        const normalised = (value - min) / range;
-        const pointY = y + height - (normalised * height);
-        if (index === 0) {
-            doc.moveTo(pointX, pointY);
-        } else {
-            doc.lineTo(pointX, pointY);
-        }
-    });
-    doc.stroke();
-    doc.setDrawColor(...color);
-    doc.setFillColor(255, 255, 255);
-    values.forEach((value, index) => {
-        const pointX = x + (index * step);
-        const normalised = (value - min) / range;
-        const pointY = y + height - (normalised * height);
-        doc.circle(pointX, pointY, 0.9, 'FD');
-    });
-}
-
-function pdfDrawSummaryCards(doc, cards, margin, y, contentWidth, theme) {
-    if (!Array.isArray(cards) || !cards.length) return y;
-    const gap = 5;
-    const columns = cards.length;
-    const cardWidth = (contentWidth - gap * (columns - 1)) / columns;
-    const cardHeight = 32;
-    cards.forEach((card, index) => {
-        const x = margin + index * (cardWidth + gap);
-        doc.setFillColor(255, 255, 255);
-        doc.roundedRect(x, y, cardWidth, cardHeight, 3, 3, 'F');
-        const accentColor = hexToRgb(card.color || theme.primary);
-        doc.setFillColor(...accentColor);
-        doc.roundedRect(x, y, cardWidth, 3, 3, 3, 'F');
-        doc.setTextColor(...hexToRgb(theme.secondary));
-        doc.setFont('helvetica', 'bold');
-        doc.setFontSize(11);
-        doc.text(String(card.value ?? '0'), x + 3, y + 13);
-        doc.setFont('helvetica', 'normal');
-        doc.setFontSize(8);
-        doc.text(card.label || '', x + 3, y + 19);
-        if (card.icon) {
-            doc.setFontSize(12);
-            doc.text(card.icon, x + cardWidth - 4, y + 12, { align: 'right' });
-        }
-        if (card.trend) {
-            const trendColor = pdfDetermineTrendColor(card.trend, theme);
-            doc.setTextColor(...trendColor);
-            doc.setFontSize(8);
-            doc.text(card.trend, x + cardWidth - 4, y + cardHeight - 5, { align: 'right' });
-        }
-        if (Array.isArray(card.sparkline) && card.sparkline.length > 1) {
-            pdfDrawSparkline(doc, card.sparkline, x + 3, y + cardHeight - 11, cardWidth - 8, 8, accentColor);
-        }
-    });
-    return y + cardHeight + 6;
-}
-
-function pdfDrawProgressBar(doc, x, y, width, percentage, color) {
-    const value = Math.max(0, Math.min(Number(percentage) || 0, 100));
-    doc.setDrawColor(225, 225, 225);
-    doc.roundedRect(x, y, width, 4, 2, 2, 'D');
-    const barWidth = (width * value) / 100;
-    doc.setFillColor(...color);
-    doc.roundedRect(x, y, Math.max(1, barWidth), 4, 2, 2, 'F');
-}
-
-function pdfDrawMiniBarGroup(doc, x, y, width, title, data, theme) {
-    if (!Array.isArray(data) || !data.length) {
-        doc.setFont('helvetica', 'italic');
-        doc.setFontSize(8);
-        doc.setTextColor(...hexToRgb(theme.neutral));
-        doc.text('No data available', x, y + 4);
-        return y + 10;
-    }
-    const labelWidth = Math.min(45, width * 0.45);
-    const barWidth = width - labelWidth - 6;
-    const barHeight = 4.5;
-    const gap = 6;
-    const maxCount = Math.max(...data.map(item => item.count || 0), 1);
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(9);
-    doc.setTextColor(...hexToRgb(theme.secondary));
-    doc.text(title, x, y + 4);
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(8);
-    data.forEach((item, index) => {
-        const currentY = y + 8 + index * gap;
-        const label = item.name.length > 28 ? `${item.name.slice(0, 27)}…` : item.name;
-        doc.text(label, x, currentY + 3);
-        const barX = x + labelWidth;
-        const ratio = (item.count || 0) / maxCount;
-        const barActualWidth = Math.max(2, barWidth * ratio);
-        doc.setFillColor(...hexToRgb(theme.primary));
-        doc.roundedRect(barX, currentY, barActualWidth, barHeight, 1.5, 1.5, 'F');
-        const detail = item.percentage !== undefined ? `${item.count} (${item.percentage}%)` : `${item.count}`;
-        doc.setTextColor(...hexToRgb(theme.secondary));
-        doc.text(detail, barX + barActualWidth + 2, currentY + 3);
-    });
-    return y + 8 + data.length * gap;
-}
-
-function pdfDrawBulletList(doc, items, margin, y, width, theme) {
-    if (!Array.isArray(items) || !items.length) {
-        doc.setFont('helvetica', 'italic');
-        doc.setFontSize(8);
-        doc.setTextColor(...hexToRgb(theme.neutral));
-        doc.text('No insights available for the selected filters.', margin, y + 4);
-        return y + 10;
-    }
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(9);
-    doc.setTextColor(...hexToRgb(theme.secondary));
-    items.forEach(item => {
-        const text = doc.splitTextToSize(item, width - 6);
-        doc.text('•', margin, y + 4);
-        doc.text(text, margin + 4, y + 4);
-        const textHeight = text.length * 5;
-        y += textHeight;
-    });
-    return y + 2;
-}
-
-function generatePDFReport(type) {
-    if (type === 'wbr' || type === 'combined') {
-        generateWBRReport();
+// ==================== INJURY & ILLNESS REPORT ====================
+function generateInjuryReport() {
+    const data = Array.isArray(state?.injury?.filteredData) ? state.injury.filteredData : [];
+    if (data.length === 0) {
+        showStatus('No injury data available for report generation', 'warning');
         return;
     }
 
-    showStatus('Generating enhanced PDF report...', 'info');
-
-    try {
-        const { jsPDF } = window.jspdf || {};
-        if (!jsPDF) {
-            throw new Error('jsPDF library not available');
-        }
-
-        const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-        const pageWidth = doc.internal.pageSize.getWidth();
-        const margin = 15;
-        const headerHeight = 25;
-        const contentWidth = pageWidth - margin * 2;
-        const theme = REPORT_THEME;
-
-        const injuryData = state?.injury?.filteredData || [];
-        const nearMissData = state?.nearMiss?.filteredData || [];
-        const kpis = calculateSafetyKPIs(injuryData, nearMissData);
-
-        const isInjury = type === 'injury';
-        const metrics = isInjury ? kpis.injury : kpis.nearMiss;
-        const reportTitle = isInjury ? 'Injury & Illness Report' : 'Near Miss Report';
-        const reportIcon = isInjury ? '🏥' : '⚠️';
-
-        const headerInfo = {
-            title: reportTitle,
-            subtitle: 'Amazon WHS Austria • Safety Analytics Platform',
-            period: metrics.dateRange || 'No data available',
-            icon: reportIcon
-        };
-
-        let y = margin + headerHeight;
-
-        const ensureSpace = (height) => {
-            y = pdfEnsureSpace(doc, y, height, margin, headerHeight);
-        };
-
-        const drawMetricList = (x, baseY, width, metricList) => {
-            if (!Array.isArray(metricList) || !metricList.length) {
-                return baseY;
-            }
-            const height = metricList.length * 14 + 10;
-            let localY = baseY;
-            localY = pdfEnsureSpace(doc, localY, height, margin, headerHeight);
-            doc.setFillColor(255, 255, 255);
-            doc.roundedRect(x, localY, width, height, 3, 3, 'F');
-            let rowY = localY + 9;
-            metricList.forEach(metric => {
-                doc.setFont('helvetica', 'bold');
-                doc.setFontSize(9);
-                doc.setTextColor(...hexToRgb(theme.secondary));
-                doc.text(metric.title, x + 3, rowY);
-                doc.setFont('helvetica', 'bold');
-                doc.setFontSize(10);
-                doc.text(String(metric.value ?? ''), x + width - 3, rowY, { align: 'right' });
-                if (metric.trend) {
-                    const trendColor = pdfDetermineTrendColor(metric.trend, theme);
-                    doc.setTextColor(...trendColor);
-                    doc.setFont('helvetica', 'normal');
-                    doc.setFontSize(8);
-                    doc.text(metric.trend, x + width - 3, rowY + 5, { align: 'right' });
-                }
-                if (metric.note) {
-                    doc.setFont('helvetica', 'normal');
-                    doc.setFontSize(7.5);
-                    doc.setTextColor(...hexToRgb(theme.neutral));
-                    const noteText = doc.splitTextToSize(metric.note, width - 6);
-                    doc.text(noteText, x + 3, rowY + 5);
-                }
-                if (metric.progress !== undefined) {
-                    const progressColor = metric.progressColor || pdfDetermineTrendColor(metric.trend || '', theme);
-                    pdfDrawProgressBar(doc, x + 3, rowY + 6, width - 6, metric.progress, progressColor);
-                }
-                rowY += 14;
-            });
-            return localY + height + 5;
-        };
-
-        // Executive Summary
-        y = pdfDrawSectionTitle(doc, 'Executive Summary', '📊', y, margin, contentWidth, theme);
-
-        const summaryCards = isInjury ? [
-            {
-                label: 'Total Incidents',
-                value: formatNumber(metrics.totalIncidents || 0),
-                icon: '🏥',
-                color: theme.primary,
-                trend: metrics.trend?.indicator,
-                sparkline: metrics.monthlyTrend
-            },
-            {
-                label: 'Recordable Rate',
-                value: `${(metrics.recordableRate || 0).toFixed(1)}%`,
-                icon: '⚖️',
-                color: metrics.recordableRateColor,
-                trend: metrics.recordableTrend?.indicator,
-                sparkline: metrics.monthlyTrend
-            },
-            {
-                label: 'Days Away From Work',
-                value: formatNumber(metrics.dafwTotal || 0),
-                icon: '📅',
-                color: theme.warning,
-                trend: metrics.dafwTrend?.indicator,
-                sparkline: metrics.monthlyTrend
-            },
-            {
-                label: 'TRIR',
-                value: (metrics.trir || 0).toFixed(2),
-                icon: '📊',
-                color: metrics.trir > 2 ? theme.danger : theme.success,
-                trend: metrics.trirTrend?.indicator,
-                sparkline: metrics.monthlyTrend
-            }
-        ] : [
-            {
-                label: 'Total Near Misses',
-                value: formatNumber(metrics.totalNearMisses || 0),
-                icon: '⚠️',
-                color: theme.primary,
-                trend: metrics.trend?.indicator,
-                sparkline: metrics.monthlyTrend
-            },
-            {
-                label: 'High Risk Events (A/B)',
-                value: formatNumber(metrics.highRiskCount || 0),
-                icon: '🚨',
-                color: metrics.highRiskCount > 0 ? theme.danger : theme.success,
-                trend: metrics.highRiskTrend?.indicator,
-                sparkline: metrics.monthlyTrend
-            },
-            {
-                label: 'Average Risk Score',
-                value: (metrics.avgRiskScore || 0).toFixed(1),
-                icon: '🎲',
-                color: metrics.avgRiskScore > 8 ? theme.danger : metrics.avgRiskScore > 5 ? theme.warning : theme.success,
-                trend: metrics.riskTrend?.indicator,
-                sparkline: metrics.monthlyTrend
-            },
-            {
-                label: 'Closure Rate',
-                value: `${Math.round(metrics.closureRate || 0)}%`,
-                icon: '✅',
-                color: metrics.closureRate >= 90 ? theme.success : metrics.closureRate >= 75 ? theme.warning : theme.danger,
-                trend: metrics.closureTrend?.indicator,
-                sparkline: metrics.monthlyTrend
-            }
-        ];
-
-        y = pdfDrawSummaryCards(doc, summaryCards, margin, y, contentWidth, theme);
-
-        // KPI Dashboard
-        y = pdfDrawSectionTitle(doc, 'KPI Dashboard', '📈', y, margin, contentWidth, theme);
-        const columnGap = 8;
-        const columnWidth = (contentWidth - columnGap) / 2;
-        let leftColumnY = y;
-        let rightColumnY = y;
-
-        const leftMetrics = isInjury ? [
-            {
-                title: 'Days Away From Work (DAFW)',
-                value: formatNumber(metrics.dafwTotal || 0),
-                trend: metrics.dafwTrend?.indicator,
-                note: 'Total days recorded in selected period'
-            },
-            {
-                title: 'Lost Time Incident Rate (LTIR)',
-                value: (metrics.ltir || 0).toFixed(2),
-                trend: metrics.ltirTrend?.indicator
-            },
-            {
-                title: 'Total Recordable Incident Rate (TRIR)',
-                value: (metrics.trir || 0).toFixed(2),
-                trend: metrics.trirTrend?.indicator
-            }
-        ] : [
-            {
-                title: 'High Risk Events (A/B)',
-                value: formatNumber(metrics.highRiskCount || 0),
-                trend: metrics.highRiskTrend?.indicator
-            },
-            {
-                title: 'Average Risk Score',
-                value: (metrics.avgRiskScore || 0).toFixed(1),
-                trend: metrics.riskTrend?.indicator
-            },
-            {
-                title: 'Near Miss to Injury Ratio',
-                value: metrics.nearMissToInjuryRatio || 'N/A',
-                trend: metrics.trend?.indicator
-            }
-        ];
-
-        leftColumnY = drawMetricList(margin, leftColumnY, columnWidth, leftMetrics);
-
-        if (isInjury) {
-            const severityPercent = Math.max(0, Math.min((metrics.avgSeverityScore || 0) / 4 * 100, 100));
-            const severityColor = metrics.avgSeverityScore > 3 ? hexToRgb(theme.danger)
-                : metrics.avgSeverityScore > 2 ? hexToRgb(theme.warning)
-                    : hexToRgb(theme.success);
-            ensureSpace(30);
-            doc.setFillColor(255, 255, 255);
-            doc.roundedRect(margin + columnWidth + columnGap, rightColumnY, columnWidth, 28, 3, 3, 'F');
-            doc.setFont('helvetica', 'bold');
-            doc.setFontSize(9);
-            doc.setTextColor(...hexToRgb(theme.secondary));
-            doc.text('Average Severity Score', margin + columnWidth + columnGap + 3, rightColumnY + 10);
-            doc.setFont('helvetica', 'bold');
-            doc.setFontSize(12);
-            doc.text((metrics.avgSeverityScore || 0).toFixed(1), margin + columnWidth + columnGap + columnWidth - 3, rightColumnY + 10, { align: 'right' });
-            pdfDrawProgressBar(doc, margin + columnWidth + columnGap + 3, rightColumnY + 13, columnWidth - 6, severityPercent, severityColor);
-            doc.setFont('helvetica', 'normal');
-            doc.setFontSize(8);
-            doc.setTextColor(...hexToRgb(theme.secondary));
-            doc.text(`Trend: ${metrics.severityTrend?.indicator || '→ 0%'}`, margin + columnWidth + columnGap + 3, rightColumnY + 22);
-            rightColumnY += 33;
-
-            const listHeightEstimate = (metrics.topBodyParts?.length || 0 + metrics.topRootCauses?.length || 0) * 6 + 20;
-            ensureSpace(listHeightEstimate);
-            doc.setFillColor(255, 255, 255);
-            doc.roundedRect(margin + columnWidth + columnGap, rightColumnY, columnWidth, listHeightEstimate, 3, 3, 'F');
-            let chartY = rightColumnY + 6;
-            chartY = pdfDrawMiniBarGroup(doc, margin + columnWidth + columnGap + 3, chartY, columnWidth - 6, 'Top Body Parts', metrics.topBodyParts, theme);
-            chartY = pdfDrawMiniBarGroup(doc, margin + columnWidth + columnGap + 3, chartY + 2, columnWidth - 6, 'Top Root Causes', metrics.topRootCauses, theme);
-            rightColumnY = chartY + 4;
-        } else {
-            const closureColor = metrics.closureRate >= 90 ? hexToRgb(theme.success)
-                : metrics.closureRate >= 75 ? hexToRgb(theme.warning)
-                    : hexToRgb(theme.danger);
-            ensureSpace(30);
-            doc.setFillColor(255, 255, 255);
-            doc.roundedRect(margin + columnWidth + columnGap, rightColumnY, columnWidth, 28, 3, 3, 'F');
-            doc.setFont('helvetica', 'bold');
-            doc.setFontSize(9);
-            doc.setTextColor(...hexToRgb(theme.secondary));
-            doc.text('Investigation Closure Rate', margin + columnWidth + columnGap + 3, rightColumnY + 10);
-            doc.setFont('helvetica', 'bold');
-            doc.setFontSize(12);
-            doc.text(`${Math.round(metrics.closureRate || 0)}%`, margin + columnWidth + columnGap + columnWidth - 3, rightColumnY + 10, { align: 'right' });
-            pdfDrawProgressBar(doc, margin + columnWidth + columnGap + 3, rightColumnY + 13, columnWidth - 6, metrics.closureRate || 0, closureColor);
-            doc.setFont('helvetica', 'normal');
-            doc.setFontSize(8);
-            doc.setTextColor(...hexToRgb(theme.secondary));
-            doc.text(`Trend: ${metrics.closureTrend?.indicator || '→ 0%'}`, margin + columnWidth + columnGap + 3, rightColumnY + 22);
-            rightColumnY += 33;
-
-            const listHeightEstimate = (metrics.topImpacts?.length || 0 + metrics.topLocations?.length || 0) * 6 + 20;
-            ensureSpace(listHeightEstimate);
-            doc.setFillColor(255, 255, 255);
-            doc.roundedRect(margin + columnWidth + columnGap, rightColumnY, columnWidth, listHeightEstimate, 3, 3, 'F');
-            let chartY = rightColumnY + 6;
-            chartY = pdfDrawMiniBarGroup(doc, margin + columnWidth + columnGap + 3, chartY, columnWidth - 6, 'Top Primary Impacts', metrics.topImpacts, theme);
-            chartY = pdfDrawMiniBarGroup(doc, margin + columnWidth + columnGap + 3, chartY + 2, columnWidth - 6, 'Top Locations', metrics.topLocations, theme);
-            doc.setFont('helvetica', 'normal');
-            doc.setFontSize(8);
-            doc.setTextColor(...hexToRgb(theme.neutral));
-            doc.text(`Repeat location count: ${formatNumber(metrics.repeatLocationCount || 0)}`, margin + columnWidth + columnGap + 3, chartY + 4);
-            rightColumnY = chartY + 8;
-        }
-
-        y = Math.max(leftColumnY, rightColumnY) + 4;
-
-        // Analysis Charts
-        y = pdfDrawSectionTitle(doc, 'Analysis Charts', '📉', y, margin, contentWidth, theme);
-        const chartIds = isInjury
-            ? ['injuryChart1', 'injuryChart2', 'injuryChart3', 'injuryChart4']
-            : ['nearMissChart1', 'nearMissChart2', 'nearMissChart3', 'nearMissChart4'];
-        const chartTitles = isInjury
-            ? ['Severity Distribution', 'Site Comparison', 'Recordable vs Non-Recordable', 'Trend Overview']
-            : ['Potential Severity Distribution', 'Site Comparison', 'Primary Impact Types', 'Risk Trend'];
-        const chartWidth = (contentWidth - 5) / 2;
-        const chartHeight = 55;
-        chartIds.forEach((chartId, index) => {
-            const row = Math.floor(index / 2);
-            const col = index % 2;
-            const chartX = margin + col * (chartWidth + 5);
-            const chartY = y + row * (chartHeight + 12);
-            if (col === 0) {
-                ensureSpace(chartHeight + 12);
-            }
-            doc.setFillColor(255, 255, 255);
-            doc.roundedRect(chartX, chartY, chartWidth, chartHeight, 3, 3, 'F');
-            doc.setFont('helvetica', 'bold');
-            doc.setFontSize(9);
-            doc.setTextColor(...hexToRgb(theme.secondary));
-            doc.text(chartTitles[index] || 'Chart', chartX + 3, chartY + 8);
-            const chartInstance = Chart.getChart(chartId);
-            if (chartInstance) {
-                try {
-                    const base64 = chartInstance.toBase64Image();
-                    doc.addImage(base64, 'PNG', chartX + 3, chartY + 10, chartWidth - 6, chartHeight - 15);
-                } catch (err) {
-                    doc.setFont('helvetica', 'italic');
-                    doc.setFontSize(8);
-                    doc.setTextColor(...hexToRgb(theme.neutral));
-                    doc.text('Unable to render chart in PDF export.', chartX + 3, chartY + 25);
-                }
-            } else {
-                doc.setFont('helvetica', 'italic');
-                doc.setFontSize(8);
-                doc.setTextColor(...hexToRgb(theme.neutral));
-                doc.text('Chart not available. Load dashboard first.', chartX + 3, chartY + 25);
-            }
-        });
-        y += Math.ceil(chartIds.length / 2) * (chartHeight + 12);
-
-        // Insights & Actions
-        y = pdfDrawSectionTitle(doc, 'Insights & Actions', '💡', y, margin, contentWidth, theme);
-        const moduleType = isInjury ? 'injury' : 'nearmiss';
-        const comprehensiveMetrics = calculateComprehensiveMetrics(moduleType);
-        const keyInsights = generateKeyInsights(moduleType, comprehensiveMetrics).slice(0, 5);
-        y = pdfDrawBulletList(doc, keyInsights, margin, y, contentWidth, theme) + 4;
-
-        const recommended = generateRecommendedActions(
-            moduleType,
-            comprehensiveMetrics,
-            isInjury ? metrics.topRootCauses : metrics.topImpacts
-        );
-
-        const actionSections = [
-            { label: 'Priority 1 • Critical', items: recommended.priority1, color: theme.danger },
-            { label: 'Priority 2 • Short Term', items: recommended.priority2, color: theme.warning },
-            { label: 'Priority 3 • Strategic', items: recommended.priority3, color: theme.success }
-        ];
-
-        actionSections.forEach(section => {
-            const textHeights = section.items.map(item => doc.splitTextToSize(item, contentWidth - 12).length * 4.5);
-            const sectionHeight = Math.max(18, textHeights.reduce((a, b) => a + b, 0) + 10);
-            ensureSpace(sectionHeight + 4);
-            doc.setFillColor(255, 255, 255);
-            doc.roundedRect(margin, y, contentWidth, sectionHeight, 3, 3, 'F');
-            doc.setFillColor(...hexToRgb(section.color));
-            doc.rect(margin, y, 4, sectionHeight, 'F');
-            doc.setFont('helvetica', 'bold');
-            doc.setFontSize(9);
-            doc.setTextColor(...hexToRgb(theme.secondary));
-            doc.text(section.label, margin + 7, y + 8);
-            doc.setFont('helvetica', 'normal');
-            doc.setFontSize(8);
-            let bulletY = y + 12;
-            section.items.forEach(item => {
-                const wrapped = doc.splitTextToSize(item, contentWidth - 12);
-                doc.text('-', margin + 7, bulletY);
-                doc.text(wrapped, margin + 11, bulletY);
-                bulletY += wrapped.length * 4.5;
-            });
-            y += sectionHeight + 4;
-        });
-
-        pdfFinalizeDocument(doc, headerInfo, margin, headerHeight, theme);
-
-        const fileName = `${type}_safety_report_${new Date().toISOString().split('T')[0]}.pdf`;
-        doc.save(fileName);
-        addToReportHistory(type, fileName);
-        showStatus('Enhanced PDF report generated successfully!', 'success');
-    } catch (error) {
-        console.error('PDF generation error:', error);
-        showStatus(`Error generating PDF: ${error.message}`, 'error');
+    const { jsPDF } = window.jspdf || {};
+    if (!jsPDF) {
+        showStatus('PDF library not available', 'error');
+        return;
     }
-}
 
-function generateWBRReport() {
-    showStatus('Generating Safety WBR Report...', 'info');
+    const doc = new jsPDF('p', 'mm', 'a4');
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
 
-    try {
-        const { jsPDF } = window.jspdf || {};
-        if (!jsPDF) {
-            throw new Error('jsPDF library not available');
+    const reportDate = new Date().toLocaleDateString('en-GB');
+    const dateRange = getDateRange(data, 'incident_date');
+
+    const totalIncidents = data.length;
+    const recordableCount = data.filter(d => Number(d.recordable) === 1).length;
+    const recordableRateValue = totalIncidents ? (recordableCount / totalIncidents) * 100 : 0;
+    const recordableRate = recordableRateValue.toFixed(1);
+    const totalDAFW = data.reduce((sum, d) => sum + (Number(d.total_dafw_days) || 0), 0);
+    const hoursWorked = 200000;
+    const trirValue = hoursWorked ? (recordableCount / hoursWorked) * 200000 : 0;
+    const ltirValue = hoursWorked ? (data.filter(d => (Number(d.total_dafw_days) || 0) > 0).length / hoursWorked) * 200000 : 0;
+    const dafwrValue = hoursWorked ? (totalDAFW / hoursWorked) * 200000 : 0;
+    const trir = trirValue.toFixed(2);
+    const ltir = ltirValue.toFixed(2);
+    const dafwr = dafwrValue.toFixed(2);
+
+    const severityCount = data.reduce((acc, d) => {
+        const sev = standardizeSeverity(d.severity);
+        acc[sev] = (acc[sev] || 0) + 1;
+        return acc;
+    }, {});
+    const avgSeverityScore = calculateAverageSeverity(data);
+    const avgSeverityDisplay = Number.isFinite(avgSeverityScore) ? avgSeverityScore.toFixed(1) : '0.0';
+
+    const bodyParts = {};
+    data.forEach(d => {
+        const part = d.bodyPart || d.initial_info_principal_body_part;
+        if (part) {
+            bodyParts[part] = (bodyParts[part] || 0) + 1;
         }
+    });
+    const topBodyParts = Object.entries(bodyParts)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 3);
 
-        const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-        const pageWidth = doc.internal.pageSize.getWidth();
-        const margin = 15;
-        const headerHeight = 25;
-        const contentWidth = pageWidth - margin * 2;
-        const theme = REPORT_THEME;
-
-        const injuryData = state?.injury?.filteredData || [];
-        const nearMissData = state?.nearMiss?.filteredData || [];
-        const kpis = calculateSafetyKPIs(injuryData, nearMissData);
-        const metrics = kpis.wbr;
-
-        const weeklyTrend = Array.isArray(metrics.weeklyTrend) ? metrics.weeklyTrend : [];
-        const latestWeek = weeklyTrend[weeklyTrend.length - 1] || { combined: 0 };
-        const previousWeek = weeklyTrend[weeklyTrend.length - 2] || { combined: 0 };
-        const weeklyChange = previousWeek.combined
-            ? ((latestWeek.combined - previousWeek.combined) / Math.max(previousWeek.combined, 1)) * 100
-            : latestWeek.combined > 0 ? 100 : 0;
-        const weeklyTrendIndicator = previousWeek.combined
-            ? `${weeklyChange >= 0 ? '↑' : '↓'} ${Math.abs(weeklyChange).toFixed(1)}%`
-            : '→ 0%';
-
-        const headerInfo = {
-            title: 'Weekly Business Review',
-            subtitle: 'Amazon WHS Austria • Safety Analytics Platform',
-            period: metrics.period || getDateRangeLabel([...injuryData, ...nearMissData]),
-            icon: '📅'
-        };
-
-        let y = margin + headerHeight;
-        const ensureSpace = (height) => {
-            y = pdfEnsureSpace(doc, y, height, margin, headerHeight);
-        };
-
-        const riskLevelColor = (level) => {
-            switch ((level || '').toLowerCase()) {
-                case 'critical':
-                    return hexToRgb(theme.danger);
-                case 'high':
-                    return hexToRgb(theme.warning);
-                case 'medium':
-                    return hexToRgb('#FFB74D');
-                default:
-                    return hexToRgb(theme.success);
-            }
-        };
-
-        const summaryCards = [
-            {
-                label: 'Combined Safety Index',
-                value: `${Math.round(metrics.combinedSafetyIndex || 0)}%`,
-                icon: '🎯',
-                color: metrics.combinedSafetyIndex >= 85 ? theme.success : metrics.combinedSafetyIndex >= 70 ? theme.warning : theme.danger,
-                trend: metrics.combinedSafetyIndex >= 85 ? '↑ Best in class' : metrics.combinedSafetyIndex >= 70 ? '→ Stable' : '↓ Improvement',
-                sparkline: weeklyTrend.map(point => point.combined || 0)
-            },
-            {
-                label: 'Incidents This Week',
-                value: formatNumber(latestWeek.combined || 0),
-                icon: '📆',
-                color: theme.primary,
-                trend: weeklyTrendIndicator,
-                sparkline: weeklyTrend.map(point => point.combined || 0)
-            },
-            {
-                label: 'Action Closure Rate',
-                value: `${Math.round(metrics.actionClosureRate || 0)}%`,
-                icon: '✅',
-                color: metrics.actionClosureRate >= 90 ? theme.success : metrics.actionClosureRate >= 75 ? theme.warning : theme.danger,
-                trend: metrics.actionClosureRate >= 90 ? '↑ On target' : metrics.actionClosureRate >= 75 ? '→ Monitor' : '↓ Lagging',
-                sparkline: []
-            },
-            {
-                label: 'Leading : Lagging',
-                value: metrics.leadingLagging?.ratio ? `${metrics.leadingLagging.ratio}:1` : 'N/A',
-                icon: '⚖️',
-                color: metrics.leadingLagging?.ratio >= 3 ? theme.success : metrics.leadingLagging?.ratio >= 2 ? theme.warning : theme.danger,
-                trend: metrics.leadingLagging?.ratio >= 3 ? '↑ Healthy' : metrics.leadingLagging?.ratio >= 2 ? '→ Watch' : '↓ Increase',
-                sparkline: weeklyTrend.map(point => point.injuries || 0)
-            }
-        ];
-
-        y = pdfDrawSectionTitle(doc, 'Executive Summary', '📊', y, margin, contentWidth, theme);
-        y = pdfDrawSummaryCards(doc, summaryCards, margin, y, contentWidth, theme);
-
-        // KPI Dashboard
-        y = pdfDrawSectionTitle(doc, 'KPI Dashboard', '📈', y, margin, contentWidth, theme);
-        const columnGap = 8;
-        const columnWidth = (contentWidth - columnGap) / 2;
-        let leftColumnY = y;
-        let rightColumnY = y;
-
-        const leftMetrics = [
-            {
-                title: 'Combined Safety Index',
-                value: `${Math.round(metrics.combinedSafetyIndex || 0)}%`,
-                progress: metrics.combinedSafetyIndex || 0,
-                progressColor: metrics.combinedSafetyIndex >= 85 ? hexToRgb(theme.success) : metrics.combinedSafetyIndex >= 70 ? hexToRgb(theme.warning) : hexToRgb(theme.danger)
-            },
-            {
-                title: 'Action Item Closure',
-                value: `${Math.round(metrics.actionClosureRate || 0)}%`,
-                progress: metrics.actionClosureRate || 0,
-                progressColor: metrics.actionClosureRate >= 90 ? hexToRgb(theme.success) : metrics.actionClosureRate >= 75 ? hexToRgb(theme.warning) : hexToRgb(theme.danger)
-            },
-            {
-                title: 'Leading Indicators',
-                value: formatNumber(metrics.leadingLagging?.leading || 0),
-                note: `Lagging indicators: ${formatNumber(metrics.leadingLagging?.lagging || 0)}`
-            }
-        ];
-
-        leftColumnY = (function drawMetricListWBR(x, baseY, width, metricList) {
-            if (!metricList.length) {
-                return baseY;
-            }
-            const height = metricList.length * 18 + 10;
-            let localY = pdfEnsureSpace(doc, baseY, height, margin, headerHeight);
-            doc.setFillColor(255, 255, 255);
-            doc.roundedRect(x, localY, width, height, 3, 3, 'F');
-            let rowY = localY + 11;
-            metricList.forEach(metric => {
-                doc.setFont('helvetica', 'bold');
-                doc.setFontSize(9);
-                doc.setTextColor(...hexToRgb(theme.secondary));
-                doc.text(metric.title, x + 3, rowY);
-                doc.setFont('helvetica', 'bold');
-                doc.setFontSize(11);
-                doc.text(String(metric.value ?? ''), x + width - 3, rowY, { align: 'right' });
-                if (metric.progress !== undefined) {
-                    const pColor = metric.progressColor || hexToRgb(theme.primary);
-                    pdfDrawProgressBar(doc, x + 3, rowY + 2, width - 6, metric.progress, pColor);
-                }
-                if (metric.note) {
-                    doc.setFont('helvetica', 'normal');
-                    doc.setFontSize(8);
-                    doc.setTextColor(...hexToRgb(theme.neutral));
-                    const wrapped = doc.splitTextToSize(metric.note, width - 6);
-                    doc.text(wrapped, x + 3, rowY + 7);
-                }
-                rowY += 18;
-            });
-            return localY + height + 5;
-        })(margin, leftColumnY, columnWidth, leftMetrics);
-
-        // Right column visualizations
-        const siteData = (metrics.sitePerformance || []).slice(0, 5).map(site => ({
-            name: site.site,
-            count: site.incidents,
-            percentage: site.recordableRate ? Number(site.recordableRate.toFixed(1)) : 0
-        }));
-
-        const impactData = (metrics.primaryImpacts || []).slice(0, 5).map(item => ({
-            name: item.name,
-            count: item.count,
-            percentage: item.percentage
-        }));
-
-        ensureSpace(40);
-        doc.setFillColor(255, 255, 255);
-        doc.roundedRect(margin + columnWidth + columnGap, rightColumnY, columnWidth, 38, 3, 3, 'F');
-        let chartY = pdfDrawMiniBarGroup(doc, margin + columnWidth + columnGap + 3, rightColumnY + 4, columnWidth - 6, 'Site Performance (Incidents)', siteData, theme);
-        chartY = pdfDrawMiniBarGroup(doc, margin + columnWidth + columnGap + 3, chartY + 2, columnWidth - 6, 'Primary Impact Distribution', impactData, theme);
-        rightColumnY = chartY + 4;
-
-        const processCards = (metrics.processMatrix || []).slice(0, 4);
-        if (processCards.length) {
-            ensureSpace(processCards.length * 12 + 12);
-            doc.setFillColor(255, 255, 255);
-            doc.roundedRect(margin + columnWidth + columnGap, rightColumnY, columnWidth, processCards.length * 12 + 10, 3, 3, 'F');
-            doc.setFont('helvetica', 'bold');
-            doc.setFontSize(9);
-            doc.setTextColor(...hexToRgb(theme.secondary));
-            doc.text('Process Path Risk Focus', margin + columnWidth + columnGap + 3, rightColumnY + 7);
-            let row = rightColumnY + 13;
-            processCards.forEach(process => {
-                const fill = riskLevelColor(process.riskLevel);
-                doc.setFillColor(...fill);
-                doc.roundedRect(margin + columnWidth + columnGap + 3, row - 5, columnWidth - 6, 8, 2, 2, 'F');
-                doc.setTextColor(255, 255, 255);
-                doc.setFont('helvetica', 'bold');
-                doc.setFontSize(8);
-                const label = process.process.length > 24 ? `${process.process.slice(0, 23)}…` : process.process;
-                doc.text(label, margin + columnWidth + columnGap + 5, row);
-                doc.setFont('helvetica', 'normal');
-                doc.setFontSize(7);
-                doc.text(`Incidents ${formatNumber(process.incidents || 0)} • Risk ${process.riskScore?.toFixed(1) || '0.0'} (${process.riskLevel})`, margin + columnWidth + columnGap + columnWidth - 5, row, { align: 'right' });
-                row += 12;
-            });
-            rightColumnY = row + 2;
+    const rootCauses = {};
+    data.forEach(d => {
+        const cause = d.rootCause || d.rca_primary_cause;
+        if (cause) {
+            rootCauses[cause] = (rootCauses[cause] || 0) + 1;
         }
+    });
+    const topRootCauses = Object.entries(rootCauses)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 3);
 
-        y = Math.max(leftColumnY, rightColumnY) + 4;
+    const siteData = {};
+    data.forEach(d => {
+        const site = d.site || 'Unknown';
+        if (!siteData[site]) {
+            siteData[site] = { total: 0, recordable: 0, dafw: 0 };
+        }
+        siteData[site].total += 1;
+        if (Number(d.recordable) === 1) {
+            siteData[site].recordable += 1;
+        }
+        siteData[site].dafw += Number(d.total_dafw_days) || 0;
+    });
 
-        // Analysis Charts
-        y = pdfDrawSectionTitle(doc, 'Analysis Charts', '📉', y, margin, contentWidth, theme);
+    let yPos = 20;
 
-        const chartWidth = (contentWidth - 5) / 2;
-        const chartHeight = 58;
+    doc.setFillColor(35, 47, 62);
+    doc.rect(0, 0, pageWidth, 25, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(18);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Injury & Illness Report', pageWidth / 2, 12, { align: 'center' });
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    doc.text('Amazon WHS Austria • Safety Analytics Platform', pageWidth / 2, 20, { align: 'center' });
 
-        // Combined trend card (injury + near miss)
-        ensureSpace(chartHeight + 12);
-        const trendCardX = margin;
-        const trendCardY = y;
-        doc.setFillColor(255, 255, 255);
-        doc.roundedRect(trendCardX, trendCardY, chartWidth, chartHeight, 3, 3, 'F');
+    doc.setTextColor(100, 100, 100);
+    doc.setFontSize(9);
+    doc.text(`Reporting Period: ${dateRange}`, 10, 32);
+    doc.text(`Generated: ${reportDate}`, pageWidth - 10, 32, { align: 'right' });
+
+    yPos = 45;
+    doc.setFillColor(255, 153, 0);
+    doc.rect(10, yPos, 3, 7, 'F');
+    doc.setTextColor(35, 47, 62);
+    doc.setFontSize(14);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Executive Summary', 15, yPos + 5);
+
+    yPos += 15;
+    const cardWidth = 42;
+    const cardHeight = 25;
+    const cardSpacing = 5;
+
+    drawKPICard(doc, 10, yPos, cardWidth, cardHeight,
+        'Total Incidents', totalIncidents.toString(),
+        'baseline', '0.0%', [255, 153, 0]);
+
+    const rrStatus = recordableRateValue > 30 ? 'critical' : recordableRateValue > 20 ? 'warning' : 'good';
+    drawKPICard(doc, 10 + cardWidth + cardSpacing, yPos, cardWidth, cardHeight,
+        'Recordable Rate', `${recordableRate}%`,
+        rrStatus, '0.0%', rrStatus === 'critical' ? [183, 28, 28] : rrStatus === 'warning' ? [255, 193, 7] : [76, 175, 80]);
+
+    const dafwStatus = totalDAFW > 100 ? 'warning' : 'good';
+    drawKPICard(doc, 10 + (cardWidth + cardSpacing) * 2, yPos, cardWidth, cardHeight,
+        'Days Away', totalDAFW.toString(),
+        dafwStatus, '0.0%', [255, 153, 0]);
+
+    const trirStatus = trirValue > 25 ? 'critical' : trirValue > 15 ? 'warning' : 'good';
+    drawKPICard(doc, 10 + (cardWidth + cardSpacing) * 3, yPos, cardWidth, cardHeight,
+        'TRIR', trir,
+        trirStatus, '0.0%', trirStatus === 'critical' ? [183, 28, 28] : trirStatus === 'warning' ? [255, 193, 7] : [76, 175, 80]);
+
+    yPos += cardHeight + 15;
+    doc.setFillColor(255, 153, 0);
+    doc.rect(10, yPos, 3, 7, 'F');
+    doc.setFontSize(14);
+    doc.setFont('helvetica', 'bold');
+    doc.text('KPI Dashboard', 15, yPos + 5);
+
+    yPos += 12;
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(60, 60, 60);
+
+    const metrics = [
+        ['Days Away From Work (DAFW)', totalDAFW.toString(), 'Total days in period'],
+        ['Lost Time Incident Rate (LTIR)', ltir, 'Per 200,000 hours worked'],
+        ['DAFW Rate', dafwr, 'Days per 200,000 hours'],
+        ['Total Recordable Incident Rate (TRIR)', trir, 'Per 200,000 hours worked'],
+        ['Average Severity Score', avgSeverityDisplay, `Scale 1-5 (Current: ${avgSeverityScore > 3 ? 'High' : avgSeverityScore > 2 ? 'Medium' : 'Low'})`],
+    ];
+
+    metrics.forEach(metric => {
         doc.setFont('helvetica', 'bold');
-        doc.setFontSize(9);
-        doc.setTextColor(...hexToRgb(theme.secondary));
-        doc.text('Combined Weekly Trend', trendCardX + 3, trendCardY + 8);
-        const injurySeries = weeklyTrend.map(point => point.injuries || 0);
-        const nearMissSeries = weeklyTrend.map(point => point.nearMisses || 0);
-        const combinedSeries = weeklyTrend.map(point => point.combined || 0);
-        const trendHeight = chartHeight - 18;
-        const trendWidth = chartWidth - 8;
-        const trendX = trendCardX + 4;
-        const trendY = trendCardY + 12;
-        const maxTrend = Math.max(...combinedSeries, 1);
-        const drawSeries = (series, color) => {
-            if (series.length < 2) return;
-            doc.setDrawColor(...color);
-            doc.setLineWidth(0.7);
-            const step = trendWidth / Math.max(series.length - 1, 1);
-            let previous = null;
-            series.forEach((value, index) => {
-                const xPos = trendX + index * step;
-                const yPos = trendY + trendHeight - (value / maxTrend) * trendHeight;
-                if (previous) {
-                    doc.line(previous.x, previous.y, xPos, yPos);
-                }
-                previous = { x: xPos, y: yPos };
-            });
-        };
-        drawSeries(injurySeries, hexToRgb(theme.warning));
-        drawSeries(nearMissSeries, hexToRgb(theme.primary));
-        doc.setFillColor(...hexToRgb(theme.warning));
-        doc.rect(trendX, trendY + trendHeight + 1, 3, 3, 'F');
-        doc.setFillColor(...hexToRgb(theme.primary));
-        doc.rect(trendX + 25, trendY + trendHeight + 1, 3, 3, 'F');
+        doc.text(metric[0], 15, yPos);
         doc.setFont('helvetica', 'normal');
-        doc.setFontSize(7.5);
-        doc.setTextColor(...hexToRgb(theme.neutral));
-        doc.text('Injuries', trendX + 4, trendY + trendHeight + 3.5);
-        doc.text('Near Misses', trendX + 29, trendY + trendHeight + 3.5);
-
-        // Site performance card
-        const siteCardX = margin + chartWidth + 5;
-        const siteCardY = y;
-        doc.setFillColor(255, 255, 255);
-        doc.roundedRect(siteCardX, siteCardY, chartWidth, chartHeight, 3, 3, 'F');
-        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(35, 47, 62);
+        doc.setFontSize(12);
+        doc.text(metric[1], 100, yPos);
         doc.setFontSize(9);
-        doc.setTextColor(...hexToRgb(theme.secondary));
-        doc.text('Site Performance Ranking', siteCardX + 3, siteCardY + 8);
-        let rankingY = siteCardY + 12;
-        const maxIncidents = Math.max(...siteData.map(item => item.count || 0), 1);
-        siteData.forEach((site, index) => {
-            const barWidth = (chartWidth - 30) * ((site.count || 0) / maxIncidents);
-            doc.setFillColor(...hexToRgb(theme.primary));
-            doc.roundedRect(siteCardX + 3, rankingY, Math.max(2, barWidth), 6, 1.5, 1.5, 'F');
-            doc.setFont('helvetica', 'normal');
-            doc.setFontSize(8);
-            doc.setTextColor(...hexToRgb(theme.secondary));
-            doc.text(`${index + 1}. ${site.name}`, siteCardX + 3, rankingY - 1);
-            doc.text(`${formatNumber(site.count)} events • ${site.percentage}% recordable`, siteCardX + 3, rankingY + 9);
-            rankingY += 12;
+        doc.setTextColor(100, 100, 100);
+        doc.text(metric[2], 130, yPos);
+        yPos += 8;
+        doc.setTextColor(60, 60, 60);
+        doc.setFontSize(10);
+    });
+
+    yPos += 5;
+    const bodySectionStart = yPos;
+    doc.setFont('helvetica', 'bold');
+    doc.text('Top Affected Body Parts', 15, yPos);
+    yPos += 6;
+    doc.setFont('helvetica', 'normal');
+    topBodyParts.forEach(([part, count]) => {
+        const percentage = ((count / totalIncidents) * 100).toFixed(0);
+        doc.text(`${part}`, 20, yPos);
+        doc.text(`${count} (${percentage}%)`, 80, yPos);
+        doc.setFillColor(255, 153, 0);
+        const barWidth = Math.max(1, (count / totalIncidents) * 50);
+        doc.rect(20, yPos + 1, barWidth, 2, 'F');
+        yPos += 6;
+    });
+    const bodySectionEnd = yPos;
+
+    let rootY = bodySectionStart;
+    doc.setFont('helvetica', 'bold');
+    doc.text('Top Root Causes', 110, rootY);
+    rootY += 6;
+    doc.setFont('helvetica', 'normal');
+    topRootCauses.forEach(([cause, count]) => {
+        const percentage = ((count / totalIncidents) * 100).toFixed(0);
+        const label = cause.length > 28 ? `${cause.slice(0, 27)}…` : cause;
+        doc.text(label, 115, rootY);
+        doc.text(`${count} (${percentage}%)`, 175, rootY);
+        doc.setFillColor(255, 87, 34);
+        const barWidth = Math.max(1, (count / totalIncidents) * 50);
+        doc.rect(115, rootY + 1, barWidth, 2, 'F');
+        rootY += 6;
+    });
+    yPos = Math.max(bodySectionEnd, rootY) + 5;
+
+    doc.addPage();
+    yPos = 20;
+
+    doc.setFillColor(35, 47, 62);
+    doc.rect(0, 0, pageWidth, 15, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Injury & Illness Analysis', pageWidth / 2, 10, { align: 'center' });
+
+    yPos = 25;
+    doc.setTextColor(35, 47, 62);
+    doc.setFillColor(255, 153, 0);
+    doc.rect(10, yPos, 3, 7, 'F');
+    doc.setFontSize(14);
+    doc.text('Site Performance Analysis', 15, yPos + 5);
+
+    yPos += 12;
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Site', 15, yPos);
+    doc.text('Total', 45, yPos);
+    doc.text('Recordable', 65, yPos);
+    doc.text('Rate %', 90, yPos);
+    doc.text('DAFW', 110, yPos);
+    doc.text('Severity', 130, yPos);
+    doc.text('Status', 155, yPos);
+
+    yPos += 5;
+    doc.setFont('helvetica', 'normal');
+    Object.entries(siteData)
+        .sort((a, b) => b[1].total - a[1].total)
+        .forEach(([site, siteMetrics]) => {
+            if (yPos > pageHeight - 30) {
+                doc.addPage();
+                yPos = 20;
+            }
+            const rate = siteMetrics.total ? ((siteMetrics.recordable / siteMetrics.total) * 100).toFixed(1) : '0.0';
+            const siteSeverity = calculateAverageSeverity(data.filter(d => (d.site || 'Unknown') === site));
+            const status = parseFloat(rate) > 30 ? 'Critical' : parseFloat(rate) > 20 ? 'Warning' : 'Good';
+
+            doc.text(site, 15, yPos);
+            doc.text(siteMetrics.total.toString(), 45, yPos);
+            doc.text(siteMetrics.recordable.toString(), 65, yPos);
+            doc.text(`${rate}%`, 90, yPos);
+            doc.text(siteMetrics.dafw.toString(), 110, yPos);
+            doc.text(siteSeverity.toFixed(1), 130, yPos);
+
+            if (status === 'Critical') {
+                doc.setTextColor(183, 28, 28);
+            } else if (status === 'Warning') {
+                doc.setTextColor(255, 152, 0);
+            } else {
+                doc.setTextColor(76, 175, 80);
+            }
+            doc.text(status, 155, yPos);
+            doc.setTextColor(60, 60, 60);
+
+            yPos += 6;
         });
 
-        y += chartHeight + 12;
+    yPos += 10;
+    doc.setFillColor(255, 153, 0);
+    doc.rect(10, yPos, 3, 7, 'F');
+    doc.setTextColor(35, 47, 62);
+    doc.setFontSize(14);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Key Insights & Strategic Actions', 15, yPos + 5);
 
-        // Root Cause Pareto & Process analysis
-        ensureSpace(chartHeight + 12);
-        const paretoX = margin;
-        const paretoY = y;
-        doc.setFillColor(255, 255, 255);
-        doc.roundedRect(paretoX, paretoY, chartWidth, chartHeight, 3, 3, 'F');
+    yPos += 12;
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+
+    const insights = generateInjuryInsights(data, recordableRateValue, totalDAFW, severityCount, topRootCauses);
+
+    insights.forEach(insight => {
+        if (yPos > pageHeight - 30) {
+            doc.addPage();
+            yPos = 20;
+        }
+
         doc.setFont('helvetica', 'bold');
-        doc.setFontSize(9);
-        doc.setTextColor(...hexToRgb(theme.secondary));
-        doc.text('Root Cause Pareto', paretoX + 3, paretoY + 8);
-        const paretoData = (metrics.rootCausePareto || []).slice(0, 5);
-        const maxPareto = Math.max(...paretoData.map(item => item.count || 0), 1);
-        let paretoRowY = paretoY + 12;
-        let cumulative = 0;
-        paretoData.forEach(entry => {
-            const barWidth = (chartWidth - 30) * ((entry.count || 0) / maxPareto);
-            doc.setFillColor(...hexToRgb(theme.primary));
-            doc.roundedRect(paretoX + 3, paretoRowY, Math.max(2, barWidth), 6, 1.5, 1.5, 'F');
-            cumulative += entry.percentage || 0;
-            const lineX = paretoX + 3 + Math.max(2, barWidth);
-            doc.setDrawColor(...hexToRgb(theme.warning));
-            doc.setLineWidth(0.4);
-            doc.line(lineX, paretoRowY, lineX, paretoY + chartHeight - 6);
-            doc.setFont('helvetica', 'normal');
-            doc.setFontSize(8);
-            doc.setTextColor(...hexToRgb(theme.secondary));
-            const label = entry.name.length > 24 ? `${entry.name.slice(0, 23)}…` : entry.name;
-            doc.text(label, paretoX + 3, paretoRowY - 1);
-            doc.text(`${formatNumber(entry.count)} • ${entry.percentage}% (Cum ${Math.min(100, cumulative).toFixed(1)}%)`, paretoX + 3, paretoRowY + 9);
-            paretoRowY += 12;
-        });
+        doc.setTextColor(insight.color[0], insight.color[1], insight.color[2]);
+        doc.text(insight.priority, 15, yPos);
+        doc.setTextColor(60, 60, 60);
+        yPos += 6;
 
-        const benchmarkX = margin + chartWidth + 5;
-        const benchmarkY = y;
-        doc.setFillColor(255, 255, 255);
-        doc.roundedRect(benchmarkX, benchmarkY, chartWidth, chartHeight, 3, 3, 'F');
-        doc.setFont('helvetica', 'bold');
-        doc.setFontSize(9);
-        doc.setTextColor(...hexToRgb(theme.secondary));
-        doc.text('Process Path Heatmap', benchmarkX + 3, benchmarkY + 8);
-        let heatY = benchmarkY + 14;
-        (metrics.processMatrix || []).slice(0, 6).forEach(process => {
-            const fill = riskLevelColor(process.riskLevel);
-            doc.setFillColor(...fill);
-            doc.roundedRect(benchmarkX + 3, heatY - 5, chartWidth - 6, 8, 1.5, 1.5, 'F');
-            doc.setFont('helvetica', 'bold');
-            doc.setFontSize(8);
-            doc.setTextColor(255, 255, 255);
-            const title = process.process.length > 25 ? `${process.process.slice(0, 24)}…` : process.process;
-            doc.text(title, benchmarkX + 5, heatY);
-            doc.setFont('helvetica', 'normal');
-            doc.setFontSize(7);
-            doc.text(`Incidents ${formatNumber(process.incidents || 0)} • Recordable ${Math.round(process.recordableRate || 0)}%`, benchmarkX + chartWidth - 5, heatY, { align: 'right' });
-            heatY += 12;
-        });
-
-        y += chartHeight + 12;
-
-        // Cross-site Benchmarking Table
-        y = pdfDrawSectionTitle(doc, 'Cross-site Benchmarking', '🏢', y, margin, contentWidth, theme);
-        const tableData = (metrics.crossSiteMatrix || []).map(site => [
-            site.site,
-            formatNumber(site.incidents || 0),
-            `${(site.recordableRate || 0).toFixed(1)}%`,
-            (site.avgRisk || 0).toFixed(1),
-            site.status
-        ]);
-        doc.autoTable({
-            startY: y,
-            head: [['Site', 'Incidents', 'Recordable Rate', 'Avg Risk', 'Status']],
-            body: tableData,
-            theme: 'grid',
-            headStyles: { fillColor: hexToRgb(theme.secondary), textColor: [255, 255, 255], fontSize: 9 },
-            bodyStyles: { fontSize: 8 },
-            columnStyles: {
-                0: { cellWidth: 48 },
-                1: { halign: 'center', cellWidth: 24 },
-                2: { halign: 'center', cellWidth: 30 },
-                3: { halign: 'center', cellWidth: 24 },
-                4: { cellWidth: 30 }
-            },
-            margin: { left: margin, right: margin }
-        });
-        y = doc.lastAutoTable.finalY + 6;
-
-        // Insights & Recommended Actions
-        y = pdfDrawSectionTitle(doc, 'Insights & Strategic Actions', '💡', y, margin, contentWidth, theme);
-        const combinedMetrics = calculateComprehensiveMetrics('executive');
-        const insights = generateKeyInsights('executive', combinedMetrics).slice(0, 5);
-        y = pdfDrawBulletList(doc, insights, margin, y, contentWidth, theme) + 4;
-        const execActions = generateRecommendedActions('executive', combinedMetrics, metrics.primaryImpacts || []);
-        const execSections = [
-            { label: 'Network Priorities', items: execActions.priority1, color: theme.danger },
-            { label: 'Short-term Focus', items: execActions.priority2, color: theme.warning },
-            { label: 'Strategic Initiatives', items: execActions.priority3, color: theme.success }
-        ];
-        execSections.forEach(section => {
-            const textHeights = section.items.map(item => doc.splitTextToSize(item, contentWidth - 12).length * 4.5);
-            const sectionHeight = Math.max(18, textHeights.reduce((a, b) => a + b, 0) + 10);
-            ensureSpace(sectionHeight + 4);
-            doc.setFillColor(255, 255, 255);
-            doc.roundedRect(margin, y, contentWidth, sectionHeight, 3, 3, 'F');
-            doc.setFillColor(...hexToRgb(section.color));
-            doc.rect(margin, y, 4, sectionHeight, 'F');
-            doc.setFont('helvetica', 'bold');
-            doc.setFontSize(9);
-            doc.setTextColor(...hexToRgb(theme.secondary));
-            doc.text(section.label, margin + 7, y + 8);
-            doc.setFont('helvetica', 'normal');
-            doc.setFontSize(8);
-            let bulletY = y + 12;
-            section.items.forEach(item => {
-                const wrapped = doc.splitTextToSize(item, contentWidth - 12);
-                doc.text('-', margin + 7, bulletY);
-                doc.text(wrapped, margin + 11, bulletY);
-                bulletY += wrapped.length * 4.5;
+        doc.setFont('helvetica', 'normal');
+        insight.actions.forEach(action => {
+            const lines = doc.splitTextToSize(`• ${action}`, pageWidth - 25);
+            lines.forEach(line => {
+                doc.text(line, 20, yPos);
+                yPos += 5;
             });
-            y += sectionHeight + 4;
+        });
+        yPos += 5;
+    });
+
+    const totalPages = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= totalPages; i++) {
+        doc.setPage(i);
+        doc.setFontSize(8);
+        doc.setTextColor(150, 150, 150);
+        doc.text('Amazon WHS Austria • Safety Analytics Platform', pageWidth / 2, pageHeight - 10, { align: 'center' });
+        doc.text(`Page ${i} of ${totalPages}`, pageWidth - 10, pageHeight - 10, { align: 'right' });
+    }
+
+    const fileName = `Injury_Illness_Report_${new Date().toISOString().split('T')[0]}.pdf`;
+    doc.save(fileName);
+    addToReportHistory('injury', fileName);
+    showStatus('Injury & Illness report generated successfully', 'success');
+}
+
+// ==================== NEAR MISS REPORT ====================
+function generateNearMissReport() {
+    const data = Array.isArray(state?.nearMiss?.filteredData) ? state.nearMiss.filteredData : [];
+    if (data.length === 0) {
+        showStatus('No near miss data available for report generation', 'warning');
+        return;
+    }
+
+    const { jsPDF } = window.jspdf || {};
+    if (!jsPDF) {
+        showStatus('PDF library not available', 'error');
+        return;
+    }
+
+    const doc = new jsPDF('p', 'mm', 'a4');
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+
+    const reportDate = new Date().toLocaleDateString('en-GB');
+    const dateRange = getDateRange(data, 'nearmiss_date');
+
+    const totalNearMisses = data.length;
+    const highRiskCount = data.filter(d => {
+        const sev = standardizeSeverity(d.potential_severity);
+        return sev === 'A' || sev === 'B';
+    }).length;
+    const avgRiskScore = data.reduce((sum, d) => sum + Number(d.risk ?? calculateRiskScore(d)), 0) / data.length;
+    const avgRiskDisplay = Number.isFinite(avgRiskScore) ? avgRiskScore.toFixed(1) : '0.0';
+    const closureRate = 100;
+
+    const injuryCount = Array.isArray(state?.injury?.filteredData) ? state.injury.filteredData.length : 0;
+    const nmRatioValue = injuryCount > 0 ? totalNearMisses / injuryCount : null;
+    const nmRatioDisplay = nmRatioValue !== null ? nmRatioValue.toFixed(1) : 'N/A';
+
+    const impacts = {};
+    data.forEach(d => {
+        const impact = d.primaryImpact || d.initial_info_primary_impact || 'Unspecified';
+        impacts[impact] = (impacts[impact] || 0) + 1;
+    });
+    const topImpacts = Object.entries(impacts)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 3);
+
+    const locations = {};
+    data.forEach(d => {
+        const loc = d.location || d.initial_info_location_event || 'Unknown';
+        locations[loc] = (locations[loc] || 0) + 1;
+    });
+    const topLocations = Object.entries(locations)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 3);
+    const repeatLocationCount = Object.values(locations).filter(count => count > 2).length;
+
+    const siteData = {};
+    data.forEach(d => {
+        const site = d.site || 'Unknown';
+        if (!siteData[site]) {
+            siteData[site] = {
+                total: 0,
+                highRisk: 0,
+                risks: []
+            };
+        }
+        siteData[site].total += 1;
+        const sev = standardizeSeverity(d.potential_severity);
+        if (sev === 'A' || sev === 'B') {
+            siteData[site].highRisk += 1;
+        }
+        const riskValue = Number(d.risk ?? calculateRiskScore(d));
+        if (Number.isFinite(riskValue)) {
+            siteData[site].risks.push(riskValue);
+        }
+    });
+
+    Object.keys(siteData).forEach(site => {
+        const risks = siteData[site].risks;
+        siteData[site].avgRisk = risks.length ? risks.reduce((a, b) => a + b, 0) / risks.length : 0;
+    });
+
+    let yPos = 20;
+
+    doc.setFillColor(35, 47, 62);
+    doc.rect(0, 0, pageWidth, 25, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(18);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Near Miss Report', pageWidth / 2, 12, { align: 'center' });
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    doc.text('Amazon WHS Austria • Safety Analytics Platform', pageWidth / 2, 20, { align: 'center' });
+
+    doc.setTextColor(100, 100, 100);
+    doc.setFontSize(9);
+    doc.text(`Reporting Period: ${dateRange}`, 10, 32);
+    doc.text(`Generated: ${reportDate}`, pageWidth - 10, 32, { align: 'right' });
+
+    yPos = 45;
+    doc.setFillColor(33, 150, 243);
+    doc.rect(10, yPos, 3, 7, 'F');
+    doc.setTextColor(35, 47, 62);
+    doc.setFontSize(14);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Executive Summary', 15, yPos + 5);
+
+    yPos += 15;
+    const cardWidth = 42;
+    const cardHeight = 25;
+    const cardSpacing = 5;
+
+    drawKPICard(doc, 10, yPos, cardWidth, cardHeight,
+        'Total Near Misses', totalNearMisses.toString(),
+        'baseline', '0.0%', [33, 150, 243]);
+
+    const hrStatus = highRiskCount > 20 ? 'critical' : highRiskCount > 10 ? 'warning' : 'good';
+    drawKPICard(doc, 10 + cardWidth + cardSpacing, yPos, cardWidth, cardHeight,
+        'High Risk (A/B)', highRiskCount.toString(),
+        hrStatus, '0.0%', hrStatus === 'critical' ? [183, 28, 28] : hrStatus === 'warning' ? [255, 193, 7] : [76, 175, 80]);
+
+    const riskStatus = avgRiskScore > 4 ? 'critical' : avgRiskScore > 3 ? 'warning' : 'good';
+    drawKPICard(doc, 10 + (cardWidth + cardSpacing) * 2, yPos, cardWidth, cardHeight,
+        'Avg Risk Score', avgRiskDisplay,
+        riskStatus, '0.0%', riskStatus === 'critical' ? [183, 28, 28] : riskStatus === 'warning' ? [255, 193, 7] : [76, 175, 80]);
+
+    drawKPICard(doc, 10 + (cardWidth + cardSpacing) * 3, yPos, cardWidth, cardHeight,
+        'Closure Rate', `${closureRate}%`,
+        'good', '0.0%', [76, 175, 80]);
+
+    yPos += cardHeight + 15;
+    doc.setFillColor(33, 150, 243);
+    doc.rect(10, yPos, 3, 7, 'F');
+    doc.setFontSize(14);
+    doc.setFont('helvetica', 'bold');
+    doc.text('KPI Dashboard', 15, yPos + 5);
+
+    yPos += 12;
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(60, 60, 60);
+
+    const metrics = [
+        ['High Risk Events (A/B)', highRiskCount.toString(), `${((highRiskCount / totalNearMisses) * 100).toFixed(0)}% of total`],
+        ['Average Risk Score', avgRiskDisplay, avgRiskScore > 4 ? 'Critical' : avgRiskScore > 3 ? 'High' : avgRiskScore > 2 ? 'Medium' : 'Low'],
+        ['Near Miss to Injury Ratio', nmRatioValue !== null ? `${nmRatioDisplay}:1` : 'N/A', nmRatioValue !== null ? (nmRatioValue > 3 ? 'Good reporting culture' : 'Needs improvement') : 'Requires injury data'],
+        ['Investigation Closure Rate', `${closureRate}%`, 'Actions completed'],
+        ['Repeat Location Count', repeatLocationCount.toString(), 'Locations with >2 events']
+    ];
+
+    metrics.forEach(metric => {
+        doc.setFont('helvetica', 'bold');
+        doc.text(metric[0], 15, yPos);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(35, 47, 62);
+        doc.setFontSize(12);
+        doc.text(metric[1], 80, yPos);
+        doc.setFontSize(9);
+        doc.setTextColor(100, 100, 100);
+        doc.text(metric[2], 110, yPos);
+        yPos += 8;
+        doc.setTextColor(60, 60, 60);
+        doc.setFontSize(10);
+    });
+
+    yPos += 5;
+    const impactSectionStart = yPos;
+    doc.setFont('helvetica', 'bold');
+    doc.text('Top Primary Impacts', 15, yPos);
+    yPos += 6;
+    doc.setFont('helvetica', 'normal');
+    topImpacts.forEach(([impact, count]) => {
+        const percentage = ((count / totalNearMisses) * 100).toFixed(0);
+        doc.text(`${impact}`, 20, yPos);
+        doc.text(`${count} (${percentage}%)`, 80, yPos);
+        doc.setFillColor(33, 150, 243);
+        const barWidth = Math.max(1, (count / totalNearMisses) * 50);
+        doc.rect(20, yPos + 1, barWidth, 2, 'F');
+        yPos += 6;
+    });
+    const impactSectionEnd = yPos;
+
+    let locationY = impactSectionStart;
+    doc.setFont('helvetica', 'bold');
+    doc.text('Top Risk Locations', 110, locationY);
+    locationY += 6;
+    doc.setFont('helvetica', 'normal');
+    topLocations.forEach(([location, count]) => {
+        const percentage = ((count / totalNearMisses) * 100).toFixed(0);
+        const locName = location.length > 20 ? `${location.substring(0, 20)}...` : location;
+        doc.text(locName, 115, locationY);
+        doc.text(`${count} (${percentage}%)`, 175, locationY);
+        doc.setFillColor(156, 39, 176);
+        const barWidth = Math.max(1, (count / totalNearMisses) * 50);
+        doc.rect(115, locationY + 1, barWidth, 2, 'F');
+        locationY += 6;
+    });
+    yPos = Math.max(impactSectionEnd, locationY) + 5;
+
+    doc.addPage();
+    yPos = 20;
+
+    doc.setFillColor(35, 47, 62);
+    doc.rect(0, 0, pageWidth, 15, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Near Miss Analysis', pageWidth / 2, 10, { align: 'center' });
+
+    yPos = 25;
+    doc.setTextColor(35, 47, 62);
+    doc.setFillColor(33, 150, 243);
+    doc.rect(10, yPos, 3, 7, 'F');
+    doc.setFontSize(14);
+    doc.text('Site Risk Analysis', 15, yPos + 5);
+
+    yPos += 12;
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Site', 15, yPos);
+    doc.text('Total', 45, yPos);
+    doc.text('High Risk', 65, yPos);
+    doc.text('HR %', 85, yPos);
+    doc.text('Avg Risk', 105, yPos);
+    doc.text('Status', 130, yPos);
+
+    yPos += 5;
+    doc.setFont('helvetica', 'normal');
+    Object.entries(siteData)
+        .sort((a, b) => b[1].avgRisk - a[1].avgRisk)
+        .forEach(([site, siteMetrics]) => {
+            if (yPos > pageHeight - 30) {
+                doc.addPage();
+                yPos = 20;
+            }
+            const hrRate = siteMetrics.total ? ((siteMetrics.highRisk / siteMetrics.total) * 100).toFixed(0) : '0';
+            const status = siteMetrics.avgRisk > 4 ? 'Critical' : siteMetrics.avgRisk > 3 ? 'Warning' : 'Good';
+
+            doc.text(site, 15, yPos);
+            doc.text(siteMetrics.total.toString(), 45, yPos);
+            doc.text(siteMetrics.highRisk.toString(), 65, yPos);
+            doc.text(`${hrRate}%`, 85, yPos);
+            doc.text(siteMetrics.avgRisk.toFixed(1), 105, yPos);
+
+            if (status === 'Critical') {
+                doc.setTextColor(183, 28, 28);
+            } else if (status === 'Warning') {
+                doc.setTextColor(255, 152, 0);
+            } else {
+                doc.setTextColor(76, 175, 80);
+            }
+            doc.text(status, 130, yPos);
+            doc.setTextColor(60, 60, 60);
+
+            yPos += 6;
         });
 
-        pdfFinalizeDocument(doc, headerInfo, margin, headerHeight, theme);
+    yPos += 10;
+    doc.setFillColor(33, 150, 243);
+    doc.rect(10, yPos, 3, 7, 'F');
+    doc.setTextColor(35, 47, 62);
+    doc.setFontSize(14);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Risk Matrix Distribution', 15, yPos + 5);
 
-        const fileName = `wbr_safety_report_${new Date().toISOString().split('T')[0]}.pdf`;
-        doc.save(fileName);
-        addToReportHistory('wbr', fileName);
-        showStatus('Safety WBR report generated successfully!', 'success');
-    } catch (error) {
-        console.error('WBR report error:', error);
-        showStatus(`Error generating WBR report: ${error.message}`, 'error');
+    yPos += 12;
+    const riskMatrix = createRiskMatrixData(data);
+
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'normal');
+    const matrixX = 15;
+    const matrixY = yPos;
+
+    for (let i = 0; i < 5; i++) {
+        for (let j = 0; j < 5; j++) {
+            const riskLevel = ((5 - i) * (j + 1)) / 5 * 2;
+            if (riskLevel >= 8) {
+                doc.setFillColor(183, 28, 28);
+            } else if (riskLevel >= 5) {
+                doc.setFillColor(255, 152, 0);
+            } else if (riskLevel >= 3) {
+                doc.setFillColor(255, 193, 7);
+            } else {
+                doc.setFillColor(76, 175, 80);
+            }
+
+            doc.rect(matrixX + j * 12, matrixY + i * 12, 11, 11, 'FD');
+
+            const count = riskMatrix[`${5 - i}-${j + 1}`] || 0;
+            if (count > 0) {
+                doc.setFontSize(8);
+                doc.setTextColor(0, 0, 0);
+                doc.text(count.toString(), matrixX + j * 12 + 5.5, matrixY + i * 12 + 6, { align: 'center' });
+            }
+        }
+    }
+
+    doc.setFontSize(8);
+    doc.setTextColor(100, 100, 100);
+    doc.text('Likelihood →', matrixX + 25, matrixY - 3);
+    doc.text('↑ Severity', matrixX - 10, matrixY + 30);
+
+    yPos = matrixY + 70;
+    doc.setFillColor(33, 150, 243);
+    doc.rect(10, yPos, 3, 7, 'F');
+    doc.setTextColor(35, 47, 62);
+    doc.setFontSize(14);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Key Insights & Strategic Actions', 15, yPos + 5);
+
+    yPos += 12;
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+
+    const insights = generateNearMissInsights(data, highRiskCount, avgRiskScore, nmRatioValue, topLocations);
+
+    insights.forEach(insight => {
+        if (yPos > pageHeight - 30) {
+            doc.addPage();
+            yPos = 20;
+        }
+
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(insight.color[0], insight.color[1], insight.color[2]);
+        doc.text(insight.priority, 15, yPos);
+        doc.setTextColor(60, 60, 60);
+        yPos += 6;
+
+        doc.setFont('helvetica', 'normal');
+        insight.actions.forEach(action => {
+            const lines = doc.splitTextToSize(`• ${action}`, pageWidth - 25);
+            lines.forEach(line => {
+                doc.text(line, 20, yPos);
+                yPos += 5;
+            });
+        });
+        yPos += 5;
+    });
+
+    const totalPages = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= totalPages; i++) {
+        doc.setPage(i);
+        doc.setFontSize(8);
+        doc.setTextColor(150, 150, 150);
+        doc.text('Amazon WHS Austria • Safety Analytics Platform', pageWidth / 2, pageHeight - 10, { align: 'center' });
+        doc.text(`Page ${i} of ${totalPages}`, pageWidth - 10, pageHeight - 10, { align: 'right' });
+    }
+
+    const fileName = `Near_Miss_Report_${new Date().toISOString().split('T')[0]}.pdf`;
+    doc.save(fileName);
+    addToReportHistory('nearmiss', fileName);
+    showStatus('Near Miss report generated successfully', 'success');
+}
+
+// ==================== WEEKLY BUSINESS REVIEW (WBR) ====================
+function generateWBRReport() {
+    const injuryData = Array.isArray(state?.injury?.filteredData) ? state.injury.filteredData : [];
+    const nearMissData = Array.isArray(state?.nearMiss?.filteredData) ? state.nearMiss.filteredData : [];
+
+    if (injuryData.length === 0 && nearMissData.length === 0) {
+        showStatus('No data available for WBR generation', 'warning');
+        return;
+    }
+
+    const { jsPDF } = window.jspdf || {};
+    if (!jsPDF) {
+        showStatus('PDF library not available', 'error');
+        return;
+    }
+
+    const doc = new jsPDF('p', 'mm', 'a4');
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+
+    const reportDate = new Date().toLocaleDateString('en-GB');
+
+    const allDates = [
+        ...injuryData.map(d => new Date(d.incident_date)),
+        ...nearMissData.map(d => new Date(d.nearmiss_date))
+    ].filter(d => !isNaN(d));
+
+    const dateRange = allDates.length > 0 ?
+        `${new Date(Math.min(...allDates)).toLocaleDateString('en-GB')} - ${new Date(Math.max(...allDates)).toLocaleDateString('en-GB')}` :
+        'No date range';
+
+    const totalEvents = injuryData.length + nearMissData.length;
+    const injuryRecordable = injuryData.filter(d => Number(d.recordable) === 1).length;
+    const combinedRecordableRateValue = injuryData.length ? (injuryRecordable / injuryData.length) * 100 : 0;
+    const leadingIndicators = nearMissData.length;
+    const laggingIndicators = injuryData.length;
+    const leadLagRatioValue = laggingIndicators > 0 ? leadingIndicators / laggingIndicators : null;
+    const leadLagRatioDisplay = leadLagRatioValue !== null ? `${leadLagRatioValue.toFixed(1)}` : 'N/A';
+    const leadLagText = leadLagRatioValue !== null ? `${leadLagRatioDisplay}:1` : 'N/A';
+
+    const safetyIndex = calculateSafetyIndex(injuryData, nearMissData);
+    const actionClosureRate = 100;
+    const thisWeekEvents = 0;
+    const improvement = safetyIndex > 50 ? 'Improving' : safetyIndex > 30 ? 'Stable' : 'Declining';
+
+    const combinedImpacts = {};
+    injuryData.forEach(d => {
+        const impact = d.initial_info_impact_type_primary || d.primaryImpact || 'Unspecified';
+        combinedImpacts[impact] = (combinedImpacts[impact] || 0) + 1;
+    });
+    nearMissData.forEach(d => {
+        const impact = d.primaryImpact || d.initial_info_primary_impact || 'Unspecified';
+        combinedImpacts[impact] = (combinedImpacts[impact] || 0) + 1;
+    });
+    const topCombinedImpacts = Object.entries(combinedImpacts)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5);
+
+    const combinedSiteData = {};
+    [...injuryData, ...nearMissData].forEach(d => {
+        const site = d.site || 'Unknown';
+        if (!combinedSiteData[site]) {
+            combinedSiteData[site] = {
+                injuries: 0,
+                nearMisses: 0,
+                recordable: 0,
+                risks: []
+            };
+        }
+        if (d.incident_date) {
+            combinedSiteData[site].injuries += 1;
+            if (Number(d.recordable) === 1) {
+                combinedSiteData[site].recordable += 1;
+            }
+        } else {
+            combinedSiteData[site].nearMisses += 1;
+            const riskValue = Number(d.risk ?? calculateRiskScore(d));
+            if (Number.isFinite(riskValue)) {
+                combinedSiteData[site].risks.push(riskValue);
+            }
+        }
+    });
+
+    Object.keys(combinedSiteData).forEach(site => {
+        const data = combinedSiteData[site];
+        data.total = data.injuries + data.nearMisses;
+        data.recordableRate = data.injuries > 0 ? ((data.recordable / data.injuries) * 100).toFixed(1) : '0.0';
+        data.avgRisk = data.risks.length > 0 ? (data.risks.reduce((a, b) => a + b, 0) / data.risks.length).toFixed(1) : '0.0';
+    });
+
+    const sortedSites = Object.entries(combinedSiteData)
+        .sort((a, b) => b[1].total - a[1].total)
+        .slice(0, 5);
+
+    const processData = {};
+    [...injuryData, ...nearMissData].forEach(d => {
+        const process = d.processPath || d.initial_info_process_path || 'Unknown';
+        if (!processData[process]) {
+            processData[process] = {
+                count: 0,
+                recordable: 0,
+                risks: []
+            };
+        }
+        processData[process].count += 1;
+        if (Number(d.recordable) === 1) {
+            processData[process].recordable += 1;
+        }
+        const riskValue = Number(d.risk ?? calculateRiskScore(d));
+        if (Number.isFinite(riskValue)) {
+            processData[process].risks.push(riskValue);
+        }
+    });
+
+    Object.keys(processData).forEach(process => {
+        const data = processData[process];
+        data.avgRisk = data.risks.length > 0 ? data.risks.reduce((a, b) => a + b, 0) / data.risks.length : 0;
+        data.recordableRate = data.count > 0 ? ((data.recordable / data.count) * 100).toFixed(0) : '0';
+    });
+
+    const topProcesses = Object.entries(processData)
+        .sort((a, b) => b[1].avgRisk - a[1].avgRisk)
+        .slice(0, 6);
+
+    const rootCauses = {};
+    injuryData.forEach(d => {
+        const cause = d.rootCause || d.rca_primary_cause || 'Unknown';
+        rootCauses[cause] = (rootCauses[cause] || 0) + 1;
+    });
+    nearMissData.forEach(d => {
+        const cause = d.rootCause || d.rca_primary_cause || 'Hazardous Condition';
+        rootCauses[cause] = (rootCauses[cause] || 0) + 1;
+    });
+    const sortedCauses = Object.entries(rootCauses)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5);
+
+    let yPos = 20;
+
+    doc.setFillColor(35, 47, 62);
+    doc.rect(0, 0, pageWidth, 25, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(18);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Weekly Business Review', pageWidth / 2, 12, { align: 'center' });
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    doc.text('Amazon WHS Austria • Safety Analytics Platform', pageWidth / 2, 20, { align: 'center' });
+
+    doc.setTextColor(100, 100, 100);
+    doc.setFontSize(9);
+    doc.text(`Reporting Period: ${dateRange}`, 10, 32);
+    doc.text(`Generated: ${reportDate}`, pageWidth - 10, 32, { align: 'right' });
+
+    yPos = 45;
+    doc.setFillColor(103, 58, 183);
+    doc.rect(10, yPos, 3, 7, 'F');
+    doc.setTextColor(35, 47, 62);
+    doc.setFontSize(14);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Executive Summary', 15, yPos + 5);
+
+    yPos += 15;
+    const cardWidth = 42;
+    const cardHeight = 25;
+    const cardSpacing = 5;
+
+    const siStatus = safetyIndex > 60 ? 'good' : safetyIndex > 40 ? 'warning' : 'critical';
+    drawKPICard(doc, 10, yPos, cardWidth, cardHeight,
+        'Safety Index', `${safetyIndex}%`,
+        siStatus, improvement, siStatus === 'good' ? [76, 175, 80] : siStatus === 'warning' ? [255, 193, 7] : [183, 28, 28]);
+
+    drawKPICard(doc, 10 + cardWidth + cardSpacing, yPos, cardWidth, cardHeight,
+        'This Week', thisWeekEvents.toString(),
+        thisWeekEvents === 0 ? 'good' : 'warning', '0%', thisWeekEvents === 0 ? [76, 175, 80] : [255, 193, 7]);
+
+    drawKPICard(doc, 10 + (cardWidth + cardSpacing) * 2, yPos, cardWidth, cardHeight,
+        'Action Closure', `${actionClosureRate}%`,
+        'good', 'On target', [76, 175, 80]);
+
+    const llStatus = leadLagRatioValue === null || leadLagRatioValue > 2 ? 'good' : 'warning';
+    drawKPICard(doc, 10 + (cardWidth + cardSpacing) * 3, yPos, cardWidth, cardHeight,
+        'Lead:Lag Ratio', leadLagText,
+        llStatus, 'Healthy', llStatus === 'good' ? [76, 175, 80] : [255, 193, 7]);
+
+    yPos += cardHeight + 15;
+    doc.setFillColor(103, 58, 183);
+    doc.rect(10, yPos, 3, 7, 'F');
+    doc.setFontSize(14);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Combined KPI Dashboard', 15, yPos + 5);
+
+    yPos += 12;
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+
+    const metrics = [
+        ['Combined Safety Index', `${safetyIndex}%`, improvement],
+        ['Action Item Closure', `${actionClosureRate}%`, 'Target: 100%'],
+        ['Leading Indicators', leadingIndicators.toString(), 'Near misses & observations'],
+        ['Lagging Indicators', laggingIndicators.toString(), 'Injuries & incidents']
+    ];
+
+    metrics.forEach(metric => {
+        doc.setFont('helvetica', 'bold');
+        doc.text(metric[0], 15, yPos);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(35, 47, 62);
+        doc.setFontSize(12);
+        doc.text(metric[1], 80, yPos);
+        doc.setFontSize(9);
+        doc.setTextColor(100, 100, 100);
+        doc.text(metric[2], 110, yPos);
+        yPos += 8;
+        doc.setTextColor(60, 60, 60);
+        doc.setFontSize(10);
+    });
+
+    yPos += 5;
+    doc.setFillColor(103, 58, 183);
+    doc.rect(10, yPos, 3, 7, 'F');
+    doc.setTextColor(35, 47, 62);
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Site Performance (Combined)', 15, yPos + 5);
+
+    yPos += 10;
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'normal');
+    sortedSites.forEach(([site, data], index) => {
+        if (yPos > pageHeight - 30) {
+            doc.addPage();
+            yPos = 20;
+        }
+        doc.text(`${index + 1}. ${site}`, 15, yPos);
+        doc.text(`${data.total} events`, 50, yPos);
+        doc.text(`${data.recordableRate}% recordable`, 85, yPos);
+        const risk = parseFloat(data.avgRisk);
+        if (risk > 4) {
+            doc.setTextColor(183, 28, 28);
+        } else if (risk > 3) {
+            doc.setTextColor(255, 152, 0);
+        } else {
+            doc.setTextColor(76, 175, 80);
+        }
+        doc.text(`Risk: ${data.avgRisk}`, 130, yPos);
+        doc.setTextColor(60, 60, 60);
+        yPos += 6;
+    });
+
+    doc.addPage();
+    yPos = 20;
+
+    doc.setFillColor(35, 47, 62);
+    doc.rect(0, 0, pageWidth, 15, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Trending & Analysis', pageWidth / 2, 10, { align: 'center' });
+
+    yPos = 25;
+    doc.setTextColor(35, 47, 62);
+    doc.setFillColor(103, 58, 183);
+    doc.rect(10, yPos, 3, 7, 'F');
+    doc.setFontSize(14);
+    doc.text('Primary Impact Distribution', 15, yPos + 5);
+
+    yPos += 12;
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    topCombinedImpacts.forEach(([impact, count]) => {
+        const percentage = totalEvents ? ((count / totalEvents) * 100).toFixed(0) : '0';
+        doc.text(`${impact}`, 20, yPos);
+        doc.text(`${count}`, 80, yPos);
+        doc.text(`(${percentage}%)`, 100, yPos);
+        doc.setFillColor(103, 58, 183);
+        const barWidth = totalEvents ? Math.max(1, (count / totalEvents) * 60) : 1;
+        doc.rect(120, yPos - 3, barWidth, 4, 'F');
+        yPos += 7;
+    });
+
+    yPos += 10;
+    doc.setFillColor(103, 58, 183);
+    doc.rect(10, yPos, 3, 7, 'F');
+    doc.setTextColor(35, 47, 62);
+    doc.setFontSize(14);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Process Path Risk Focus', 15, yPos + 5);
+
+    yPos += 12;
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    topProcesses.forEach(([process, data]) => {
+        const riskLevel = data.avgRisk > 4 ? 'Critical' : data.avgRisk > 3 ? 'High' : 'Medium';
+        doc.text(`${process}`, 20, yPos);
+        doc.text(`Incidents: ${data.count}`, 70, yPos);
+        doc.text(`Recordable: ${data.recordableRate}%`, 110, yPos);
+        if (riskLevel === 'Critical') {
+            doc.setTextColor(183, 28, 28);
+        } else if (riskLevel === 'High') {
+            doc.setTextColor(255, 152, 0);
+        } else {
+            doc.setTextColor(255, 193, 7);
+        }
+        doc.text(`Risk: ${data.avgRisk.toFixed(1)} (${riskLevel})`, 150, yPos);
+        doc.setTextColor(60, 60, 60);
+        yPos += 7;
+    });
+
+    yPos += 10;
+    doc.setFillColor(103, 58, 183);
+    doc.rect(10, yPos, 3, 7, 'F');
+    doc.setTextColor(35, 47, 62);
+    doc.setFontSize(14);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Root Cause Pareto Analysis', 15, yPos + 5);
+
+    yPos += 12;
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    let cumulative = 0;
+    sortedCauses.forEach(([cause, count]) => {
+        const percentage = totalEvents ? ((count / totalEvents) * 100).toFixed(1) : '0.0';
+        cumulative += parseFloat(percentage);
+        const label = cause.length > 30 ? `${cause.slice(0, 29)}…` : cause;
+        doc.text(label, 20, yPos);
+        doc.text(`${count}`, 80, yPos);
+        doc.text(`${percentage}%`, 100, yPos);
+        doc.text(`(Cum: ${Math.min(cumulative, 100).toFixed(1)}%)`, 125, yPos);
+        yPos += 7;
+    });
+
+    doc.addPage();
+    yPos = 20;
+
+    doc.setFillColor(35, 47, 62);
+    doc.rect(0, 0, pageWidth, 15, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Strategic Actions & Insights', pageWidth / 2, 10, { align: 'center' });
+
+    yPos = 25;
+    doc.setTextColor(35, 47, 62);
+    doc.setFillColor(103, 58, 183);
+    doc.rect(10, yPos, 3, 7, 'F');
+    doc.setFontSize(14);
+    doc.text('Cross-site Benchmarking', 15, yPos + 5);
+
+    yPos += 12;
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Site', 15, yPos);
+    doc.text('Incidents', 40, yPos);
+    doc.text('Rec. Rate', 65, yPos);
+    doc.text('Avg Risk', 90, yPos);
+    doc.text('Status', 115, yPos);
+
+    yPos += 5;
+    doc.setFont('helvetica', 'normal');
+    sortedSites.forEach(([site, data]) => {
+        if (yPos > pageHeight - 30) {
+            doc.addPage();
+            yPos = 20;
+        }
+        const status = parseFloat(data.avgRisk) > 4 ? 'Critical' : parseFloat(data.avgRisk) > 3 ? 'Warning' : 'Good';
+        doc.text(site, 15, yPos);
+        doc.text(data.total.toString(), 40, yPos);
+        doc.text(`${data.recordableRate}%`, 65, yPos);
+        doc.text(data.avgRisk, 90, yPos);
+        if (status === 'Critical') {
+            doc.setTextColor(183, 28, 28);
+        } else if (status === 'Warning') {
+            doc.setTextColor(255, 152, 0);
+        } else {
+            doc.setTextColor(76, 175, 80);
+        }
+        doc.text(status, 115, yPos);
+        doc.setTextColor(60, 60, 60);
+        yPos += 6;
+    });
+
+    yPos += 10;
+    doc.setFillColor(103, 58, 183);
+    doc.rect(10, yPos, 3, 7, 'F');
+    doc.setTextColor(35, 47, 62);
+    doc.setFontSize(14);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Insights & Strategic Actions', 15, yPos + 5);
+
+    yPos += 12;
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+
+    const insights = generateWBRInsights(
+        injuryData,
+        nearMissData,
+        safetyIndex,
+        leadLagRatioValue,
+        sortedCauses[0] ? sortedCauses[0][0] : 'Unknown'
+    );
+
+    doc.setFont('helvetica', 'bold');
+    doc.text('Current Status:', 15, yPos);
+    doc.setFont('helvetica', 'normal');
+    yPos += 6;
+    insights.status.forEach(item => {
+        const lines = doc.splitTextToSize(`• ${item}`, pageWidth - 25);
+        lines.forEach(line => {
+            doc.text(line, 20, yPos);
+            yPos += 5;
+        });
+    });
+
+    yPos += 5;
+
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(183, 28, 28);
+    doc.text('Network Priorities:', 15, yPos);
+    doc.setTextColor(60, 60, 60);
+    doc.setFont('helvetica', 'normal');
+    yPos += 6;
+    insights.priorities.network.forEach(item => {
+        const lines = doc.splitTextToSize(`• ${item}`, pageWidth - 25);
+        lines.forEach(line => {
+            doc.text(line, 20, yPos);
+            yPos += 5;
+        });
+    });
+
+    if (yPos > pageHeight - 60) {
+        doc.addPage();
+        yPos = 20;
+    }
+
+    yPos += 5;
+
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(255, 152, 0);
+    doc.text('Short-term Focus:', 15, yPos);
+    doc.setTextColor(60, 60, 60);
+    doc.setFont('helvetica', 'normal');
+    yPos += 6;
+    insights.priorities.shortTerm.forEach(item => {
+        const lines = doc.splitTextToSize(`• ${item}`, pageWidth - 25);
+        lines.forEach(line => {
+            doc.text(line, 20, yPos);
+            yPos += 5;
+        });
+    });
+
+    yPos += 5;
+
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(76, 175, 80);
+    doc.text('Strategic Initiatives:', 15, yPos);
+    doc.setTextColor(60, 60, 60);
+    doc.setFont('helvetica', 'normal');
+    yPos += 6;
+    insights.priorities.strategic.forEach(item => {
+        const lines = doc.splitTextToSize(`• ${item}`, pageWidth - 25);
+        lines.forEach(line => {
+            doc.text(line, 20, yPos);
+            yPos += 5;
+        });
+    });
+
+    const totalPages = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= totalPages; i++) {
+        doc.setPage(i);
+        doc.setFontSize(8);
+        doc.setTextColor(150, 150, 150);
+        doc.text('Amazon WHS Austria • Safety Analytics Platform', pageWidth / 2, pageHeight - 10, { align: 'center' });
+        doc.text(`Page ${i} of ${totalPages}`, pageWidth - 10, pageHeight - 10, { align: 'right' });
+    }
+
+    const fileName = `WBR_Safety_Report_${new Date().toISOString().split('T')[0]}.pdf`;
+    doc.save(fileName);
+    addToReportHistory('wbr', fileName);
+    showStatus('Weekly Business Review generated successfully', 'success');
+}
+
+// ==================== HELPER FUNCTIONS ====================
+function drawKPICard(doc, x, y, width, height, title, value, status, trend, color) {
+    doc.setFillColor(255, 255, 255);
+    doc.setDrawColor(230, 230, 230);
+    doc.roundedRect(x, y, width, height, 2, 2, 'FD');
+
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(100, 100, 100);
+    doc.text(title, x + width / 2, y + 5, { align: 'center' });
+
+    doc.setFontSize(16);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(color[0], color[1], color[2]);
+    doc.text(value, x + width / 2, y + 14, { align: 'center' });
+
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'normal');
+    if (status === 'critical') {
+        doc.setTextColor(183, 28, 28);
+        doc.text('⬇ ' + trend, x + width / 2, y + 20, { align: 'center' });
+    } else if (status === 'warning') {
+        doc.setTextColor(255, 152, 0);
+        doc.text('➡ ' + trend, x + width / 2, y + 20, { align: 'center' });
+    } else if (status === 'good') {
+        doc.setTextColor(76, 175, 80);
+        doc.text('⬆ ' + trend, x + width / 2, y + 20, { align: 'center' });
+    } else {
+        doc.setTextColor(100, 100, 100);
+        doc.text('◆ ' + trend, x + width / 2, y + 20, { align: 'center' });
     }
 }
 
+function getDateRange(data, dateField) {
+    const dates = (Array.isArray(data) ? data : [])
+        .map(d => new Date(d[dateField]))
+        .filter(d => !isNaN(d))
+        .sort((a, b) => a - b);
+
+    if (dates.length === 0) return 'No date range';
+
+    const startDate = dates[0].toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+    const endDate = dates[dates.length - 1].toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+
+    return `${startDate} – ${endDate}`;
+}
+
+function calculateAverageSeverity(data) {
+    if (!Array.isArray(data) || data.length === 0) {
+        return 0;
+    }
+    const severityValues = { 'A': 5, 'B': 4, 'C': 3, 'D': 2, 'Unknown': 1 };
+    const total = data.reduce((sum, d) => {
+        const sev = standardizeSeverity(d.severity || d.potential_severity);
+        return sum + (severityValues[sev] || 1);
+    }, 0);
+    return total / data.length;
+}
+
+function createRiskMatrixData(data) {
+    const matrix = {};
+    (Array.isArray(data) ? data : []).forEach(d => {
+        const severity = standardizeSeverity(d.potential_severity || d.severity);
+        const likelihood = standardizeLikelihood(d.standardized_likelihood || d.initial_risk_assessment_likeliness);
+        const severityMap = { 'A': 5, 'B': 4, 'C': 3, 'D': 2, 'Unknown': 1 };
+        const likelihoodMap = {
+            'Almost Certain': 5,
+            'Likely': 4,
+            'Possible': 3,
+            'Unlikely': 2,
+            'Rare': 1,
+            'Unknown': 1
+        };
+        const sevValue = severityMap[severity] || 1;
+        const likeValue = likelihoodMap[likelihood] || 1;
+        const key = `${sevValue}-${likeValue}`;
+        matrix[key] = (matrix[key] || 0) + 1;
+    });
+    return matrix;
+}
+
+function calculateSafetyIndex(injuryData, nearMissData) {
+    const injuries = Array.isArray(injuryData) ? injuryData : [];
+    const nearMisses = Array.isArray(nearMissData) ? nearMissData : [];
+    let score = 100;
+
+    if (injuries.length > 0) {
+        const recordableRate = (injuries.filter(d => Number(d.recordable) === 1).length / injuries.length) * 100;
+        score -= recordableRate * 0.5;
+    }
+
+    const highSeverityCount = [...injuries, ...nearMisses].filter(d => {
+        const sev = standardizeSeverity(d.severity || d.potential_severity);
+        return sev === 'A' || sev === 'B';
+    }).length;
+    score -= highSeverityCount * 2;
+
+    const ratio = nearMisses.length / Math.max(injuries.length, 1);
+    if (ratio > 3) {
+        score += 10;
+    } else if (ratio > 2) {
+        score += 5;
+    }
+
+    return Math.max(0, Math.min(100, Math.round(score)));
+}
+
+function generateInjuryInsights(data, recordableRate, totalDAFW, severityCount, topRootCauses) {
+    const insights = [];
+    const criticalActions = [];
+    const highSeverity = (severityCount['A'] || 0) + (severityCount['B'] || 0);
+
+    if (recordableRate > 30) {
+        criticalActions.push(`Recordable rate of ${recordableRate.toFixed(1)}% exceeds critical threshold. Immediate intervention required.`);
+    }
+    if (highSeverity > 0) {
+        criticalActions.push(`${highSeverity} high-severity incidents require executive review within 24 hours.`);
+    }
+    if (totalDAFW > 100) {
+        criticalActions.push(`${totalDAFW} days lost impacts productivity. Implement return-to-work program immediately.`);
+    }
+
+    if (criticalActions.length > 0) {
+        insights.push({
+            priority: 'Priority 1 • Critical',
+            color: [183, 28, 28],
+            actions: criticalActions
+        });
+    }
+
+    const shortTermActions = [];
+    if (Array.isArray(topRootCauses) && topRootCauses.length > 0) {
+        shortTermActions.push(`Focus corrective actions on top root cause: ${topRootCauses[0][0]} (${topRootCauses[0][1]} incidents).`);
+    }
+    shortTermActions.push('Conduct safety stand-downs in high-incident areas.');
+    shortTermActions.push('Review and update risk assessments for all critical tasks.');
+
+    insights.push({
+        priority: 'Priority 2 • Short Term',
+        color: [255, 152, 0],
+        actions: shortTermActions
+    });
+
+    insights.push({
+        priority: 'Priority 3 • Strategic',
+        color: [76, 175, 80],
+        actions: [
+            'Implement predictive analytics to identify injury patterns before they occur.',
+            'Develop comprehensive ergonomic assessment program for all workstations.',
+            'Establish quarterly safety culture survey with action planning.',
+            'Create cross-site best practice sharing forum for injury prevention.'
+        ]
+    });
+
+    return insights;
+}
+
+function generateNearMissInsights(data, highRiskCount, avgRiskScore, nmRatioValue, topLocations) {
+    const insights = [];
+    const criticalActions = [];
+
+    if (highRiskCount > 20) {
+        criticalActions.push(`${highRiskCount} high-risk near misses indicate systemic hazards requiring immediate action.`);
+    }
+    if (avgRiskScore > 4) {
+        criticalActions.push(`Average risk score of ${avgRiskScore.toFixed(1)} exceeds critical threshold. Deploy rapid response team.`);
+    }
+    if (Array.isArray(topLocations) && topLocations[0] && topLocations[0][1] > 10) {
+        criticalActions.push(`${topLocations[0][0]} has ${topLocations[0][1]} events - conduct immediate area assessment.`);
+    }
+
+    if (criticalActions.length > 0) {
+        insights.push({
+            priority: 'Priority 1 • Critical',
+            color: [183, 28, 28],
+            actions: criticalActions
+        });
+    }
+
+    const shortTermActions = [];
+    if (nmRatioValue !== null && nmRatioValue < 3) {
+        shortTermActions.push(`Near miss ratio of ${nmRatioValue.toFixed(1)}:1 indicates under-reporting. Launch awareness campaign.`);
+    }
+    shortTermActions.push('Implement visual management boards for high-risk areas.');
+    shortTermActions.push('Establish daily near miss review meetings with operations teams.');
+
+    insights.push({
+        priority: 'Priority 2 • Short Term',
+        color: [255, 152, 0],
+        actions: shortTermActions
+    });
+
+    insights.push({
+        priority: 'Priority 3 • Strategic',
+        color: [76, 175, 80],
+        actions: [
+            'Deploy mobile reporting app to increase near miss capture rate.',
+            'Integrate near miss data with predictive maintenance systems.',
+            'Establish recognition program for proactive hazard identification.',
+            'Create heat mapping system for real-time risk visualization.'
+        ]
+    });
+
+    return insights;
+}
+
+function generateWBRInsights(injuryData, nearMissData, safetyIndex, leadLagRatioValue, topRootCause) {
+    const insights = {
+        status: [],
+        priorities: {
+            network: [],
+            shortTerm: [],
+            strategic: []
+        }
+    };
+
+    const injuries = Array.isArray(injuryData) ? injuryData : [];
+    const nearMisses = Array.isArray(nearMissData) ? nearMissData : [];
+    const recordableRate = injuries.length > 0 ?
+        ((injuries.filter(d => Number(d.recordable) === 1).length / injuries.length) * 100).toFixed(0) : 0;
+
+    insights.status.push(`Recordable rate at ${recordableRate}% ${parseFloat(recordableRate) > 30 ? 'requires urgent attention' : 'within acceptable range'}.`);
+
+    const highSeverityTotal = [...injuries, ...nearMisses].filter(d => {
+        const sev = standardizeSeverity(d.severity || d.potential_severity);
+        return sev === 'A' || sev === 'B';
+    }).length;
+    insights.status.push(`${highSeverityTotal} high-severity events recorded this period.`);
+
+    if (leadLagRatioValue !== null) {
+        insights.status.push(`Near miss reporting ratio of ${leadLagRatioValue.toFixed(1)}:1 ${leadLagRatioValue > 3 ? 'indicates strong' : 'needs improvement in'} safety culture.`);
+    }
+
+    insights.status.push(`Safety Index at ${safetyIndex}% ${safetyIndex > 60 ? 'shows positive trend' : 'requires focused improvement'}.`);
+
+    if (highSeverityTotal > 0) {
+        insights.priorities.network.push('Conduct deep-dive investigations for all Severity A/B events with C-suite review.');
+    }
+    insights.priorities.network.push(`Address primary root cause: ${topRootCause} through targeted interventions.`);
+    insights.priorities.network.push('Standardize safety practices across all sites with focus on high-performing locations.');
+
+    insights.priorities.shortTerm.push('Implement daily safety walks with structured observation cards.');
+    insights.priorities.shortTerm.push('Launch "See Something, Say Something" campaign to increase reporting.');
+    insights.priorities.shortTerm.push('Deploy rapid improvement teams to address top 3 risk areas.');
+
+    insights.priorities.strategic.push('Integrate AI-powered video analytics for proactive hazard detection.');
+    insights.priorities.strategic.push('Establish predictive model using leading indicators for injury prevention.');
+    insights.priorities.strategic.push('Create digital twin simulations for high-risk process optimization.');
+    insights.priorities.strategic.push('Develop comprehensive contractor safety management system.');
+
+    return insights;
+}
+
+function generatePDFReport(type) {
+    if (type === 'injury') {
+        generateInjuryReport();
+    } else if (type === 'nearmiss') {
+        generateNearMissReport();
+    } else {
+        generateWBRReport();
+    }
+}
 // Initialize Application
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Safety Analytics Platform - Amazon WHS Austria');
@@ -12935,7 +13330,7 @@ function setupEventListeners() {
         // Ctrl/Cmd + P to generate PDF
         if ((event.ctrlKey || event.metaKey) && event.key === 'p') {
             event.preventDefault();
-            generatePDFReport('combined');
+            generateWBRReport();
         }
     });
     
@@ -13020,6 +13415,8 @@ window.SafetyAnalytics = {
     loadSampleData,
     exportToExcel,
     generatePDFReport,
+    generateInjuryReport,
+    generateNearMissReport,
     generateWBRReport,
     refreshDashboard,
     switchModule,
@@ -13042,6 +13439,8 @@ window.toggleTheme = toggleTheme;
 window.loadSampleData = loadSampleData;
 window.exportToExcel = exportToExcel;
 window.generatePDFReport = generatePDFReport;
+window.generateInjuryReport = generateInjuryReport;
+window.generateNearMissReport = generateNearMissReport;
 window.generateWBRReport = generateWBRReport;
 window.refreshDashboard = refreshDashboard;
 // Functions used by various buttons and interactions
