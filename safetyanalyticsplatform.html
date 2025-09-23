@@ -462,6 +462,41 @@
             height: 250px;
         }
 
+        .capture-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid #ddd;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            z-index: 10;
+            opacity: 0.7;
+        }
+
+        .capture-btn:hover {
+            opacity: 1;
+            background: #FF9900;
+            color: white;
+            transform: scale(1.1);
+        }
+
+        [data-theme="dark"] .capture-btn {
+            background: rgba(46, 46, 46, 0.9);
+            border-color: #555;
+        }
+
+        [data-theme="dark"] .capture-btn:hover {
+            background: #FF9900;
+        }
+
         /* Data Table */
         .table-container {
             background: var(--bg-primary);
@@ -705,6 +740,7 @@
         }
 
         .missing-fields-chart {
+            position: relative;
             height: 300px;
         }
 
@@ -1474,22 +1510,16 @@
                 <div class="chart-card">
                     <div class="chart-header">
                         <h3 class="chart-title">Safety Trend Overview</h3>
-                        <button class="btn btn-sm btn-outline" onclick="exportChart('overviewTrendChart')">
-                            <span>📸</span> Export
-                        </button>
                     </div>
-                    <div class="chart-container">
+                    <div class="chart-container" data-capture-title="Safety Trend Overview">
                         <canvas id="overviewTrendChart"></canvas>
                     </div>
                 </div>
                 <div class="chart-card">
                     <div class="chart-header">
                         <h3 class="chart-title">Site Comparison</h3>
-                        <button class="btn btn-sm btn-outline" onclick="exportChart('overviewSiteChart')">
-                            <span>📸</span> Export
-                        </button>
                     </div>
-                    <div class="chart-container">
+                    <div class="chart-container" data-capture-title="Site Comparison">
                         <canvas id="overviewSiteChart"></canvas>
                     </div>
                 </div>
@@ -1637,7 +1667,7 @@
                                 <option value="impactType">Impact Types</option>
                             </select>
                         </div>
-                        <div class="chart-container">
+                        <div class="chart-container" data-capture-title="Injury Analysis View 1">
                             <canvas id="injuryChart1"></canvas>
                         </div>
                     </div>
@@ -1655,7 +1685,7 @@
                                 <option value="impactType">Impact Types</option>
                             </select>
                         </div>
-                        <div class="chart-container">
+                        <div class="chart-container" data-capture-title="Injury Analysis View 2">
                             <canvas id="injuryChart2"></canvas>
                         </div>
                     </div>
@@ -1673,7 +1703,7 @@
                                 <option value="impactType">Impact Types</option>
                             </select>
                         </div>
-                        <div class="chart-container">
+                        <div class="chart-container" data-capture-title="Injury Analysis View 3">
                             <canvas id="injuryChart3"></canvas>
                         </div>
                     </div>
@@ -1691,7 +1721,7 @@
                                 <option value="impactType">Impact Types</option>
                             </select>
                         </div>
-                        <div class="chart-container">
+                        <div class="chart-container" data-capture-title="Injury Analysis View 4">
                             <canvas id="injuryChart4"></canvas>
                         </div>
                     </div>
@@ -1823,7 +1853,7 @@
                         <div class="chart-header">
                             <h3 class="chart-title">Severity Pattern Radar</h3>
                         </div>
-                        <div class="chart-container">
+                        <div class="chart-container" data-capture-title="Severity Pattern Radar">
                             <canvas id="injurySeverityPatternChart"></canvas>
                         </div>
                     </div>
@@ -1831,7 +1861,7 @@
                         <div class="chart-header">
                             <h3 class="chart-title">Average Recovery Time</h3>
                         </div>
-                        <div class="chart-container">
+                        <div class="chart-container" data-capture-title="Average Recovery Time">
                             <canvas id="injuryRecoveryTimeChart"></canvas>
                         </div>
                     </div>
@@ -1839,7 +1869,7 @@
                         <div class="chart-header">
                             <h3 class="chart-title">Estimated Cost Impact</h3>
                         </div>
-                        <div class="chart-container">
+                        <div class="chart-container" data-capture-title="Estimated Cost Impact">
                             <canvas id="injuryCostImpactChart"></canvas>
                         </div>
                     </div>
@@ -1989,7 +2019,7 @@
                                 <option value="riskTrend">Risk Score Trend</option>
                             </select>
                         </div>
-                        <div class="chart-container">
+                        <div class="chart-container" data-capture-title="Near Miss Analysis View 1">
                             <canvas id="nearMissChart1"></canvas>
                         </div>
                     </div>
@@ -2007,7 +2037,7 @@
                                 <option value="riskTrend">Risk Score Trend</option>
                             </select>
                         </div>
-                        <div class="chart-container">
+                        <div class="chart-container" data-capture-title="Near Miss Analysis View 2">
                             <canvas id="nearMissChart2"></canvas>
                         </div>
                     </div>
@@ -2025,7 +2055,7 @@
                                 <option value="riskTrend">Risk Score Trend</option>
                             </select>
                         </div>
-                        <div class="chart-container">
+                        <div class="chart-container" data-capture-title="Near Miss Analysis View 3">
                             <canvas id="nearMissChart3"></canvas>
                         </div>
                     </div>
@@ -2043,7 +2073,7 @@
                                 <option value="riskTrend">Risk Score Trend</option>
                             </select>
                         </div>
-                        <div class="chart-container">
+                        <div class="chart-container" data-capture-title="Near Miss Analysis View 4">
                             <canvas id="nearMissChart4"></canvas>
                         </div>
                     </div>
@@ -2174,7 +2204,7 @@
                         <div class="chart-header">
                             <h3 class="chart-title">Near Miss to Injury Ratio</h3>
                         </div>
-                        <div class="chart-container">
+                        <div class="chart-container" data-capture-title="Near Miss to Injury Ratio">
                             <canvas id="nearMissToInjuryRatioChart"></canvas>
                         </div>
                     </div>
@@ -2182,7 +2212,7 @@
                         <div class="chart-header">
                             <h3 class="chart-title">Emerging Risk Locations</h3>
                         </div>
-                        <div class="chart-container">
+                        <div class="chart-container" data-capture-title="Emerging Risk Locations">
                             <canvas id="nearMissPredictiveRiskChart"></canvas>
                         </div>
                     </div>
@@ -2190,7 +2220,7 @@
                         <div class="chart-header">
                             <h3 class="chart-title">Risk Hotspots</h3>
                         </div>
-                        <div class="chart-container">
+                        <div class="chart-container" data-capture-title="Risk Hotspots">
                             <canvas id="nearMissHotspotChart"></canvas>
                         </div>
                     </div>
@@ -2313,7 +2343,7 @@
                     <div class="chart-header">
                         <h3 class="chart-title">Safety Performance Trend</h3>
                     </div>
-                    <div class="chart-container">
+                    <div class="chart-container" data-capture-title="Safety Performance Trend">
                         <canvas id="combinedTrendChart"></canvas>
                     </div>
                 </div>
@@ -2321,7 +2351,7 @@
                     <div class="chart-header">
                         <h3 class="chart-title">Site Safety Comparison</h3>
                     </div>
-                    <div class="chart-container">
+                    <div class="chart-container" data-capture-title="Site Safety Comparison">
                         <canvas id="combinedSiteChart"></canvas>
                     </div>
                 </div>
@@ -2329,7 +2359,7 @@
                     <div class="chart-header">
                         <h3 class="chart-title">Severity Analysis</h3>
                     </div>
-                    <div class="chart-container">
+                    <div class="chart-container" data-capture-title="Severity Analysis">
                         <canvas id="combinedSeverityChart"></canvas>
                     </div>
                 </div>
@@ -2337,7 +2367,7 @@
                     <div class="chart-header">
                         <h3 class="chart-title">Prevention Effectiveness</h3>
                     </div>
-                    <div class="chart-container">
+                    <div class="chart-container" data-capture-title="Prevention Effectiveness">
                         <canvas id="combinedPreventionChart"></canvas>
                     </div>
                 </div>
@@ -2700,6 +2730,7 @@ document.addEventListener('DOMContentLoaded', function() {
     setupTableSorting('injury');
     setupTableSorting('nearMiss');
     initializeAnalysisCaptureButtons();
+    initializeChartCaptureButtons();
 
     // Check for saved theme preference
     const savedTheme = localStorage.getItem('theme') || 'light';
@@ -3691,7 +3722,7 @@ function updateQualityDisplay(type, metrics) {
             <!-- Missing Fields Chart -->
             <div class="quality-section">
                 <h4><span class="section-icon">📊</span> Missing Fields Analysis</h4>
-                <div class="missing-fields-chart">
+                <div class="missing-fields-chart chart-container" data-capture-title="${type === 'injury' ? 'Injury Missing Fields Analysis' : 'Near Miss Missing Fields Analysis'}">
                     <canvas id="${type}MissingFieldsChart"></canvas>
                 </div>
             </div>
@@ -3717,6 +3748,8 @@ function updateQualityDisplay(type, metrics) {
             </div>
         </div>
     `;
+
+    initializeChartCaptureButtons();
     
     // Add enhanced CSS styles
     const styleId = 'quality-enhancement-styles';
@@ -8791,21 +8824,155 @@ function exportNearMissDuplicatesPDF() {
     showStatus('Duplicate report exported!', 'success');
 }
 
-// Export Chart
-function exportChart(chartId) {
-    const chart = Chart.getChart(chartId);
-    if (!chart) {
-        showStatus('Chart not found', 'error');
+// Capture individual charts
+function captureChart(chartId) {
+    const canvas = document.getElementById(chartId);
+    if (!canvas) {
+        console.error('Chart not found:', chartId);
         return;
     }
 
-    const url = chart.toBase64Image();
-    const link = document.createElement('a');
-    link.download = `${chartId}_${new Date().toISOString().split('T')[0]}.png`;
-    link.href = url;
-    link.click();
+    const tempCanvas = document.createElement('canvas');
+    const tempCtx = tempCanvas.getContext('2d');
+    tempCanvas.width = canvas.width;
+    tempCanvas.height = canvas.height;
 
-    showStatus('Chart exported successfully!', 'success');
+    tempCtx.fillStyle = 'white';
+    tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+    tempCtx.drawImage(canvas, 0, 0);
+
+    tempCanvas.toBlob((blob) => {
+        if (!blob) {
+            showStatus('Unable to capture chart image.', 'error');
+            return;
+        }
+
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `chart_${chartId}_${new Date().toISOString().slice(0, 10)}.png`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        showStatus('Chart saved successfully!', 'success');
+    }, 'image/png');
+}
+
+function captureChartWithTitle(chartId, title) {
+    const canvas = document.getElementById(chartId);
+    if (!canvas) {
+        console.error('Chart not found:', chartId);
+        return;
+    }
+
+    const padding = 40;
+    const tempCanvas = document.createElement('canvas');
+    const tempCtx = tempCanvas.getContext('2d');
+    tempCanvas.width = canvas.width;
+    tempCanvas.height = canvas.height + padding;
+
+    tempCtx.fillStyle = 'white';
+    tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+
+    tempCtx.fillStyle = '#232F3E';
+    tempCtx.font = 'bold 16px Inter, sans-serif';
+    tempCtx.textAlign = 'center';
+    tempCtx.fillText(title || 'Safety Analytics Chart', tempCanvas.width / 2, 25);
+
+    tempCtx.drawImage(canvas, 0, padding);
+
+    tempCanvas.toBlob((blob) => {
+        if (!blob) {
+            showStatus('Unable to capture chart image.', 'error');
+            return;
+        }
+
+        const slug = slugifyLabel(title || 'chart') || 'chart';
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${slug}_${new Date().toISOString().slice(0, 10)}.png`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        showStatus(`${title || 'Chart'} saved successfully!`, 'success');
+    }, 'image/png');
+}
+
+function deriveChartTitle(container, canvas, fallbackTitle) {
+    let title = fallbackTitle || '';
+
+    if (!title) {
+        const chartCard = container?.closest('.chart-card');
+        const cardTitle = chartCard?.querySelector('.chart-title');
+        if (cardTitle?.textContent) {
+            title = cardTitle.textContent.trim();
+        }
+    }
+
+    const chartCard = container?.closest('.chart-card');
+    const select = chartCard?.querySelector('select');
+    if (select) {
+        const selectedOption = select.options[select.selectedIndex];
+        if (selectedOption?.textContent) {
+            const optionText = selectedOption.textContent.trim();
+            if (title && !title.includes(optionText)) {
+                title = `${title} - ${optionText}`;
+            } else if (!title) {
+                title = optionText;
+            }
+        }
+    }
+
+    if (!title && canvas?.id) {
+        title = canvas.id;
+    }
+
+    return title || 'Safety Analytics Chart';
+}
+
+function addCaptureButton(chartContainer) {
+    if (!chartContainer) {
+        return;
+    }
+
+    const canvas = chartContainer.querySelector('canvas');
+    if (!canvas || chartContainer.querySelector('.capture-btn')) {
+        return;
+    }
+
+    if (!chartContainer.style.position || chartContainer.style.position === 'static') {
+        chartContainer.style.position = 'relative';
+    }
+
+    const baseTitle = chartContainer.dataset.captureTitle
+        || canvas.dataset.captureTitle
+        || chartContainer.closest('.chart-card')?.querySelector('.chart-title')?.textContent?.trim()
+        || canvas.id;
+
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'capture-btn';
+    button.innerHTML = '📷';
+    button.title = 'Save as PNG';
+    button.setAttribute('aria-label', 'Save chart as PNG');
+    button.dataset.captureBaseTitle = baseTitle || '';
+
+    button.addEventListener('click', () => {
+        const title = deriveChartTitle(chartContainer, canvas, button.dataset.captureBaseTitle);
+        captureChartWithTitle(canvas.id, title);
+    });
+
+    chartContainer.appendChild(button);
+}
+
+function initializeChartCaptureButtons() {
+    const containers = document.querySelectorAll('.chart-container');
+    containers.forEach(container => addCaptureButton(container));
 }
 
 function deriveViewLabel(id) {
@@ -10788,13 +10955,14 @@ window.addNewAction = addNewAction;
 window.changePage = changePage;
 window.changeTimelinePage = changeTimelinePage;
 window.closeModal = closeModal;
-window.exportChart = exportChart;
 window.exportDashboard = exportDashboard;
 window.exportInjuryData = exportInjuryData;
 window.exportNearMissData = exportNearMissData;
 window.exportTable = exportTable;
 window.exportNearMissDuplicatesPDF = exportNearMissDuplicatesPDF;
 window.captureAnalysisView = captureAnalysisView;
+window.captureChart = captureChart;
+window.captureChartWithTitle = captureChartWithTitle;
 window.markActionComplete = markActionComplete;
 window.switchInjuryView = switchInjuryView;
 window.switchNearMissView = switchNearMissView;
