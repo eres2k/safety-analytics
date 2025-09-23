@@ -8892,8 +8892,8 @@ async function exportDashboard() {
     showStatus('Capturing analysis views...', 'info');
 
     const modulesToCapture = [
-        { moduleId: 'injury', selector: '.injury-view:not(.hidden)', fallbackId: 'injuryDashboard' },
-        { moduleId: 'nearmiss', selector: '.nearmiss-view:not(.hidden)', fallbackId: 'nearMissDashboard' }
+        { moduleId: 'injury', viewSelector: '.injury-view' },
+        { moduleId: 'nearmiss', viewSelector: '.nearmiss-view' }
     ];
 
     let capturedAny = false;
@@ -8904,32 +8904,59 @@ async function exportDashboard() {
             continue;
         }
 
-        const wasActive = moduleEl.classList.contains('active');
-        if (!wasActive) {
+        const wasModuleActive = moduleEl.classList.contains('active');
+        if (!wasModuleActive) {
             moduleEl.classList.add('active');
         }
 
         await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
 
-        let viewElement = moduleEl.querySelector(config.selector);
-        if (!viewElement && config.fallbackId) {
-            viewElement = document.getElementById(config.fallbackId);
+        const views = Array.from(moduleEl.querySelectorAll(config.viewSelector)).filter(view => view.id);
+        if (!views.length) {
+            if (!wasModuleActive) {
+                moduleEl.classList.remove('active');
+            }
+            continue;
         }
 
-        if (viewElement) {
-            const label = deriveViewLabel(viewElement.id);
+        const originallyVisibleViews = new Set(
+            views.filter(view => !view.classList.contains('hidden')).map(view => view.id)
+        );
+
+        for (const view of views) {
+            const wasHidden = view.classList.contains('hidden');
+            if (wasHidden) {
+                view.classList.remove('hidden');
+            }
+
+            await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+
+            const label = deriveViewLabel(view.id);
             const fileSlug = slugifyLabel(label);
             const filename = formatCaptureFileName(fileSlug);
+
             try {
-                await captureHTMLElement(viewElement, filename);
+                await captureHTMLElement(view, filename);
                 capturedAny = true;
             } catch (error) {
                 console.error('Dashboard export error:', error);
                 showStatus(`Error capturing ${label}: ${error.message}`, 'error');
             }
+
+            if (wasHidden) {
+                view.classList.add('hidden');
+            }
         }
 
-        if (!wasActive) {
+        views.forEach(view => {
+            if (originallyVisibleViews.has(view.id)) {
+                view.classList.remove('hidden');
+            } else {
+                view.classList.add('hidden');
+            }
+        });
+
+        if (!wasModuleActive) {
             moduleEl.classList.remove('active');
         }
     }
