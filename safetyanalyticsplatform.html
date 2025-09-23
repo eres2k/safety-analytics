@@ -3671,8 +3671,29 @@ function generatePDFReport(type) {
 
         let y = margin + headerHeight;
 
+        const ensureBlockSpace = (position, height) => {
+            const adjusted = pdfEnsureSpace(doc, position, height, margin, headerHeight);
+            if (adjusted !== position) {
+                y = adjusted;
+            }
+            return adjusted;
+        };
+
         const ensureSpace = (height) => {
-            y = pdfEnsureSpace(doc, y, height, margin, headerHeight);
+            y = ensureBlockSpace(y, height);
+            return y;
+        };
+
+        let leftColumnY;
+        let rightColumnY;
+
+        const adjustColumnY = (currentY, height) => {
+            const adjusted = ensureBlockSpace(currentY, height);
+            if (adjusted !== currentY) {
+                leftColumnY = adjusted;
+                rightColumnY = adjusted;
+            }
+            return adjusted;
         };
 
         const drawMetricList = (x, baseY, width, metricList) => {
@@ -3680,8 +3701,7 @@ function generatePDFReport(type) {
                 return baseY;
             }
             const height = metricList.length * 14 + 10;
-            let localY = baseY;
-            localY = pdfEnsureSpace(doc, localY, height, margin, headerHeight);
+            const localY = adjustColumnY(baseY, height);
             doc.setFillColor(255, 255, 255);
             doc.roundedRect(x, localY, width, height, 3, 3, 'F');
             let rowY = localY + 9;
@@ -3793,8 +3813,8 @@ function generatePDFReport(type) {
         y = pdfDrawSectionTitle(doc, 'KPI Dashboard', '📈', y, margin, contentWidth, theme);
         const columnGap = 8;
         const columnWidth = (contentWidth - columnGap) / 2;
-        let leftColumnY = y;
-        let rightColumnY = y;
+        leftColumnY = y;
+        rightColumnY = y;
 
         const leftMetrics = isInjury ? [
             {
@@ -3838,7 +3858,7 @@ function generatePDFReport(type) {
             const severityColor = metrics.avgSeverityScore > 3 ? hexToRgb(theme.danger)
                 : metrics.avgSeverityScore > 2 ? hexToRgb(theme.warning)
                     : hexToRgb(theme.success);
-            ensureSpace(30);
+            rightColumnY = adjustColumnY(rightColumnY, 30);
             doc.setFillColor(255, 255, 255);
             doc.roundedRect(margin + columnWidth + columnGap, rightColumnY, columnWidth, 28, 3, 3, 'F');
             doc.setFont('helvetica', 'bold');
@@ -3856,7 +3876,7 @@ function generatePDFReport(type) {
             rightColumnY += 33;
 
             const listHeightEstimate = (metrics.topBodyParts?.length || 0 + metrics.topRootCauses?.length || 0) * 6 + 20;
-            ensureSpace(listHeightEstimate);
+            rightColumnY = adjustColumnY(rightColumnY, listHeightEstimate);
             doc.setFillColor(255, 255, 255);
             doc.roundedRect(margin + columnWidth + columnGap, rightColumnY, columnWidth, listHeightEstimate, 3, 3, 'F');
             let chartY = rightColumnY + 6;
@@ -3867,7 +3887,7 @@ function generatePDFReport(type) {
             const closureColor = metrics.closureRate >= 90 ? hexToRgb(theme.success)
                 : metrics.closureRate >= 75 ? hexToRgb(theme.warning)
                     : hexToRgb(theme.danger);
-            ensureSpace(30);
+            rightColumnY = adjustColumnY(rightColumnY, 30);
             doc.setFillColor(255, 255, 255);
             doc.roundedRect(margin + columnWidth + columnGap, rightColumnY, columnWidth, 28, 3, 3, 'F');
             doc.setFont('helvetica', 'bold');
@@ -3885,7 +3905,7 @@ function generatePDFReport(type) {
             rightColumnY += 33;
 
             const listHeightEstimate = (metrics.topImpacts?.length || 0 + metrics.topLocations?.length || 0) * 6 + 20;
-            ensureSpace(listHeightEstimate);
+            rightColumnY = adjustColumnY(rightColumnY, listHeightEstimate);
             doc.setFillColor(255, 255, 255);
             doc.roundedRect(margin + columnWidth + columnGap, rightColumnY, columnWidth, listHeightEstimate, 3, 3, 'F');
             let chartY = rightColumnY + 6;
@@ -3910,39 +3930,46 @@ function generatePDFReport(type) {
             : ['Potential Severity Distribution', 'Site Comparison', 'Primary Impact Types', 'Risk Trend'];
         const chartWidth = (contentWidth - 5) / 2;
         const chartHeight = 55;
-        chartIds.forEach((chartId, index) => {
-            const row = Math.floor(index / 2);
-            const col = index % 2;
-            const chartX = margin + col * (chartWidth + 5);
-            const chartY = y + row * (chartHeight + 12);
-            if (col === 0) {
-                ensureSpace(chartHeight + 12);
-            }
+        const chartRowGap = 12;
+        const drawChartCard = (chartId, title, x, yPos) => {
             doc.setFillColor(255, 255, 255);
-            doc.roundedRect(chartX, chartY, chartWidth, chartHeight, 3, 3, 'F');
+            doc.roundedRect(x, yPos, chartWidth, chartHeight, 3, 3, 'F');
             doc.setFont('helvetica', 'bold');
             doc.setFontSize(9);
             doc.setTextColor(...hexToRgb(theme.secondary));
-            doc.text(chartTitles[index] || 'Chart', chartX + 3, chartY + 8);
+            doc.text(title, x + 3, yPos + 8);
             const chartInstance = Chart.getChart(chartId);
             if (chartInstance) {
                 try {
                     const base64 = chartInstance.toBase64Image();
-                    doc.addImage(base64, 'PNG', chartX + 3, chartY + 10, chartWidth - 6, chartHeight - 15);
+                    doc.addImage(base64, 'PNG', x + 3, yPos + 10, chartWidth - 6, chartHeight - 15);
                 } catch (err) {
                     doc.setFont('helvetica', 'italic');
                     doc.setFontSize(8);
                     doc.setTextColor(...hexToRgb(theme.neutral));
-                    doc.text('Unable to render chart in PDF export.', chartX + 3, chartY + 25);
+                    doc.text('Unable to render chart in PDF export.', x + 3, yPos + 25);
                 }
             } else {
                 doc.setFont('helvetica', 'italic');
                 doc.setFontSize(8);
                 doc.setTextColor(...hexToRgb(theme.neutral));
-                doc.text('Chart not available. Load dashboard first.', chartX + 3, chartY + 25);
+                doc.text('Chart not available. Load dashboard first.', x + 3, yPos + 25);
             }
-        });
-        y += Math.ceil(chartIds.length / 2) * (chartHeight + 12);
+        };
+        let chartRowY = y;
+        for (let i = 0; i < chartIds.length; i += 2) {
+            chartRowY = ensureBlockSpace(chartRowY, chartHeight + chartRowGap);
+            const leftId = chartIds[i];
+            const rightId = chartIds[i + 1];
+            if (leftId) {
+                drawChartCard(leftId, chartTitles[i] || 'Chart', margin, chartRowY);
+            }
+            if (rightId) {
+                drawChartCard(rightId, chartTitles[i + 1] || 'Chart', margin + chartWidth + 5, chartRowY);
+            }
+            chartRowY += chartHeight + chartRowGap;
+        }
+        y = chartRowY;
 
         // Insights & Actions
         y = pdfDrawSectionTitle(doc, 'Insights & Actions', '💡', y, margin, contentWidth, theme);
@@ -4038,8 +4065,30 @@ function generateWBRReport() {
         };
 
         let y = margin + headerHeight;
+
+        const ensureBlockSpace = (position, height) => {
+            const adjusted = pdfEnsureSpace(doc, position, height, margin, headerHeight);
+            if (adjusted !== position) {
+                y = adjusted;
+            }
+            return adjusted;
+        };
+
         const ensureSpace = (height) => {
-            y = pdfEnsureSpace(doc, y, height, margin, headerHeight);
+            y = ensureBlockSpace(y, height);
+            return y;
+        };
+
+        let leftColumnY;
+        let rightColumnY;
+
+        const adjustColumnY = (currentY, height) => {
+            const adjusted = ensureBlockSpace(currentY, height);
+            if (adjusted !== currentY) {
+                leftColumnY = adjusted;
+                rightColumnY = adjusted;
+            }
+            return adjusted;
         };
 
         const riskLevelColor = (level) => {
@@ -4097,8 +4146,8 @@ function generateWBRReport() {
         y = pdfDrawSectionTitle(doc, 'KPI Dashboard', '📈', y, margin, contentWidth, theme);
         const columnGap = 8;
         const columnWidth = (contentWidth - columnGap) / 2;
-        let leftColumnY = y;
-        let rightColumnY = y;
+        leftColumnY = y;
+        rightColumnY = y;
 
         const leftMetrics = [
             {
@@ -4125,7 +4174,7 @@ function generateWBRReport() {
                 return baseY;
             }
             const height = metricList.length * 18 + 10;
-            let localY = pdfEnsureSpace(doc, baseY, height, margin, headerHeight);
+            const localY = adjustColumnY(baseY, height);
             doc.setFillColor(255, 255, 255);
             doc.roundedRect(x, localY, width, height, 3, 3, 'F');
             let rowY = localY + 11;
@@ -4166,7 +4215,7 @@ function generateWBRReport() {
             percentage: item.percentage
         }));
 
-        ensureSpace(40);
+        rightColumnY = adjustColumnY(rightColumnY, 40);
         doc.setFillColor(255, 255, 255);
         doc.roundedRect(margin + columnWidth + columnGap, rightColumnY, columnWidth, 38, 3, 3, 'F');
         let chartY = pdfDrawMiniBarGroup(doc, margin + columnWidth + columnGap + 3, rightColumnY + 4, columnWidth - 6, 'Site Performance (Incidents)', siteData, theme);
@@ -4175,7 +4224,7 @@ function generateWBRReport() {
 
         const processCards = (metrics.processMatrix || []).slice(0, 4);
         if (processCards.length) {
-            ensureSpace(processCards.length * 12 + 12);
+            rightColumnY = adjustColumnY(rightColumnY, processCards.length * 12 + 12);
             doc.setFillColor(255, 255, 255);
             doc.roundedRect(margin + columnWidth + columnGap, rightColumnY, columnWidth, processCards.length * 12 + 10, 3, 3, 'F');
             doc.setFont('helvetica', 'bold');
@@ -4207,11 +4256,12 @@ function generateWBRReport() {
 
         const chartWidth = (contentWidth - 5) / 2;
         const chartHeight = 58;
+        const chartRowGap = 12;
 
         // Combined trend card (injury + near miss)
-        ensureSpace(chartHeight + 12);
+        const firstRowY = ensureSpace(chartHeight + chartRowGap);
         const trendCardX = margin;
-        const trendCardY = y;
+        const trendCardY = firstRowY;
         doc.setFillColor(255, 255, 255);
         doc.roundedRect(trendCardX, trendCardY, chartWidth, chartHeight, 3, 3, 'F');
         doc.setFont('helvetica', 'bold');
@@ -4255,7 +4305,7 @@ function generateWBRReport() {
 
         // Site performance card
         const siteCardX = margin + chartWidth + 5;
-        const siteCardY = y;
+        const siteCardY = firstRowY;
         doc.setFillColor(255, 255, 255);
         doc.roundedRect(siteCardX, siteCardY, chartWidth, chartHeight, 3, 3, 'F');
         doc.setFont('helvetica', 'bold');
@@ -4276,12 +4326,11 @@ function generateWBRReport() {
             rankingY += 12;
         });
 
-        y += chartHeight + 12;
+        y = firstRowY + chartHeight + chartRowGap;
 
         // Root Cause Pareto & Process analysis
-        ensureSpace(chartHeight + 12);
+        const paretoY = ensureSpace(chartHeight + chartRowGap);
         const paretoX = margin;
-        const paretoY = y;
         doc.setFillColor(255, 255, 255);
         doc.roundedRect(paretoX, paretoY, chartWidth, chartHeight, 3, 3, 'F');
         doc.setFont('helvetica', 'bold');
@@ -4311,7 +4360,7 @@ function generateWBRReport() {
         });
 
         const benchmarkX = margin + chartWidth + 5;
-        const benchmarkY = y;
+        const benchmarkY = paretoY;
         doc.setFillColor(255, 255, 255);
         doc.roundedRect(benchmarkX, benchmarkY, chartWidth, chartHeight, 3, 3, 'F');
         doc.setFont('helvetica', 'bold');
@@ -4334,7 +4383,7 @@ function generateWBRReport() {
             heatY += 12;
         });
 
-        y += chartHeight + 12;
+        y = paretoY + chartHeight + chartRowGap;
 
         // Cross-site Benchmarking Table
         y = pdfDrawSectionTitle(doc, 'Cross-site Benchmarking', '🏢', y, margin, contentWidth, theme);
