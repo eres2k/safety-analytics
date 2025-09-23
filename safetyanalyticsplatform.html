@@ -3530,41 +3530,59 @@ function pdfDrawSparkline(doc, series, x, y, width, height, color) {
     });
 }
 
-function pdfDrawSummaryCards(doc, cards, margin, y, contentWidth, theme) {
+function pdfDrawSummaryCards(doc, cards, margin, y, contentWidth, theme, headerHeight) {
     if (!Array.isArray(cards) || !cards.length) return y;
+
     const gap = 5;
-    const columns = cards.length;
-    const cardWidth = (contentWidth - gap * (columns - 1)) / columns;
-    const cardHeight = 32;
+    const cardHeight = 34;
+    const cardsPerRow = cards.length === 4 ? 2 : Math.min(3, cards.length);
+    const rows = Math.ceil(cards.length / cardsPerRow);
+    const blockHeight = rows * cardHeight + (rows - 1) * gap;
+
+    y = pdfEnsureSpace(doc, y, blockHeight, margin, headerHeight);
+
     cards.forEach((card, index) => {
-        const x = margin + index * (cardWidth + gap);
+        const row = Math.floor(index / cardsPerRow);
+        const column = index % cardsPerRow;
+        const cardsInRow = Math.min(cardsPerRow, cards.length - row * cardsPerRow);
+        const cardWidth = (contentWidth - gap * (cardsInRow - 1)) / cardsInRow;
+        const x = margin + column * (cardWidth + gap);
+        const cardY = y + row * (cardHeight + gap);
+
         doc.setFillColor(255, 255, 255);
-        doc.roundedRect(x, y, cardWidth, cardHeight, 3, 3, 'F');
+        doc.roundedRect(x, cardY, cardWidth, cardHeight, 3, 3, 'F');
+
         const accentColor = hexToRgb(card.color || theme.primary);
         doc.setFillColor(...accentColor);
-        doc.roundedRect(x, y, cardWidth, 3, 3, 3, 'F');
+        doc.roundedRect(x, cardY, cardWidth, 3, 3, 3, 'F');
+
         doc.setTextColor(...hexToRgb(theme.secondary));
         doc.setFont('helvetica', 'bold');
         doc.setFontSize(11);
-        doc.text(String(card.value ?? '0'), x + 3, y + 13);
+        doc.text(String(card.value ?? '0'), x + 3, cardY + 13);
+
         doc.setFont('helvetica', 'normal');
         doc.setFontSize(8);
-        doc.text(card.label || '', x + 3, y + 19);
+        doc.text(card.label || '', x + 3, cardY + 20);
+
         if (card.icon) {
             doc.setFontSize(12);
-            doc.text(card.icon, x + cardWidth - 4, y + 12, { align: 'right' });
+            doc.text(card.icon, x + cardWidth - 4, cardY + 12, { align: 'right' });
         }
+
         if (card.trend) {
             const trendColor = pdfDetermineTrendColor(card.trend, theme);
             doc.setTextColor(...trendColor);
             doc.setFontSize(8);
-            doc.text(card.trend, x + cardWidth - 4, y + cardHeight - 5, { align: 'right' });
+            doc.text(card.trend, x + cardWidth - 4, cardY + cardHeight - 5, { align: 'right' });
         }
+
         if (Array.isArray(card.sparkline) && card.sparkline.length > 1) {
-            pdfDrawSparkline(doc, card.sparkline, x + 3, y + cardHeight - 11, cardWidth - 8, 8, accentColor);
+            pdfDrawSparkline(doc, card.sparkline, x + 3, cardY + cardHeight - 11, cardWidth - 8, 8, accentColor);
         }
     });
-    return y + cardHeight + 6;
+
+    return y + blockHeight + 6;
 }
 
 function pdfDrawProgressBar(doc, x, y, width, percentage, color) {
@@ -3574,6 +3592,87 @@ function pdfDrawProgressBar(doc, x, y, width, percentage, color) {
     const barWidth = (width * value) / 100;
     doc.setFillColor(...color);
     doc.roundedRect(x, y, Math.max(1, barWidth), 4, 2, 2, 'F');
+}
+
+function pdfPrepareMetricRows(doc, metricList, width) {
+    if (!Array.isArray(metricList) || !metricList.length) {
+        return [];
+    }
+
+    return metricList.map(metric => {
+        const noteLines = metric.note ? doc.splitTextToSize(metric.note, width - 6) : [];
+        const noteHeight = noteLines.length ? noteLines.length * 4 : 0;
+        const progressHeight = metric.progress !== undefined ? 6 : 0;
+        const contentHeight = 8 + noteHeight + progressHeight;
+        const rowHeight = Math.max(18, contentHeight + 4);
+        return { metric, noteLines, rowHeight };
+    });
+}
+
+function pdfRenderMetricList(doc, metricList, x, y, width, margin, headerHeight, theme, options = {}) {
+    const rows = pdfPrepareMetricRows(doc, metricList, width);
+    if (!rows.length) {
+        return y;
+    }
+
+    const paddingTop = options.paddingTop ?? 9;
+    const paddingBottom = options.paddingBottom ?? 6;
+    const blockSpacing = options.blockSpacing ?? 5;
+    const valueFontSize = options.valueFontSize ?? 10;
+    const blockHeight = paddingTop + paddingBottom + rows.reduce((sum, row) => sum + row.rowHeight, 0);
+
+    y = pdfEnsureSpace(doc, y, blockHeight, margin, headerHeight);
+
+    doc.setFillColor(255, 255, 255);
+    doc.roundedRect(x, y, width, blockHeight, 3, 3, 'F');
+
+    let rowY = y + paddingTop;
+    rows.forEach(row => {
+        const { metric, noteLines, rowHeight } = row;
+
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(options.titleFontSize ?? 9);
+        doc.setTextColor(...hexToRgb(theme.secondary));
+        doc.text(metric.title, x + 3, rowY);
+
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(valueFontSize);
+        doc.setTextColor(...hexToRgb(theme.secondary));
+        doc.text(String(metric.value ?? ''), x + width - 3, rowY, { align: 'right' });
+
+        if (metric.trend) {
+            const trendColor = pdfDetermineTrendColor(metric.trend, theme);
+            doc.setTextColor(...trendColor);
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(options.trendFontSize ?? 8);
+            doc.text(metric.trend, x + width - 3, rowY + 5, { align: 'right' });
+        }
+
+        let contentY = rowY + 5;
+
+        if (noteLines.length) {
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(options.noteFontSize ?? 8);
+            doc.setTextColor(...hexToRgb(theme.neutral));
+            doc.text(noteLines, x + 3, contentY);
+            contentY += noteLines.length * 4;
+        }
+
+        if (metric.progress !== undefined) {
+            const rawColor = metric.progressColor !== undefined
+                ? metric.progressColor
+                : metric.trend ? pdfDetermineTrendColor(metric.trend, theme) : hexToRgb(theme.primary);
+            const progressColor = Array.isArray(rawColor) ? rawColor : hexToRgb(rawColor);
+            const barY = Math.max(contentY + 1, rowY + 7);
+            pdfDrawProgressBar(doc, x + 3, barY, width - 6, metric.progress, progressColor);
+            contentY = barY + 6;
+        }
+
+        rowY += rowHeight;
+        doc.setTextColor(...hexToRgb(theme.secondary));
+    });
+
+    return y + blockHeight + blockSpacing;
 }
 
 function pdfDrawMiniBarGroup(doc, x, y, width, title, data, theme) {
@@ -3675,47 +3774,6 @@ function generatePDFReport(type) {
             y = pdfEnsureSpace(doc, y, height, margin, headerHeight);
         };
 
-        const drawMetricList = (x, baseY, width, metricList) => {
-            if (!Array.isArray(metricList) || !metricList.length) {
-                return baseY;
-            }
-            const height = metricList.length * 14 + 10;
-            let localY = baseY;
-            localY = pdfEnsureSpace(doc, localY, height, margin, headerHeight);
-            doc.setFillColor(255, 255, 255);
-            doc.roundedRect(x, localY, width, height, 3, 3, 'F');
-            let rowY = localY + 9;
-            metricList.forEach(metric => {
-                doc.setFont('helvetica', 'bold');
-                doc.setFontSize(9);
-                doc.setTextColor(...hexToRgb(theme.secondary));
-                doc.text(metric.title, x + 3, rowY);
-                doc.setFont('helvetica', 'bold');
-                doc.setFontSize(10);
-                doc.text(String(metric.value ?? ''), x + width - 3, rowY, { align: 'right' });
-                if (metric.trend) {
-                    const trendColor = pdfDetermineTrendColor(metric.trend, theme);
-                    doc.setTextColor(...trendColor);
-                    doc.setFont('helvetica', 'normal');
-                    doc.setFontSize(8);
-                    doc.text(metric.trend, x + width - 3, rowY + 5, { align: 'right' });
-                }
-                if (metric.note) {
-                    doc.setFont('helvetica', 'normal');
-                    doc.setFontSize(7.5);
-                    doc.setTextColor(...hexToRgb(theme.neutral));
-                    const noteText = doc.splitTextToSize(metric.note, width - 6);
-                    doc.text(noteText, x + 3, rowY + 5);
-                }
-                if (metric.progress !== undefined) {
-                    const progressColor = metric.progressColor || pdfDetermineTrendColor(metric.trend || '', theme);
-                    pdfDrawProgressBar(doc, x + 3, rowY + 6, width - 6, metric.progress, progressColor);
-                }
-                rowY += 14;
-            });
-            return localY + height + 5;
-        };
-
         // Executive Summary
         y = pdfDrawSectionTitle(doc, 'Executive Summary', '📊', y, margin, contentWidth, theme);
 
@@ -3787,7 +3845,7 @@ function generatePDFReport(type) {
             }
         ];
 
-        y = pdfDrawSummaryCards(doc, summaryCards, margin, y, contentWidth, theme);
+        y = pdfDrawSummaryCards(doc, summaryCards, margin, y, contentWidth, theme, headerHeight);
 
         // KPI Dashboard
         y = pdfDrawSectionTitle(doc, 'KPI Dashboard', '📈', y, margin, contentWidth, theme);
@@ -3831,7 +3889,7 @@ function generatePDFReport(type) {
             }
         ];
 
-        leftColumnY = drawMetricList(margin, leftColumnY, columnWidth, leftMetrics);
+        leftColumnY = pdfRenderMetricList(doc, leftMetrics, margin, leftColumnY, columnWidth, margin, headerHeight, theme);
 
         if (isInjury) {
             const severityPercent = Math.max(0, Math.min((metrics.avgSeverityScore || 0) / 4 * 100, 100));
@@ -3855,7 +3913,7 @@ function generatePDFReport(type) {
             doc.text(`Trend: ${metrics.severityTrend?.indicator || '→ 0%'}`, margin + columnWidth + columnGap + 3, rightColumnY + 22);
             rightColumnY += 33;
 
-            const listHeightEstimate = (metrics.topBodyParts?.length || 0 + metrics.topRootCauses?.length || 0) * 6 + 20;
+            const listHeightEstimate = ((metrics.topBodyParts?.length || 0) + (metrics.topRootCauses?.length || 0)) * 6 + 20;
             ensureSpace(listHeightEstimate);
             doc.setFillColor(255, 255, 255);
             doc.roundedRect(margin + columnWidth + columnGap, rightColumnY, columnWidth, listHeightEstimate, 3, 3, 'F');
@@ -3884,7 +3942,7 @@ function generatePDFReport(type) {
             doc.text(`Trend: ${metrics.closureTrend?.indicator || '→ 0%'}`, margin + columnWidth + columnGap + 3, rightColumnY + 22);
             rightColumnY += 33;
 
-            const listHeightEstimate = (metrics.topImpacts?.length || 0 + metrics.topLocations?.length || 0) * 6 + 20;
+            const listHeightEstimate = ((metrics.topImpacts?.length || 0) + (metrics.topLocations?.length || 0)) * 6 + 20;
             ensureSpace(listHeightEstimate);
             doc.setFillColor(255, 255, 255);
             doc.roundedRect(margin + columnWidth + columnGap, rightColumnY, columnWidth, listHeightEstimate, 3, 3, 'F');
@@ -4091,7 +4149,7 @@ function generateWBRReport() {
         ];
 
         y = pdfDrawSectionTitle(doc, 'Executive Summary', '📊', y, margin, contentWidth, theme);
-        y = pdfDrawSummaryCards(doc, summaryCards, margin, y, contentWidth, theme);
+        y = pdfDrawSummaryCards(doc, summaryCards, margin, y, contentWidth, theme, headerHeight);
 
         // KPI Dashboard
         y = pdfDrawSectionTitle(doc, 'KPI Dashboard', '📈', y, margin, contentWidth, theme);
@@ -4120,38 +4178,17 @@ function generateWBRReport() {
             }
         ];
 
-        leftColumnY = (function drawMetricListWBR(x, baseY, width, metricList) {
-            if (!metricList.length) {
-                return baseY;
-            }
-            const height = metricList.length * 18 + 10;
-            let localY = pdfEnsureSpace(doc, baseY, height, margin, headerHeight);
-            doc.setFillColor(255, 255, 255);
-            doc.roundedRect(x, localY, width, height, 3, 3, 'F');
-            let rowY = localY + 11;
-            metricList.forEach(metric => {
-                doc.setFont('helvetica', 'bold');
-                doc.setFontSize(9);
-                doc.setTextColor(...hexToRgb(theme.secondary));
-                doc.text(metric.title, x + 3, rowY);
-                doc.setFont('helvetica', 'bold');
-                doc.setFontSize(11);
-                doc.text(String(metric.value ?? ''), x + width - 3, rowY, { align: 'right' });
-                if (metric.progress !== undefined) {
-                    const pColor = metric.progressColor || hexToRgb(theme.primary);
-                    pdfDrawProgressBar(doc, x + 3, rowY + 2, width - 6, metric.progress, pColor);
-                }
-                if (metric.note) {
-                    doc.setFont('helvetica', 'normal');
-                    doc.setFontSize(8);
-                    doc.setTextColor(...hexToRgb(theme.neutral));
-                    const wrapped = doc.splitTextToSize(metric.note, width - 6);
-                    doc.text(wrapped, x + 3, rowY + 7);
-                }
-                rowY += 18;
-            });
-            return localY + height + 5;
-        })(margin, leftColumnY, columnWidth, leftMetrics);
+        leftColumnY = pdfRenderMetricList(
+            doc,
+            leftMetrics,
+            margin,
+            leftColumnY,
+            columnWidth,
+            margin,
+            headerHeight,
+            theme,
+            { valueFontSize: 11, blockSpacing: 6 }
+        );
 
         // Right column visualizations
         const siteData = (metrics.sitePerformance || []).slice(0, 5).map(site => ({
