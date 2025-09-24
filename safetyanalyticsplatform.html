@@ -935,33 +935,49 @@
             display: inline-flex;
             align-items: center;
             gap: 0.35rem;
-            opacity: 0;
-            pointer-events: none;
-            transform: translateY(-4px);
+            opacity: 0.9;
+            pointer-events: auto;
+            transform: translateY(0);
             transition: var(--transition);
             box-shadow: 0 2px 8px var(--shadow);
-            z-index: 5;
+            z-index: 10;
         }
 
-        .capture-view-btn:hover {
+        .capture-view-btn:hover,
+        .capture-view-btn:focus-visible {
             background: var(--amazon-orange);
             box-shadow: 0 4px 12px var(--shadow-hover);
+        }
+
+        .capture-view-btn:focus-visible {
+            outline: 2px solid var(--amazon-orange);
+            outline-offset: 2px;
         }
 
         .capture-view-btn.capturing {
             visibility: hidden;
         }
 
-        .injury-view:hover .capture-view-btn,
-        .nearmiss-view:hover .capture-view-btn {
-            opacity: 1;
-            pointer-events: auto;
-            transform: translateY(0);
+        @media (hover: hover) {
+            .injury-view:not(:hover) .capture-view-btn,
+            .nearmiss-view:not(:hover) .capture-view-btn {
+                opacity: 0;
+                pointer-events: none;
+                transform: translateY(-4px);
+            }
+
+            .injury-view:hover .capture-view-btn,
+            .nearmiss-view:hover .capture-view-btn {
+                opacity: 1;
+                pointer-events: auto;
+                transform: translateY(0);
+            }
         }
 
         body.capturing .capture-view-btn {
             opacity: 0 !important;
             visibility: hidden !important;
+            pointer-events: none !important;
         }
 
         /* Sub Navigation */
@@ -1538,7 +1554,7 @@
             </div>
 
             <!-- Dashboard View -->
-            <div id="injuryDashboard" class="injury-view">
+            <div id="injuryDashboard" class="injury-view" data-capture-label="Injury Dashboard">
                 <div class="control-panel">
                     <div class="control-header">
                         <h2 class="control-title">Injury & Illness Analysis</h2>
@@ -1770,7 +1786,7 @@
             </div>
 
             <!-- Risk Matrix View -->
-            <div id="injuryRiskMatrix" class="injury-view hidden">
+            <div id="injuryRiskMatrix" class="injury-view hidden" data-capture-label="Injury Risk Matrix">
                 <div class="card">
                     <h3 style="margin-bottom: 1rem;">Injury & Illness Risk Assessment Matrix</h3>
                     <p style="color: var(--text-secondary); margin-bottom: 0.5rem; font-size: 0.85rem;">
@@ -1792,7 +1808,7 @@
             </div>
 
             <!-- Timeline View -->
-            <div id="injuryTimeline" class="injury-view hidden">
+            <div id="injuryTimeline" class="injury-view hidden" data-capture-label="Injury Timeline">
                 <div class="timeline-container">
                     <h3 style="margin-bottom: 1rem;">Injury & Illness Timeline</h3>
                     <div id="injuryTimelineContent">
@@ -1807,7 +1823,7 @@
             </div>
 
             <!-- Quality Assessment View -->
-            <div id="injuryQuality" class="injury-view hidden">
+            <div id="injuryQuality" class="injury-view hidden" data-capture-label="Injury Quality Assessment">
                 <div class="quality-score-card">
                     <h3>Data Quality Assessment</h3>
                     <div class="quality-score-value" id="injuryQualityScore">0%</div>
@@ -1847,7 +1863,7 @@
             </div>
 
             <!-- Advanced Analytics View -->
-            <div id="injuryAnalytics" class="injury-view hidden">
+            <div id="injuryAnalytics" class="injury-view hidden" data-capture-label="Injury Advanced Analytics">
                 <div class="charts-grid">
                     <div class="chart-card">
                         <div class="chart-header">
@@ -1889,7 +1905,7 @@
             </div>
 
             <!-- Dashboard View -->
-            <div id="nearMissDashboard" class="nearmiss-view">
+            <div id="nearMissDashboard" class="nearmiss-view" data-capture-label="Near Miss Dashboard">
                 <div class="control-panel">
                     <div class="control-header">
                         <h2 class="control-title">Near Miss Analysis</h2>
@@ -2121,7 +2137,7 @@
             </div>
 
             <!-- Risk Matrix View -->
-            <div id="nearMissRiskMatrix" class="nearmiss-view hidden">
+            <div id="nearMissRiskMatrix" class="nearmiss-view hidden" data-capture-label="Near Miss Risk Matrix">
                 <div class="card">
                     <h3 style="margin-bottom: 1rem;">Near Miss Risk Assessment Matrix</h3>
                     <p style="color: var(--text-secondary); margin-bottom: 0.5rem; font-size: 0.85rem;">
@@ -2134,7 +2150,7 @@
             </div>
 
             <!-- Timeline View -->
-            <div id="nearMissTimeline" class="nearmiss-view hidden">
+            <div id="nearMissTimeline" class="nearmiss-view hidden" data-capture-label="Near Miss Timeline">
                 <div class="timeline-container">
                     <h3 style="margin-bottom: 1rem;">Near Miss Timeline</h3>
                     <div id="nearMissTimelineContent">
@@ -2149,7 +2165,7 @@
             </div>
 
             <!-- Quality Assessment View -->
-            <div id="nearMissQuality" class="nearmiss-view hidden">
+            <div id="nearMissQuality" class="nearmiss-view hidden" data-capture-label="Near Miss Quality Assessment">
                 <div class="quality-score-card">
                     <h3>Data Quality Assessment</h3>
                     <div class="quality-score-value" id="nearMissQualityScore">0%</div>
@@ -2198,7 +2214,7 @@
             </div>
 
             <!-- Advanced Analytics View -->
-            <div id="nearMissAnalytics" class="nearmiss-view hidden">
+            <div id="nearMissAnalytics" class="nearmiss-view hidden" data-capture-label="Near Miss Advanced Analytics">
                 <div class="charts-grid">
                     <div class="chart-card">
                         <div class="chart-header">
@@ -11204,7 +11220,7 @@ function initializeAnalysisCaptureButtons() {
             return;
         }
 
-        const friendlyLabel = deriveViewLabel(view.id);
+        const friendlyLabel = view.dataset.captureLabel || deriveViewLabel(view.id);
         const button = document.createElement('button');
         button.type = 'button';
         button.className = 'capture-view-btn';
