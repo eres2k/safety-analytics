@@ -1196,35 +1196,271 @@
             font-size: 0.85rem;
         }
 
-        /* KPI Dashboard */
-        .kpi-container {
-            background: linear-gradient(135deg, var(--amazon-blue) 0%, var(--amazon-blue-dark) 100%);
-            color: white;
+        /* Report Section Layout */
+        .report-section {
+            background: var(--bg-primary);
             border-radius: var(--border-radius);
             padding: var(--spacing-lg);
+            box-shadow: 0 1px 6px var(--shadow);
             margin-bottom: var(--spacing-lg);
+            border: 1px solid rgba(35, 47, 62, 0.06);
         }
 
-        .kpi-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: var(--spacing-lg);
-            margin-top: var(--spacing-md);
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-md);
+            flex-wrap: wrap;
+            gap: var(--spacing-sm);
         }
 
-        .kpi-item {
-            text-align: center;
+        .section-header h3 {
+            font-size: 1.2rem;
+            color: var(--amazon-blue);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
         }
 
-        .kpi-value {
-            font-size: 2rem;
-            font-weight: 700;
-            margin-bottom: var(--spacing-xs);
+        .section-header h3 span.icon {
+            font-size: 1.3rem;
         }
 
-        .kpi-label {
+        .section-subtitle {
             font-size: 0.85rem;
-            opacity: 0.9;
+            color: var(--text-secondary);
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: var(--spacing-md);
+        }
+
+        .summary-card {
+            background: linear-gradient(135deg, rgba(35, 47, 62, 0.92), rgba(55, 71, 90, 0.92));
+            color: #fff;
+            border-radius: var(--border-radius);
+            padding: var(--spacing-md);
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-sm);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .summary-card::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at top right, rgba(255, 153, 0, 0.35), transparent 55%);
+            opacity: 0.75;
+        }
+
+        .summary-card > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        .summary-card .summary-icon {
+            font-size: 1.6rem;
+        }
+
+        .summary-card .summary-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        .summary-card .summary-label {
+            font-size: 0.85rem;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+
+        .summary-card .summary-trend {
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+
+        .kpi-board {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: var(--spacing-md);
+        }
+
+        .kpi-card {
+            border: 1px solid rgba(35, 47, 62, 0.08);
+            border-radius: var(--border-radius);
+            padding: var(--spacing-md);
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-sm);
+            background: var(--bg-primary);
+            position: relative;
+            overflow: hidden;
+            min-height: 130px;
+        }
+
+        .kpi-card.highlight {
+            border: 1px solid var(--amazon-orange);
+            box-shadow: 0 6px 16px rgba(255, 153, 0, 0.16);
+        }
+
+        .kpi-card .kpi-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        .kpi-card .kpi-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .kpi-card .kpi-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            background: rgba(255, 153, 0, 0.12);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            color: var(--amazon-orange);
+        }
+
+        .kpi-card .kpi-value {
+            font-size: 1.9rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            display: flex;
+            align-items: baseline;
+            gap: var(--spacing-sm);
+        }
+
+        .kpi-card .kpi-unit {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .kpi-card .kpi-trend {
+            font-size: 0.78rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            border-radius: 999px;
+            padding: 0.15rem 0.55rem;
+            background: rgba(35, 47, 62, 0.06);
+        }
+
+        .kpi-card .kpi-trend.trend-positive,
+        .summary-card .summary-trend.trend-positive {
+            background: rgba(76, 175, 80, 0.18);
+            color: var(--success);
+        }
+
+        .kpi-card .kpi-trend.trend-negative,
+        .summary-card .summary-trend.trend-negative {
+            background: rgba(183, 28, 28, 0.18);
+            color: var(--critical);
+        }
+
+        .kpi-card .kpi-trend.trend-flat,
+        .summary-card .summary-trend.trend-flat {
+            background: rgba(35, 47, 62, 0.12);
+            color: var(--text-secondary);
+        }
+
+        .kpi-card .kpi-footnote {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .kpi-progress {
+            width: 100%;
+            height: 6px;
+            border-radius: 999px;
+            background: var(--bg-secondary);
+            overflow: hidden;
+        }
+
+        .kpi-progress span {
+            display: block;
+            height: 100%;
+            border-radius: inherit;
+            background: var(--amazon-orange);
+            transition: width 0.3s ease;
+        }
+
+        .kpi-card .mini-chart {
+            height: 90px;
+            position: relative;
+        }
+
+        .kpi-card .mini-chart canvas {
+            height: 90px !important;
+        }
+
+        .kpi-card .sparkline {
+            height: 60px;
+        }
+
+        .kpi-card .sparkline canvas {
+            height: 60px !important;
+        }
+
+        .kpi-card .kpi-tag {
+            position: absolute;
+            top: var(--spacing-sm);
+            right: var(--spacing-sm);
+            font-size: 0.7rem;
+            padding: 0.15rem 0.5rem;
+            border-radius: 999px;
+            background: rgba(255, 153, 0, 0.16);
+            color: var(--amazon-orange);
+            font-weight: 600;
+            letter-spacing: 0.03em;
+        }
+
+        .kpi-card .kpi-tag.success {
+            background: rgba(76, 175, 80, 0.16);
+            color: var(--success);
+        }
+
+        .kpi-card .kpi-tag.warning {
+            background: rgba(255, 193, 7, 0.18);
+            color: var(--warning);
+        }
+
+        .kpi-card .kpi-tag.danger {
+            background: rgba(183, 28, 28, 0.15);
+            color: var(--critical);
+        }
+
+        .insights-list {
+            display: grid;
+            gap: var(--spacing-sm);
+        }
+
+        .insights-list li {
+            list-style: none;
+            background: var(--bg-secondary);
+            padding: var(--spacing-sm);
+            border-radius: 6px;
+            font-size: 0.85rem;
+            display: flex;
+            gap: var(--spacing-sm);
+            align-items: flex-start;
+        }
+
+        .insights-list li span {
+            font-size: 1rem;
         }
 
         /* Footer */
@@ -1617,39 +1853,126 @@
                     </div>
                 </div>
 
-                <!-- Injury Metrics -->
-                <div class="metrics-grid" id="injuryMetrics">
-                    <div class="metric-card">
-                        <div class="metric-icon">🏥</div>
-                        <div class="metric-value" id="injuryTotal">0</div>
-                        <div class="metric-label">Total Incidents</div>
+                <!-- Injury Executive Summary -->
+                <section class="report-section" id="injuryExecutiveSummarySection">
+                    <div class="section-header">
+                        <h3><span class="icon">🧭</span>Executive Summary</h3>
+                        <div class="section-subtitle" id="injurySummaryPeriod">Awaiting data</div>
                     </div>
-                    <div class="metric-card">
-                        <div class="metric-icon">📝</div>
-                        <div class="metric-value" id="injuryRecordable">0</div>
-                        <div class="metric-label">Recordable Cases</div>
+                    <div class="summary-grid" id="injuryExecutiveSummary">
+                        <div class="summary-card">
+                            <div class="summary-icon">🏥</div>
+                            <div class="summary-label">Total Incidents</div>
+                            <div class="summary-value" id="injurySummaryTotalValue">0</div>
+                            <div class="summary-trend" id="injurySummaryTotalTrend"><span>↔</span><span>0%</span></div>
+                        </div>
+                        <div class="summary-card">
+                            <div class="summary-icon">⚖️</div>
+                            <div class="summary-label">Recordable Rate</div>
+                            <div class="summary-value" id="injurySummaryRecordableValue">0%</div>
+                            <div class="summary-trend" id="injurySummaryRecordableTrend"><span>↔</span><span>0%</span></div>
+                        </div>
+                        <div class="summary-card">
+                            <div class="summary-icon">📅</div>
+                            <div class="summary-label">DAFW Days</div>
+                            <div class="summary-value" id="injurySummaryDafwValue">0</div>
+                            <div class="summary-trend" id="injurySummaryDafwTrend"><span>↔</span><span>0%</span></div>
+                        </div>
+                        <div class="summary-card">
+                            <div class="summary-icon">📈</div>
+                            <div class="summary-label">TRIR</div>
+                            <div class="summary-value" id="injurySummaryTrirValue">0</div>
+                            <div class="summary-trend" id="injurySummaryTrirTrend"><span>↔</span><span>0%</span></div>
+                        </div>
                     </div>
-                    <div class="metric-card">
-                        <div class="metric-icon">📅</div>
-                        <div class="metric-value" id="injuryLostTime">0</div>
-                        <div class="metric-label">Lost Time Cases</div>
+                </section>
+
+                <!-- Injury KPI Dashboard -->
+                <section class="report-section" id="injuryKpiSection">
+                    <div class="section-header">
+                        <h3><span class="icon">📊</span>KPI Dashboard</h3>
+                        <div class="section-subtitle">Injury &amp; Illness Key Performance Indicators</div>
                     </div>
-                    <div class="metric-card">
-                        <div class="metric-icon">⏱️</div>
-                        <div class="metric-value" id="injuryDaysLost">0</div>
-                        <div class="metric-label">Days Away From Work</div>
+                    <div class="kpi-board" id="injuryKpiBoard">
+                        <div class="kpi-card highlight" id="injuryTotalIncidentsCard">
+                            <span class="kpi-tag" id="injuryTotalIncidentsBadge">Trend</span>
+                            <div class="kpi-header">
+                                <div class="kpi-title">Total Incidents</div>
+                                <div class="kpi-icon">🏥</div>
+                            </div>
+                            <div class="kpi-value"><span id="injuryTotalIncidents">0</span></div>
+                            <div class="kpi-trend" id="injuryTotalIncidentsTrend">—</div>
+                            <div class="kpi-footnote">Rolling 30 days</div>
+                        </div>
+                        <div class="kpi-card" id="injuryRecordableRateCard">
+                            <span class="kpi-tag" id="injuryRecordableRateTag">Target</span>
+                            <div class="kpi-header">
+                                <div class="kpi-title">Recordable Rate %</div>
+                                <div class="kpi-icon">🛡️</div>
+                            </div>
+                            <div class="kpi-value"><span id="injuryRecordableRate">0</span><span class="kpi-unit">%</span></div>
+                            <div class="kpi-trend" id="injuryRecordableRateTrend">—</div>
+                            <div class="kpi-progress"><span id="injuryRecordableProgress" style="width:0%;"></span></div>
+                            <div class="kpi-footnote">Target &lt; 5%</div>
+                        </div>
+                        <div class="kpi-card" id="injuryDafwCard">
+                            <div class="kpi-header">
+                                <div class="kpi-title">Days Away From Work</div>
+                                <div class="kpi-icon">⏱️</div>
+                            </div>
+                            <div class="kpi-value"><span id="injuryDafwDays">0</span></div>
+                            <div class="kpi-trend" id="injuryDafwTrend">—</div>
+                            <div class="kpi-footnote">Cumulative year-to-date</div>
+                        </div>
+                        <div class="kpi-card" id="injuryLtIRCard">
+                            <div class="kpi-header">
+                                <div class="kpi-title">Lost Time Incident Rate</div>
+                                <div class="kpi-icon">🚑</div>
+                            </div>
+                            <div class="kpi-value"><span id="injuryLtir">0</span></div>
+                            <div class="kpi-trend" id="injuryLtirTrend">—</div>
+                            <div class="kpi-footnote">Per 200K hours</div>
+                        </div>
+                        <div class="kpi-card" id="injuryTrirCard">
+                            <div class="kpi-header">
+                                <div class="kpi-title">Total Recordable Incident Rate</div>
+                                <div class="kpi-icon">📈</div>
+                            </div>
+                            <div class="kpi-value"><span id="injuryTrir">0</span></div>
+                            <div class="kpi-trend" id="injuryTrirTrend">—</div>
+                            <div class="kpi-footnote">Per 200K hours</div>
+                        </div>
+                        <div class="kpi-card" id="injurySeverityCard">
+                            <div class="kpi-header">
+                                <div class="kpi-title">Average Severity Score</div>
+                                <div class="kpi-icon">⚠️</div>
+                            </div>
+                            <div class="kpi-value"><span id="injurySeverityScore">0.0</span></div>
+                            <div class="kpi-trend" id="injurySeverityTrend">—</div>
+                            <div class="kpi-footnote" id="injurySeverityDescription">Severity mix</div>
+                        </div>
+                        <div class="kpi-card" id="injuryBodyPartCard">
+                            <div class="kpi-header">
+                                <div class="kpi-title">Top 3 Body Parts</div>
+                                <div class="kpi-icon">🦾</div>
+                            </div>
+                            <div class="mini-chart">
+                                <canvas id="injuryBodyPartMiniChart"></canvas>
+                            </div>
+                            <div class="kpi-footnote" id="injuryBodyPartSummary">Awaiting data</div>
+                        </div>
+                        <div class="kpi-card" id="injuryRootCauseCard">
+                            <div class="kpi-header">
+                                <div class="kpi-title">Top 3 Root Causes</div>
+                                <div class="kpi-icon">🔍</div>
+                            </div>
+                            <div class="mini-chart">
+                                <canvas id="injuryRootCauseMiniChart"></canvas>
+                            </div>
+                            <div class="kpi-footnote" id="injuryRootCauseSummary">Awaiting data</div>
+                        </div>
                     </div>
-                    <div class="metric-card">
-                        <div class="metric-icon">🚗</div>
-                        <div class="metric-value" id="injuryOTR">0</div>
-                        <div class="metric-label">OTR Incidents</div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-icon">📊</div>
-                        <div class="metric-value" id="injuryRecordableRate">0.0</div>
-                        <div class="metric-label">Recordable Rate</div>
-                    </div>
-                </div>
+                </section>
 
                 <!-- Injury Charts -->
                 <div class="charts-grid">
@@ -1969,39 +2292,124 @@
                     </div>
                 </div>
 
-                <!-- Near Miss Metrics -->
-                <div class="metrics-grid" id="nearMissMetrics">
-                    <div class="metric-card">
-                        <div class="metric-icon">⚠️</div>
-                        <div class="metric-value" id="nearMissTotal">0</div>
-                        <div class="metric-label">Total Near Misses</div>
+                <!-- Near Miss Executive Summary -->
+                <section class="report-section" id="nearMissExecutiveSummarySection">
+                    <div class="section-header">
+                        <h3><span class="icon">🧭</span>Executive Summary</h3>
+                        <div class="section-subtitle" id="nearMissSummaryPeriod">Awaiting data</div>
                     </div>
-                    <div class="metric-card">
-                        <div class="metric-icon">📊</div>
-                        <div class="metric-value" id="nearMissRisk">0.0</div>
-                        <div class="metric-label">Average Risk Score</div>
+                    <div class="summary-grid" id="nearMissExecutiveSummary">
+                        <div class="summary-card">
+                            <div class="summary-icon">⚠️</div>
+                            <div class="summary-label">Total Near Misses</div>
+                            <div class="summary-value" id="nearMissSummaryTotalValue">0</div>
+                            <div class="summary-trend" id="nearMissSummaryTotalTrend"><span>↔</span><span>0%</span></div>
+                        </div>
+                        <div class="summary-card">
+                            <div class="summary-icon">🚨</div>
+                            <div class="summary-label">High Risk Events</div>
+                            <div class="summary-value" id="nearMissSummaryHighRiskValue">0</div>
+                            <div class="summary-trend" id="nearMissSummaryHighRiskTrend"><span>↔</span><span>0</span></div>
+                        </div>
+                        <div class="summary-card">
+                            <div class="summary-icon">✅</div>
+                            <div class="summary-label">Closure Rate</div>
+                            <div class="summary-value" id="nearMissSummaryClosureValue">0%</div>
+                            <div class="summary-trend" id="nearMissSummaryClosureTrend"><span>↔</span><span>0%</span></div>
+                        </div>
+                        <div class="summary-card">
+                            <div class="summary-icon">🔄</div>
+                            <div class="summary-label">NM to Injury Ratio</div>
+                            <div class="summary-value" id="nearMissSummaryRatioValue">0:1</div>
+                            <div class="summary-trend" id="nearMissSummaryRatioTrend"><span>↔</span><span>0%</span></div>
+                        </div>
                     </div>
-                    <div class="metric-card">
-                        <div class="metric-icon">🚨</div>
-                        <div class="metric-value" id="nearMissHigh">0</div>
-                        <div class="metric-label">High Severity (A & B)</div>
+                </section>
+
+                <!-- Near Miss KPI Dashboard -->
+                <section class="report-section" id="nearMissKpiSection">
+                    <div class="section-header">
+                        <h3><span class="icon">📊</span>KPI Dashboard</h3>
+                        <div class="section-subtitle">Near Miss Performance Indicators</div>
                     </div>
-                    <div class="metric-card">
-                        <div class="metric-icon">✅</div>
-                        <div class="metric-value" id="nearMissRepeat">0%</div>
-                        <div class="metric-label">Closure Rate</div>
+                    <div class="kpi-board" id="nearMissKpiBoard">
+                        <div class="kpi-card highlight" id="nearMissTotalCard">
+                            <span class="kpi-tag" id="nearMissTotalBadge">Trend</span>
+                            <div class="kpi-header">
+                                <div class="kpi-title">Total Near Misses</div>
+                                <div class="kpi-icon">⚠️</div>
+                            </div>
+                            <div class="kpi-value"><span id="nearMissTotal">0</span></div>
+                            <div class="kpi-trend" id="nearMissTotalTrend">—</div>
+                            <div class="kpi-footnote">Rolling 30 days</div>
+                        </div>
+                        <div class="kpi-card" id="nearMissHighRiskCard">
+                            <div class="kpi-header">
+                                <div class="kpi-title">High Risk Events (A+B)</div>
+                                <div class="kpi-icon">🚨</div>
+                            </div>
+                            <div class="kpi-value"><span id="nearMissHigh">0</span></div>
+                            <div class="kpi-trend" id="nearMissHighTrend">—</div>
+                            <div class="kpi-footnote">Based on severity</div>
+                        </div>
+                        <div class="kpi-card" id="nearMissRiskScoreCard">
+                            <div class="kpi-header">
+                                <div class="kpi-title">Average Risk Score</div>
+                                <div class="kpi-icon">🎲</div>
+                            </div>
+                            <div class="kpi-value"><span id="nearMissRisk">0.0</span></div>
+                            <div class="kpi-trend" id="nearMissRiskTrend">—</div>
+                            <div class="kpi-footnote">Severity × Likelihood</div>
+                        </div>
+                        <div class="kpi-card" id="nearMissRatioCard">
+                            <div class="kpi-header">
+                                <div class="kpi-title">Near Miss to Injury Ratio</div>
+                                <div class="kpi-icon">🔄</div>
+                            </div>
+                            <div class="kpi-value"><span id="nearMissRatio">0:1</span></div>
+                            <div class="kpi-trend" id="nearMissRatioTrend">—</div>
+                            <div class="kpi-footnote">Higher indicates proactive reporting</div>
+                        </div>
+                        <div class="kpi-card" id="nearMissImpactCard">
+                            <div class="kpi-header">
+                                <div class="kpi-title">Top 3 Primary Impacts</div>
+                                <div class="kpi-icon">🎯</div>
+                            </div>
+                            <div class="mini-chart">
+                                <canvas id="nearMissImpactMiniChart"></canvas>
+                            </div>
+                            <div class="kpi-footnote" id="nearMissImpactSummary">Awaiting data</div>
+                        </div>
+                        <div class="kpi-card" id="nearMissLocationCard">
+                            <div class="kpi-header">
+                                <div class="kpi-title">Top 3 Locations</div>
+                                <div class="kpi-icon">📍</div>
+                            </div>
+                            <div class="mini-chart">
+                                <canvas id="nearMissLocationMiniChart"></canvas>
+                            </div>
+                            <div class="kpi-footnote" id="nearMissLocationSummary">Awaiting data</div>
+                        </div>
+                        <div class="kpi-card" id="nearMissClosureCard">
+                            <span class="kpi-tag" id="nearMissClosureBadge">Target</span>
+                            <div class="kpi-header">
+                                <div class="kpi-title">Investigation Closure Rate</div>
+                                <div class="kpi-icon">✅</div>
+                            </div>
+                            <div class="kpi-value"><span id="nearMissClosureRate">0</span><span class="kpi-unit">%</span></div>
+                            <div class="kpi-progress"><span id="nearMissClosureProgress" style="width:0%;"></span></div>
+                            <div class="kpi-footnote">Target ≥ 85%</div>
+                        </div>
+                        <div class="kpi-card" id="nearMissRepeatCard">
+                            <div class="kpi-header">
+                                <div class="kpi-title">Repeat Location Count</div>
+                                <div class="kpi-icon">♻️</div>
+                            </div>
+                            <div class="kpi-value"><span id="nearMissRepeatLocations">0</span></div>
+                            <div class="kpi-footnote">Locations with 2+ events</div>
+                        </div>
                     </div>
-                    <div class="metric-card">
-                        <div class="metric-icon">⚡</div>
-                        <div class="metric-value" id="nearMissActionable">0</div>
-                        <div class="metric-label">Requires Action</div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-icon">📈</div>
-                        <div class="metric-value" id="nearMissFrequency">0.0</div>
-                        <div class="metric-label">Frequency Rate</div>
-                    </div>
-                </div>
+                </section>
 
                 <!-- Near Miss Charts -->
                 <div class="charts-grid">
@@ -2674,7 +3082,9 @@ const state = {
     },
     currentModule: 'overview',
     theme: 'light',
-    itemsPerPage: 20
+    itemsPerPage: 20,
+    miniCharts: {},
+    sparklineCharts: {}
 };
 
 // Constants
@@ -6356,9 +6766,9 @@ function standardizeSeverity(severity) {
 // Standardize likelihood
 function standardizeLikelihood(likelihood) {
     if (!likelihood) return 'Possible';
-    
+
     const likelihoodStr = String(likelihood).toLowerCase().trim();
-    
+
     if (likelihoodStr.includes('rare')) return 'Rare';
     if (likelihoodStr.includes('unlikely')) return 'Unlikely';
     if (likelihoodStr.includes('possible')) return 'Possible';
@@ -6380,25 +6790,458 @@ function standardizeLikelihood(likelihood) {
             case 5: return 'Almost Certain';
         }
     }
-    
+
     return 'Possible';
+}
+
+function likelihoodToScore(likelihood) {
+    const normalized = standardizeLikelihood(likelihood);
+    switch (normalized) {
+        case 'Rare': return 1;
+        case 'Unlikely': return 2;
+        case 'Possible': return 3;
+        case 'Likely': return 4;
+        case 'Almost Certain': return 5;
+        default: return 3;
+    }
+}
+
+function severityToScore(severity) {
+    const normalized = standardizeSeverity(severity);
+    switch (normalized) {
+        case 'A': return 4;
+        case 'B': return 3;
+        case 'C': return 2;
+        case 'D': return 1;
+        default: return 0;
+    }
 }
 
 // Calculate risk score
 function calculateRiskScore(row) {
     const severityMap = { 'A': 5, 'B': 4, 'C': 3, 'D': 2, 'Unknown': 1 };
-    const likelihoodMap = { 
-        'Rare': 1, 
-        'Unlikely': 2, 
-        'Possible': 3, 
-        'Likely': 4, 
-        'Almost Certain': 5 
+    const likelihoodMap = {
+        'Rare': 1,
+        'Unlikely': 2,
+        'Possible': 3,
+        'Likely': 4,
+        'Almost Certain': 5
     };
-    
+
     const severity = severityMap[row.severity] || 1;
     const likelihood = likelihoodMap[row.standardized_likelihood] || 3;
-    
+
     return ((severity * likelihood) / 5 * 2).toFixed(1);
+}
+
+function resolveRecordDate(record) {
+    if (!record) return null;
+    if (record.parsedDate instanceof Date && !Number.isNaN(record.parsedDate)) {
+        return record.parsedDate;
+    }
+    const raw = record.incident_date || record.nearmiss_date || record.date || record.event_date || record.report_date;
+    if (!raw) return null;
+    const parsed = new Date(raw);
+    return Number.isNaN(parsed) ? null : parsed;
+}
+
+function getISOWeekNumber(date) {
+    const target = new Date(date.valueOf());
+    const dayNumber = (target.getDay() + 6) % 7;
+    target.setDate(target.getDate() - dayNumber + 3);
+    const firstThursday = target.valueOf();
+    target.setMonth(0, 1);
+    if (target.getDay() !== 4) {
+        target.setMonth(0, 1 + ((4 - target.getDay()) + 7) % 7);
+    }
+    const weekNumber = 1 + Math.ceil((firstThursday - target) / (7 * 24 * 3600 * 1000));
+    return weekNumber;
+}
+
+function calculateTrendIndicators(data, period = 30) {
+    const records = Array.isArray(data) ? data : [];
+    const days = typeof period === 'number' ? period : 30;
+    const now = new Date();
+    const currentStart = new Date(now);
+    currentStart.setHours(0, 0, 0, 0);
+    currentStart.setDate(currentStart.getDate() - (days - 1));
+
+    const previousStart = new Date(currentStart);
+    previousStart.setDate(previousStart.getDate() - days);
+
+    let current = 0;
+    let previous = 0;
+
+    records.forEach(record => {
+        const date = resolveRecordDate(record);
+        if (!date) return;
+        if (date >= currentStart && date <= now) {
+            current += 1;
+        } else if (date >= previousStart && date < currentStart) {
+            previous += 1;
+        }
+    });
+
+    let percentChange = 0;
+    if (previous === 0) {
+        percentChange = current > 0 ? 100 : 0;
+    } else {
+        percentChange = ((current - previous) / previous) * 100;
+    }
+
+    const rounded = Number(percentChange.toFixed(1));
+    let direction = 'flat';
+    if (rounded > 1) direction = 'up';
+    if (rounded < -1) direction = 'down';
+
+    return {
+        current,
+        previous,
+        percentChange: rounded,
+        direction,
+        label: `${rounded >= 0 ? '+' : ''}${rounded}%`
+    };
+}
+
+function analyzePrimaryImpacts(data = []) {
+    const records = Array.isArray(data) ? data : [];
+    const total = records.length;
+    const map = new Map();
+
+    records.forEach(row => {
+        const impact = row.primaryImpact || row.initial_info_primary_impact || row.initial_info_primary_impact_type || 'Unknown';
+        const entry = map.get(impact) || { count: 0, severity: [], likelihood: [] };
+        entry.count += 1;
+
+        const severityScore = severityToScore(row.severity || row.potential_severity);
+        if (severityScore) entry.severity.push(severityScore);
+
+        const likelihoodScore = likelihoodToScore(row.standardized_likelihood || row.initial_risk_assessment_likeliness);
+        if (likelihoodScore) entry.likelihood.push(likelihoodScore);
+
+        map.set(impact, entry);
+    });
+
+    return Array.from(map.entries()).map(([impact, info]) => {
+        const avgSeverity = info.severity.length ? info.severity.reduce((a, b) => a + b, 0) / info.severity.length : 0;
+        const avgLikelihood = info.likelihood.length ? info.likelihood.reduce((a, b) => a + b, 0) / info.likelihood.length : 0;
+        const riskScore = avgSeverity * avgLikelihood;
+        let riskLevel = 'Low';
+        if (riskScore >= 16) riskLevel = 'Critical';
+        else if (riskScore >= 12) riskLevel = 'High';
+        else if (riskScore >= 8) riskLevel = 'Medium';
+
+        return {
+            type: impact,
+            count: info.count,
+            percentage: total ? Number(((info.count / total) * 100).toFixed(1)) : 0,
+            averageRisk: Number(riskScore.toFixed(1)),
+            riskLevel
+        };
+    }).sort((a, b) => b.count - a.count);
+}
+
+function generateSiteComparison(data = [], metric = 'total') {
+    const siteMap = new Map();
+    const records = Array.isArray(data) ? data : [];
+
+    records.forEach(row => {
+        const site = row.site || 'Unknown';
+        if (!siteMap.has(site)) {
+            siteMap.set(site, { injuries: 0, nearMisses: 0, total: 0, risk: 0 });
+        }
+        const entry = siteMap.get(site);
+        const isInjury = Boolean(row.case_number || row.record_type === 'injury');
+        if (isInjury) {
+            entry.injuries += 1;
+        } else {
+            entry.nearMisses += 1;
+        }
+        entry.total += 1;
+
+        const riskScore = parseFloat(row.risk ?? calculateRiskScore(row));
+        if (!Number.isNaN(riskScore)) {
+            entry.risk += riskScore;
+        }
+    });
+
+    return Array.from(siteMap.entries()).map(([site, info]) => {
+        const averageRisk = info.total ? info.risk / info.total : 0;
+        let value = info.total;
+        if (metric === 'injuries') value = info.injuries;
+        if (metric === 'nearmiss') value = info.nearMisses;
+        if (metric === 'risk') value = Number(averageRisk.toFixed(1));
+        return {
+            site,
+            total: info.total,
+            injuries: info.injuries,
+            nearMisses: info.nearMisses,
+            averageRisk: Number(averageRisk.toFixed(1)),
+            value
+        };
+    }).sort((a, b) => b.value - a.value);
+}
+
+function createProcessPathMatrix(data = []) {
+    const matrix = Array.from({ length: 5 }, () => Array(5).fill(0));
+    const processRisk = new Map();
+    const records = Array.isArray(data) ? data : [];
+
+    records.forEach(row => {
+        const severityScore = severityToScore(row.severity || row.potential_severity);
+        const likelihoodScore = likelihoodToScore(row.standardized_likelihood || row.initial_risk_assessment_likeliness);
+        if (!severityScore || !likelihoodScore) return;
+
+        const severityIndex = Math.max(0, 4 - severityScore);
+        const likelihoodIndex = Math.max(0, Math.min(4, likelihoodScore - 1));
+        matrix[severityIndex][likelihoodIndex] += 1;
+
+        const process = row.processPath || row.initial_info_process_path || 'Unknown';
+        if (!processRisk.has(process)) {
+            processRisk.set(process, { incidents: 0, cumulativeRisk: 0 });
+        }
+        const entry = processRisk.get(process);
+        entry.incidents += 1;
+        entry.cumulativeRisk += severityScore * likelihoodScore;
+    });
+
+    const processArray = Array.from(processRisk.entries()).map(([process, info]) => ({
+        process,
+        incidents: info.incidents,
+        risk: info.incidents ? Number((info.cumulativeRisk / info.incidents).toFixed(1)) : 0
+    })).sort((a, b) => b.risk - a.risk);
+
+    return {
+        matrix,
+        processRisk: processArray
+    };
+}
+
+function calculateSafetyKPIs(injuryData = [], nearMissData = []) {
+    const injuries = Array.isArray(injuryData) ? injuryData : [];
+    const nearMisses = Array.isArray(nearMissData) ? nearMissData : [];
+    const HOURS_WORKED = 200000;
+
+    const totalIncidents = injuries.length;
+    const recordableCount = injuries.filter(row => Number(row.recordable) === 1).length;
+    const recordableRate = totalIncidents ? (recordableCount / totalIncidents) * 100 : 0;
+    const totalDafw = injuries.reduce((sum, row) => sum + (Number(row.total_dafw_days) || 0), 0);
+    const lostTimeCases = injuries.filter(row => (Number(row.total_dafw_days) || 0) > 0).length;
+    const trir = HOURS_WORKED ? (recordableCount / HOURS_WORKED) * 200000 : 0;
+    const ltir = HOURS_WORKED ? (lostTimeCases / HOURS_WORKED) * 200000 : 0;
+
+    const severityScores = injuries
+        .map(row => severityToScore(row.severity))
+        .filter(score => score > 0);
+    const avgSeverityScore = severityScores.length ?
+        severityScores.reduce((a, b) => a + b, 0) / severityScores.length : 0;
+    const severityBand = avgSeverityScore >= 3.5 ? 'A' : avgSeverityScore >= 2.5 ? 'B' : avgSeverityScore >= 1.5 ? 'C' : 'D';
+
+    const bodyPartCounts = {};
+    injuries.forEach(row => {
+        const key = row.bodyPart || row.initial_info_principal_body_part || 'Unknown';
+        if (!key) return;
+        bodyPartCounts[key] = (bodyPartCounts[key] || 0) + 1;
+    });
+    const topBodyParts = Object.entries(bodyPartCounts).sort((a, b) => b[1] - a[1]).slice(0, 3);
+
+    const rootCauseCounts = {};
+    injuries.forEach(row => {
+        const key = row.rootCause || row.rca_primary_cause || 'Under Investigation';
+        if (!key) return;
+        rootCauseCounts[key] = (rootCauseCounts[key] || 0) + 1;
+    });
+    const topRootCauses = Object.entries(rootCauseCounts).sort((a, b) => b[1] - a[1]).slice(0, 3);
+
+    const injuryTrend = calculateTrendIndicators(injuries, 30);
+    const recordableTrend = calculateTrendIndicators(injuries.filter(row => Number(row.recordable) === 1), 30);
+    const dafwTrend = calculateTrendIndicators(injuries.filter(row => (Number(row.total_dafw_days) || 0) > 0), 30);
+    const trirTrend = calculateTrendIndicators(injuries.filter(row => Number(row.recordable) === 1), 30);
+    const ltirTrend = calculateTrendIndicators(injuries.filter(row => (Number(row.total_dafw_days) || 0) > 0), 30);
+    const severityTrend = calculateTrendIndicators(injuries.filter(row => ['A', 'B'].includes(standardizeSeverity(row.severity))), 30);
+
+    const nearMissTrend = calculateTrendIndicators(nearMisses, 30);
+    const highRiskNearMisses = nearMisses.filter(row => ['A', 'B'].includes(standardizeSeverity(row.severity || row.potential_severity)));
+    const highRiskTrend = calculateTrendIndicators(highRiskNearMisses, 30);
+
+    const riskScores = nearMisses
+        .map(row => {
+            const severityScore = severityToScore(row.severity || row.potential_severity);
+            const likelihoodScore = likelihoodToScore(row.standardized_likelihood || row.initial_risk_assessment_likeliness);
+            if (!severityScore || !likelihoodScore) return null;
+            return severityScore * likelihoodScore;
+        })
+        .filter(score => typeof score === 'number');
+    const avgRiskScore = riskScores.length ? riskScores.reduce((a, b) => a + b, 0) / riskScores.length : 0;
+    const riskTrend = calculateTrendIndicators(nearMisses.filter(row => severityToScore(row.severity || row.potential_severity) >= 3), 30);
+
+    const ratio = injuries.length ? nearMisses.length / injuries.length : null;
+    const ratioDisplay = ratio === null ? 'N/A' : `${ratio.toFixed(1)}:1`;
+
+    const ratioTrend = (() => {
+        const currentInjuries = injuryTrend.current;
+        const previousInjuries = injuryTrend.previous;
+        const currentNearMisses = nearMissTrend.current;
+        const previousNearMisses = nearMissTrend.previous;
+        if (!currentInjuries || !previousInjuries) return null;
+        const currentRatio = currentInjuries ? currentNearMisses / currentInjuries : null;
+        const previousRatio = previousInjuries ? previousNearMisses / previousInjuries : null;
+        if (currentRatio === null || previousRatio === null) return null;
+        let change = 0;
+        if (previousRatio === 0) {
+            change = currentRatio > 0 ? 100 : 0;
+        } else {
+            change = ((currentRatio - previousRatio) / previousRatio) * 100;
+        }
+        const rounded = Number(change.toFixed(1));
+        let direction = 'flat';
+        if (rounded > 1) direction = 'up';
+        if (rounded < -1) direction = 'down';
+        return {
+            current: Number(currentRatio.toFixed(2)),
+            previous: Number(previousRatio.toFixed(2)),
+            percentChange: rounded,
+            direction,
+            label: `${rounded >= 0 ? '+' : ''}${rounded}%`
+        };
+    })();
+
+    const closureStatuses = ['closed', 'complete', 'completed', 'resolved', 'implemented', 'done'];
+    const closureCount = nearMisses.filter(row => closureStatuses.includes(String(row.status || '').toLowerCase())).length;
+    const closureRate = nearMisses.length ? Math.round((closureCount / nearMisses.length) * 100) : 0;
+    const closureTrend = calculateTrendIndicators(nearMisses.filter(row => closureStatuses.includes(String(row.status || '').toLowerCase())), 30);
+
+    const locationCounts = {};
+    nearMisses.forEach(row => {
+        const location = row.location || row.initial_info_location_event || 'Unknown';
+        locationCounts[location] = (locationCounts[location] || 0) + 1;
+    });
+    const repeatLocationCount = Object.values(locationCounts).filter(count => count > 1).length;
+    const topLocations = Object.entries(locationCounts).sort((a, b) => b[1] - a[1]).slice(0, 3);
+
+    const topImpacts = analyzePrimaryImpacts(nearMisses).slice(0, 3);
+
+    const combinedData = [...injuries, ...nearMisses];
+    const combinedTotal = combinedData.length;
+    const combinedRiskScores = combinedData
+        .map(row => parseFloat(row.risk ?? calculateRiskScore(row)))
+        .filter(score => !Number.isNaN(score));
+    const combinedAvgRisk = combinedRiskScores.length ?
+        combinedRiskScores.reduce((a, b) => a + b, 0) / combinedRiskScores.length : 0;
+    const combinedHighSeverity = combinedData.filter(row => ['A', 'B'].includes(standardizeSeverity(row.severity || row.potential_severity))).length;
+    const combinedTrend = calculateTrendIndicators(combinedData, 30);
+    const combinedClosureCount = combinedData.filter(row => closureStatuses.includes(String(row.status || row.case_status || '').toLowerCase())).length;
+    const combinedClosureRate = combinedData.length ? Math.round((combinedClosureCount / combinedData.length) * 100) : 0;
+
+    const weeklyTrend = (() => {
+        const result = [];
+        const now = new Date();
+        for (let i = 11; i >= 0; i--) {
+            const end = new Date(now);
+            end.setHours(23, 59, 59, 999);
+            end.setDate(end.getDate() - (i * 7));
+            const start = new Date(end);
+            start.setHours(0, 0, 0, 0);
+            start.setDate(start.getDate() - 6);
+
+            let injuriesCount = 0;
+            let nearMissCount = 0;
+            combinedData.forEach(row => {
+                const date = resolveRecordDate(row);
+                if (!date || date < start || date > end) return;
+                if (row.case_number || row.record_type === 'injury') {
+                    injuriesCount += 1;
+                } else {
+                    nearMissCount += 1;
+                }
+            });
+
+            const label = `W${String(getISOWeekNumber(end)).padStart(2, '0')}`;
+            result.push({
+                label,
+                injuries: injuriesCount,
+                nearMisses: nearMissCount,
+                total: injuriesCount + nearMissCount
+            });
+        }
+        return result;
+    })();
+
+    const sitePerformance = generateSiteComparison(combinedData, 'total');
+    const processMatrix = createProcessPathMatrix(combinedData);
+    const combinedPrimaryImpacts = analyzePrimaryImpacts(combinedData);
+
+    const combinedRootCauses = (() => {
+        const counts = {};
+        combinedData.forEach(row => {
+            const cause = row.rootCause || row.rca_primary_cause || 'Not Determined';
+            counts[cause] = (counts[cause] || 0) + 1;
+        });
+        return Object.entries(counts)
+            .sort((a, b) => b[1] - a[1])
+            .map(([cause, count]) => ({ cause, count }));
+    })();
+
+    const recordableTag = recordableRate < 5 ? 'success' : recordableRate <= 8 ? 'warning' : 'danger';
+    const safetyIndex = (() => {
+        const recordableScore = Math.max(0, 100 - Math.min(recordableRate * 10, 100));
+        const riskScoreComponent = Math.max(0, 100 - Math.min(avgRiskScore * 5, 100));
+        const closureScore = closureRate;
+        const nearMissScore = ratio === null ? 60 : Math.min(100, (ratio / 5) * 100);
+        return Math.round(recordableScore * 0.3 + riskScoreComponent * 0.2 + closureScore * 0.3 + nearMissScore * 0.2);
+    })();
+
+    return {
+        injury: {
+            totalIncidents,
+            recordableCount,
+            recordableRate: Number(recordableRate.toFixed(1)),
+            recordableTrend,
+            recordableTag,
+            totalDafw,
+            dafwTrend,
+            lostTimeCases,
+            ltir: Number(ltir.toFixed(2)),
+            ltirTrend,
+            trir: Number(trir.toFixed(2)),
+            trirTrend,
+            severityScore: Number(avgSeverityScore.toFixed(2)),
+            severityBand,
+            severityTrend,
+            trend: injuryTrend,
+            bodyParts: topBodyParts,
+            rootCauses: topRootCauses
+        },
+        nearMiss: {
+            total: nearMisses.length,
+            trend: nearMissTrend,
+            highRiskCount: highRiskNearMisses.length,
+            highRiskTrend,
+            avgRiskScore: Number(avgRiskScore.toFixed(1)),
+            riskTrend,
+            ratio: ratioDisplay,
+            ratioTrend,
+            closureRate,
+            closureTrend,
+            repeatLocations: repeatLocationCount,
+            topLocations,
+            topImpacts
+        },
+        combined: {
+            safetyIndex,
+            totalIncidents: combinedTotal,
+            highSeverityCount: combinedHighSeverity,
+            averageRisk: Number(combinedAvgRisk.toFixed(1)),
+            weeklyTrend,
+            sitePerformance,
+            processMatrix,
+            primaryImpacts: combinedPrimaryImpacts,
+            rootCauses: combinedRootCauses,
+            closureRate: combinedClosureRate,
+            trend: combinedTrend,
+            recordableRate: Number(recordableRate.toFixed(1))
+        }
+    };
 }
 
 // Populate Filters
@@ -6950,48 +7793,121 @@ function updateKPIs() {
 
 // Update Dashboards
 function updateInjuryDashboard() {
-    const data = state.injury.filteredData;
-    
-    document.getElementById('injuryTotal').textContent = data.length;
-    document.getElementById('injuryRecordable').textContent = 
-        data.filter(r => r.recordable === 1).length;
-    document.getElementById('injuryLostTime').textContent = 
-        data.filter(r => r.total_dafw_days > 0).length;
-    document.getElementById('injuryDaysLost').textContent = 
-        data.reduce((sum, r) => sum + (r.total_dafw_days || 0), 0);
-    document.getElementById('injuryOTR').textContent = 
-        data.filter(r => r.otr === 'yes').length;
-    
-    const recordableCount = data.filter(r => r.recordable === 1).length;
-    const recordableRate = data.length > 0 ? 
-        ((recordableCount / data.length) * 100).toFixed(1) : '0.0';
-    document.getElementById('injuryRecordableRate').textContent = recordableRate + '%';
+    const kpiData = calculateSafetyKPIs(state.injury.filteredData, state.nearMiss.filteredData);
+    const injury = kpiData.injury;
+
+    setElementText('injurySummaryPeriod', getReportPeriod());
+    setElementText('injurySummaryTotalValue', formatNumber(injury.totalIncidents));
+    applyTrendToElement('injurySummaryTotalTrend', injury.trend);
+    setElementText('injurySummaryRecordableValue', `${injury.recordableRate.toFixed(1)}%`);
+    applyTrendToElement('injurySummaryRecordableTrend', injury.recordableTrend, true);
+    setElementText('injurySummaryDafwValue', formatNumber(injury.totalDafw));
+    applyTrendToElement('injurySummaryDafwTrend', injury.dafwTrend, true);
+    setElementText('injurySummaryTrirValue', injury.trir.toFixed(2));
+    applyTrendToElement('injurySummaryTrirTrend', injury.trirTrend, true);
+
+    setElementText('injuryTotalIncidents', formatNumber(injury.totalIncidents));
+    applyTrendToElement('injuryTotalIncidentsTrend', injury.trend);
+    setElementText('injuryTotalIncidentsBadge', injury.trend ? injury.trend.label : 'Trend');
+
+    setElementText('injuryRecordableRate', injury.recordableRate.toFixed(1));
+    applyTrendToElement('injuryRecordableRateTrend', injury.recordableTrend, true);
+    const recordableProgress = document.getElementById('injuryRecordableProgress');
+    if (recordableProgress) {
+        recordableProgress.style.width = `${Math.min(100, injury.recordableRate)}%`;
+    }
+    const recordableLabel = injury.recordableTag === 'success' ? 'On Track' : injury.recordableTag === 'warning' ? 'Monitor' : 'Action';
+    updateTagIndicator('injuryRecordableRateTag', injury.recordableTag, recordableLabel);
+
+    setElementText('injuryDafwDays', formatNumber(injury.totalDafw));
+    applyTrendToElement('injuryDafwTrend', injury.dafwTrend, true);
+    setElementText('injuryLtir', injury.ltir.toFixed(2));
+    applyTrendToElement('injuryLtirTrend', injury.ltirTrend, true);
+    setElementText('injuryTrir', injury.trir.toFixed(2));
+    applyTrendToElement('injuryTrirTrend', injury.trirTrend, true);
+
+    setElementText('injurySeverityScore', injury.severityScore.toFixed(2));
+    applyTrendToElement('injurySeverityTrend', injury.severityTrend);
+    setElementText('injurySeverityDescription', `Dominant severity: ${injury.severityBand}`);
+
+    renderMiniBarChart(
+        'injuryBodyPartMiniChart',
+        injury.bodyParts.map(([label]) => label),
+        injury.bodyParts.map(([, count]) => count),
+        AMAZON_COLORS.orange
+    );
+    updateFootnote('injuryBodyPartSummary', injury.bodyParts);
+
+    renderMiniBarChart(
+        'injuryRootCauseMiniChart',
+        injury.rootCauses.map(([label]) => label),
+        injury.rootCauses.map(([, count]) => count),
+        AMAZON_COLORS.darkBlue
+    );
+    updateFootnote('injuryRootCauseSummary', injury.rootCauses);
 }
 
 function updateNearMissDashboard() {
-    const data = state.nearMiss.filteredData;
-    
-    document.getElementById('nearMissTotal').textContent = data.length;
-    
-    const risks = data.map(r => parseFloat(r.risk)).filter(r => !isNaN(r));
-    const avgRisk = risks.length > 0 ? 
-        (risks.reduce((a, b) => a + b, 0) / risks.length).toFixed(1) : '0.0';
-    document.getElementById('nearMissRisk').textContent = avgRisk;
-    
-    document.getElementById('nearMissHigh').textContent = 
-        data.filter(r => r.severity === 'A' || r.severity === 'B').length;
-    
-    // Calculate closure rate (more meaningful metric)
-    const closedCount = data.filter(r => r.status === 'Closed' || r.status === 'Completed').length;
-    const closureRate = data.length > 0 ? ((closedCount / data.length) * 100).toFixed(0) : '0';
-    document.getElementById('nearMissRepeat').textContent = closureRate + '%';
-    
-    const actionableCount = data.filter(r => parseFloat(r.risk) >= 7).length;
-    document.getElementById('nearMissActionable').textContent = actionableCount;
-    
-    const frequencyRate = data.length > 0 ? 
-        (data.length / 30).toFixed(1) : '0.0';
-    document.getElementById('nearMissFrequency').textContent = frequencyRate;
+    const kpiData = calculateSafetyKPIs(state.injury.filteredData, state.nearMiss.filteredData);
+    const nearMiss = kpiData.nearMiss;
+
+    setElementText('nearMissSummaryPeriod', getReportPeriod());
+    setElementText('nearMissSummaryTotalValue', formatNumber(nearMiss.total));
+    applyTrendToElement('nearMissSummaryTotalTrend', nearMiss.trend);
+    setElementText('nearMissSummaryHighRiskValue', formatNumber(nearMiss.highRiskCount));
+    applyTrendToElement('nearMissSummaryHighRiskTrend', nearMiss.highRiskTrend, true);
+    setElementText('nearMissSummaryClosureValue', `${nearMiss.closureRate}%`);
+    applyTrendToElement('nearMissSummaryClosureTrend', nearMiss.closureTrend);
+    setElementText('nearMissSummaryRatioValue', nearMiss.ratio);
+    if (nearMiss.ratioTrend) {
+        applyTrendToElement('nearMissSummaryRatioTrend', nearMiss.ratioTrend);
+    } else {
+        applyTrendToElement('nearMissSummaryRatioTrend', { percentChange: 0, direction: 'flat' });
+    }
+
+    setElementText('nearMissTotal', formatNumber(nearMiss.total));
+    applyTrendToElement('nearMissTotalTrend', nearMiss.trend);
+    setElementText('nearMissTotalBadge', nearMiss.trend ? nearMiss.trend.label : 'Trend');
+
+    setElementText('nearMissHigh', formatNumber(nearMiss.highRiskCount));
+    applyTrendToElement('nearMissHighTrend', nearMiss.highRiskTrend, true);
+
+    setElementText('nearMissRisk', nearMiss.avgRiskScore.toFixed(1));
+    applyTrendToElement('nearMissRiskTrend', nearMiss.riskTrend, true);
+
+    setElementText('nearMissRatio', nearMiss.ratio);
+    if (nearMiss.ratioTrend) {
+        applyTrendToElement('nearMissRatioTrend', nearMiss.ratioTrend);
+    } else {
+        applyTrendToElement('nearMissRatioTrend', { percentChange: 0, direction: 'flat' });
+    }
+
+    setElementText('nearMissClosureRate', nearMiss.closureRate);
+    const closureProgress = document.getElementById('nearMissClosureProgress');
+    if (closureProgress) {
+        closureProgress.style.width = `${Math.min(100, nearMiss.closureRate)}%`;
+    }
+    const closureStatus = nearMiss.closureRate >= 85 ? 'success' : nearMiss.closureRate >= 70 ? 'warning' : 'danger';
+    const closureLabel = closureStatus === 'success' ? 'On Track' : closureStatus === 'warning' ? 'Monitor' : 'Action';
+    updateTagIndicator('nearMissClosureBadge', closureStatus, closureLabel);
+
+    setElementText('nearMissRepeatLocations', formatNumber(nearMiss.repeatLocations));
+
+    renderMiniBarChart(
+        'nearMissImpactMiniChart',
+        nearMiss.topImpacts.map(item => item.type),
+        nearMiss.topImpacts.map(item => item.count),
+        AMAZON_COLORS.orange
+    );
+    updateFootnote('nearMissImpactSummary', nearMiss.topImpacts.map(item => [item.type, item.count]));
+
+    renderMiniBarChart(
+        'nearMissLocationMiniChart',
+        nearMiss.topLocations.map(([label]) => label),
+        nearMiss.topLocations.map(([, count]) => count),
+        AMAZON_COLORS.darkBlue
+    );
+    updateFootnote('nearMissLocationSummary', nearMiss.topLocations);
 }
 
 // Update Tables with Pagination
@@ -11339,10 +12255,20 @@ function legacyGeneratePDFReport(type) {
             doc.text(label, x + width / 2, y + height / 2 + 5, { align: 'center' });
 
             if (trend) {
-                const trendColor = trend.includes('+') || trend.startsWith('↑') ? REPORT_COLORS.danger : trend.includes('-') || trend.startsWith('↓') ? REPORT_COLORS.success : REPORT_COLORS.info;
-                doc.setFontSize(8);
-                doc.setTextColor(...hexToRgb(trendColor));
-                doc.text(trend, x + width / 2, y + height - 4, { align: 'center' });
+                let trendText = '';
+                let trendColor = REPORT_COLORS.info;
+                if (typeof trend === 'object') {
+                    trendText = trend.text || '';
+                    trendColor = trend.color || REPORT_COLORS.info;
+                } else {
+                    trendText = trend;
+                    trendColor = trend.includes('+') || trend.startsWith('↑') ? REPORT_COLORS.danger : trend.includes('-') || trend.startsWith('↓') ? REPORT_COLORS.success : REPORT_COLORS.info;
+                }
+                if (trendText) {
+                    doc.setFontSize(8);
+                    doc.setTextColor(...hexToRgb(trendColor));
+                    doc.text(trendText, x + width / 2, y + height - 4, { align: 'center' });
+                }
             }
         };
 
@@ -11419,7 +12345,10 @@ function legacyGeneratePDFReport(type) {
             return 45;
         };
 
-        const metrics = calculateComprehensiveMetrics(type);
+        const legacyMetrics = calculateComprehensiveMetrics(type);
+        const safetyKpis = calculateSafetyKPIs(injuryData, nearMissData);
+        const summaryMetrics = type === 'injury' ? safetyKpis.injury : type === 'nearmiss' ? safetyKpis.nearMiss : safetyKpis.combined;
+        const metrics = legacyMetrics;
         let yPos = 45;
 
         addHeader(currentPage, type);
@@ -11428,42 +12357,257 @@ function legacyGeneratePDFReport(type) {
 
         const cardWidth = (contentWidth - 30) / 4;
         const cardHeight = 25;
+        const formatTrendForPdf = (indicator, invert = false) => {
+            if (!indicator || Number.isNaN(indicator.percentChange)) return null;
+            const arrow = indicator.direction === 'up' ? '↑' : indicator.direction === 'down' ? '↓' : '→';
+            const text = `${arrow} ${indicator.percentChange >= 0 ? '+' : ''}${indicator.percentChange}%`;
+            const color = invert
+                ? (indicator.direction === 'up' ? REPORT_COLORS.danger : indicator.direction === 'down' ? REPORT_COLORS.success : REPORT_COLORS.info)
+                : (indicator.direction === 'down' ? REPORT_COLORS.success : indicator.direction === 'up' ? REPORT_COLORS.danger : REPORT_COLORS.info);
+            return { text, color };
+        };
 
-        addMetricCard(margin, yPos, cardWidth, cardHeight,
-            'Total Incidents', metrics.totalIncidents, metrics.incidentTrend,
-            REPORT_COLORS.primary, '📈');
+        const summaryCards = (() => {
+            if (type === 'injury') {
+                return [
+                    { label: 'Total Incidents', value: formatNumber(summaryMetrics.totalIncidents), trend: formatTrendForPdf(summaryMetrics.trend), color: REPORT_COLORS.primary, icon: '🏥' },
+                    { label: 'Recordable Rate', value: `${summaryMetrics.recordableRate.toFixed(1)}%`, trend: formatTrendForPdf(summaryMetrics.recordableTrend, true), color: summaryMetrics.recordableTag === 'danger' ? REPORT_COLORS.danger : summaryMetrics.recordableTag === 'warning' ? REPORT_COLORS.warning : REPORT_COLORS.success, icon: '🛡️' },
+                    { label: 'DAFW Days', value: formatNumber(summaryMetrics.totalDafw), trend: formatTrendForPdf(summaryMetrics.dafwTrend, true), color: REPORT_COLORS.warning, icon: '⏱️' },
+                    { label: 'TRIR', value: summaryMetrics.trir.toFixed(2), trend: formatTrendForPdf(summaryMetrics.trirTrend, true), color: REPORT_COLORS.secondary, icon: '📈' },
+                    { label: 'LTIR', value: summaryMetrics.ltir.toFixed(2), trend: formatTrendForPdf(summaryMetrics.ltirTrend, true), color: REPORT_COLORS.info, icon: '🚑' },
+                    { label: 'Avg Severity Score', value: summaryMetrics.severityScore.toFixed(2), trend: formatTrendForPdf(summaryMetrics.severityTrend), color: REPORT_COLORS.danger, icon: '⚠️' },
+                    { label: 'Top Body Part', value: summaryMetrics.bodyParts[0] ? summaryMetrics.bodyParts[0][0] : 'N/A', trend: null, color: REPORT_COLORS.primary, icon: '🦾' },
+                    { label: 'Top Root Cause', value: summaryMetrics.rootCauses[0] ? summaryMetrics.rootCauses[0][0] : 'N/A', trend: null, color: REPORT_COLORS.secondary, icon: '🔍' }
+                ];
+            }
+            if (type === 'nearmiss') {
+                return [
+                    { label: 'Total Near Misses', value: formatNumber(summaryMetrics.total), trend: formatTrendForPdf(summaryMetrics.trend), color: REPORT_COLORS.primary, icon: '⚠️' },
+                    { label: 'High Risk Events', value: formatNumber(summaryMetrics.highRiskCount), trend: formatTrendForPdf(summaryMetrics.highRiskTrend, true), color: summaryMetrics.highRiskCount > 0 ? REPORT_COLORS.danger : REPORT_COLORS.success, icon: '🚨' },
+                    { label: 'Closure Rate', value: `${summaryMetrics.closureRate}%`, trend: formatTrendForPdf(summaryMetrics.closureTrend), color: summaryMetrics.closureRate >= 85 ? REPORT_COLORS.success : summaryMetrics.closureRate >= 70 ? REPORT_COLORS.warning : REPORT_COLORS.danger, icon: '✅' },
+                    { label: 'NM to Injury Ratio', value: summaryMetrics.ratio, trend: summaryMetrics.ratioTrend ? formatTrendForPdf(summaryMetrics.ratioTrend) : null, color: REPORT_COLORS.info, icon: '🔄' },
+                    { label: 'Avg Risk Score', value: summaryMetrics.avgRiskScore.toFixed(1), trend: formatTrendForPdf(summaryMetrics.riskTrend, true), color: summaryMetrics.avgRiskScore >= 12 ? REPORT_COLORS.danger : summaryMetrics.avgRiskScore >= 9 ? REPORT_COLORS.warning : REPORT_COLORS.success, icon: '🎲' },
+                    { label: 'Repeat Locations', value: formatNumber(summaryMetrics.repeatLocations), trend: null, color: REPORT_COLORS.warning, icon: '♻️' },
+                    { label: 'Top Impact', value: summaryMetrics.topImpacts[0] ? summaryMetrics.topImpacts[0].type : 'N/A', trend: null, color: REPORT_COLORS.primary, icon: '🎯' },
+                    { label: 'Top Location', value: summaryMetrics.topLocations[0] ? summaryMetrics.topLocations[0][0] : 'N/A', trend: null, color: REPORT_COLORS.secondary, icon: '📍' }
+                ];
+            }
+            const injurySupport = safetyKpis.injury;
+            return [
+                { label: 'Safety Index', value: summaryMetrics.safetyIndex, trend: formatTrendForPdf(summaryMetrics.trend), color: REPORT_COLORS.primary, icon: '🏆' },
+                { label: 'Total Events', value: formatNumber(summaryMetrics.totalIncidents), trend: formatTrendForPdf(summaryMetrics.trend), color: REPORT_COLORS.secondary, icon: '📊' },
+                { label: 'Average Risk Score', value: summaryMetrics.averageRisk.toFixed(1), trend: null, color: summaryMetrics.averageRisk >= 12 ? REPORT_COLORS.danger : summaryMetrics.averageRisk >= 9 ? REPORT_COLORS.warning : REPORT_COLORS.success, icon: '🎲' },
+                { label: 'Closure Rate', value: `${summaryMetrics.closureRate}%`, trend: null, color: summaryMetrics.closureRate >= 85 ? REPORT_COLORS.success : summaryMetrics.closureRate >= 70 ? REPORT_COLORS.warning : REPORT_COLORS.danger, icon: '✅' },
+                { label: 'High Severity Events', value: formatNumber(summaryMetrics.highSeverityCount), trend: null, color: summaryMetrics.highSeverityCount > 0 ? REPORT_COLORS.danger : REPORT_COLORS.success, icon: '🚨' },
+                { label: 'Recordable Rate', value: `${injurySupport.recordableRate.toFixed(1)}%`, trend: formatTrendForPdf(injurySupport.recordableTrend, true), color: injurySupport.recordableTag === 'danger' ? REPORT_COLORS.danger : injurySupport.recordableTag === 'warning' ? REPORT_COLORS.warning : REPORT_COLORS.success, icon: '🛡️' },
+                { label: 'Top Impact', value: summaryMetrics.primaryImpacts[0] ? summaryMetrics.primaryImpacts[0].type : 'N/A', trend: null, color: REPORT_COLORS.primary, icon: '🎯' },
+                { label: 'Top Performing Site', value: summaryMetrics.sitePerformance[0] ? summaryMetrics.sitePerformance[0].site : 'N/A', trend: null, color: REPORT_COLORS.secondary, icon: '🏢' }
+            ];
+        })();
 
-        addMetricCard(margin + cardWidth + 10, yPos, cardWidth, cardHeight,
-            'Recordable Rate', `${metrics.recordableRate}%`, metrics.recordableTrend,
-            metrics.recordableRate > 5 ? REPORT_COLORS.danger : REPORT_COLORS.success, '⚠️');
+        summaryCards.forEach((card, index) => {
+            const column = index % 4;
+            const row = Math.floor(index / 4);
+            const cardX = margin + column * (cardWidth + 10);
+            const cardY = yPos + row * (cardHeight + 10);
+            addMetricCard(cardX, cardY, cardWidth, cardHeight, card.label, card.value, card.trend, card.color, card.icon);
+        });
 
-        addMetricCard(margin + (cardWidth + 10) * 2, yPos, cardWidth, cardHeight,
-            'Severity A/B', metrics.highSeverityCount, metrics.severityTrend,
-            metrics.highSeverityCount > 0 ? REPORT_COLORS.danger : REPORT_COLORS.success, '🚨');
+        const summaryRows = Math.ceil(summaryCards.length / 4);
+        yPos += summaryRows * (cardHeight + 10);
+        yPos += 5;
 
-        addMetricCard(margin + (cardWidth + 10) * 3, yPos, cardWidth, cardHeight,
-            'Days Lost', metrics.totalDaysLost, metrics.daysLostTrend,
-            REPORT_COLORS.warning, '📅');
+        yPos = addSectionHeader('KPI Dashboard', yPos, '📈');
 
-        yPos += cardHeight + 10;
+        const chartWidth = (contentWidth - 10) / 2;
+        const chartHeight = 55;
 
-        addMetricCard(margin, yPos, cardWidth, cardHeight,
-            'Near Miss Ratio', metrics.nearMissRatio, '',
-            REPORT_COLORS.info, '🎯');
+        const weeklyTrend = metrics.weeklyTrend || [];
+        if (weeklyTrend.length) {
+            const weeklyImage = createChartImage({
+                type: 'line',
+                data: {
+                    labels: weeklyTrend.map(item => item.label),
+                    datasets: [
+                        {
+                            label: 'Injuries',
+                            data: weeklyTrend.map(item => item.injuries),
+                            borderColor: '#B71C1C',
+                            backgroundColor: 'rgba(183, 28, 28, 0.08)',
+                            tension: 0.35,
+                            fill: false
+                        },
+                        {
+                            label: 'Near Misses',
+                            data: weeklyTrend.map(item => item.nearMisses),
+                            borderColor: '#FF9900',
+                            backgroundColor: 'rgba(255, 153, 0, 0.08)',
+                            tension: 0.35,
+                            fill: false
+                        }
+                    ]
+                },
+                options: {
+                    plugins: { legend: { display: true, position: 'bottom' } },
+                    scales: {
+                        x: { ticks: { maxRotation: 0 } },
+                        y: { beginAtZero: true }
+                    }
+                }
+            }, 460, 220);
+            if (weeklyImage) {
+                doc.addImage(weeklyImage, 'PNG', margin, yPos, chartWidth, chartHeight);
+            }
+        } else {
+            doc.setFontSize(9);
+            doc.setTextColor(120, 120, 120);
+            doc.text('Weekly trend sparkline unavailable due to limited data.', margin, yPos + 5);
+        }
 
-        addMetricCard(margin + cardWidth + 10, yPos, cardWidth, cardHeight,
-            'Risk Score Avg', metrics.avgRiskScore.toFixed(1), metrics.riskTrend,
-            metrics.avgRiskScore > 7 ? REPORT_COLORS.danger : REPORT_COLORS.warning, '🎲');
+        const impactSeries = (metrics.primaryImpacts || []).slice(0, 6);
+        if (impactSeries.length) {
+            const impactImage = createChartImage({
+                type: 'doughnut',
+                data: {
+                    labels: impactSeries.map(item => item.type),
+                    datasets: [{
+                        data: impactSeries.map(item => item.count),
+                        backgroundColor: impactSeries.map((_, idx) => idx % 2 === 0 ? '#FF9900' : '#232F3E')
+                    }]
+                },
+                options: {
+                    plugins: { legend: { position: 'bottom' } }
+                }
+            }, 380, 220);
+            if (impactImage) {
+                doc.addImage(impactImage, 'PNG', margin + chartWidth + 10, yPos, chartWidth, chartHeight);
+            }
+        }
 
-        addMetricCard(margin + (cardWidth + 10) * 2, yPos, cardWidth, cardHeight,
-            'Closure Rate', `${metrics.closureRate}%`, '',
-            metrics.closureRate < 80 ? REPORT_COLORS.warning : REPORT_COLORS.success, '✅');
+        yPos += chartHeight + 10;
 
-        addMetricCard(margin + (cardWidth + 10) * 3, yPos, cardWidth, cardHeight,
-            'TRIR', metrics.trir.toFixed(2), metrics.trirTrend,
-            metrics.trir > 2 ? REPORT_COLORS.danger : REPORT_COLORS.success, '📊');
+        const siteRanking = (metrics.sitePerformanceEnhanced || []).slice(0, 6);
+        if (siteRanking.length) {
+            const siteImage = createChartImage({
+                type: 'bar',
+                data: {
+                    labels: siteRanking.map(item => item.site),
+                    datasets: [{
+                        label: 'Total Events',
+                        data: siteRanking.map(item => item.total || item.value || 0),
+                        backgroundColor: '#37475A'
+                    }]
+                },
+                options: {
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { ticks: { maxRotation: 0 } },
+                        y: { beginAtZero: true }
+                    }
+                }
+            }, 460, 220);
+            if (siteImage) {
+                doc.addImage(siteImage, 'PNG', margin, yPos, chartWidth, chartHeight);
+            }
+        }
 
-        yPos += cardHeight + 15;
+        const paretoSeries = (metrics.rootCausePareto || []).slice(0, 6);
+        if (paretoSeries.length) {
+            const paretoImage = createChartImage({
+                type: 'bar',
+                data: {
+                    labels: paretoSeries.map(item => item.cause),
+                    datasets: [{
+                        label: 'Incidents',
+                        data: paretoSeries.map(item => item.count),
+                        backgroundColor: '#FF9900'
+                    }]
+                },
+                options: {
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { ticks: { maxRotation: 0 } },
+                        y: { beginAtZero: true }
+                    }
+                }
+            }, 460, 220);
+            if (paretoImage) {
+                doc.addImage(paretoImage, 'PNG', margin + chartWidth + 10, yPos, chartWidth, chartHeight);
+            }
+        }
+
+        yPos += chartHeight + 15;
+
+        yPos = addSectionHeader('Process Path Risk Matrix', yPos, '🧭');
+        const matrixData = metrics.processMatrix ? metrics.processMatrix.matrix : [];
+        if (matrixData && matrixData.length) {
+            const matrixSize = 80;
+            const cellSize = matrixSize / 5;
+            const matrixX = margin + 25;
+            const matrixY = yPos;
+
+            for (let row = 0; row < 5; row++) {
+                for (let col = 0; col < 5; col++) {
+                    const value = matrixData[row][col] || 0;
+                    let fill = '#E0E0E0';
+                    if (value >= 5) fill = REPORT_COLORS.danger;
+                    else if (value >= 3) fill = REPORT_COLORS.warning;
+                    else if (value > 0) fill = REPORT_COLORS.success;
+                    doc.setFillColor(...hexToRgb(fill));
+                    doc.rect(matrixX + col * cellSize, matrixY + row * cellSize, cellSize, cellSize, 'F');
+                    doc.setTextColor(fill === REPORT_COLORS.danger ? 255 : 0);
+                    doc.setFontSize(8);
+                    doc.text(String(value), matrixX + col * cellSize + cellSize / 2, matrixY + row * cellSize + cellSize / 2 + 2, { align: 'center' });
+                }
+            }
+
+            doc.setFontSize(9);
+            doc.setTextColor(80, 80, 80);
+            doc.text('Severity →', matrixX + matrixSize + 5, matrixY + matrixSize / 2);
+            doc.text('Likelihood ↑', matrixX + matrixSize / 2, matrixY - 4, { align: 'center' });
+
+            yPos += matrixSize + 10;
+
+            const processRows = (metrics.processMatrix.processRisk || []).slice(0, 6).map(item => [
+                item.process,
+                item.incidents,
+                item.risk
+            ]);
+            if (processRows.length) {
+                doc.autoTable({
+                    startY: yPos,
+                    head: [['Process Path', 'Incidents', 'Avg Risk']],
+                    body: processRows,
+                    theme: 'striped',
+                    headStyles: { fillColor: hexToRgb(REPORT_COLORS.secondary), textColor: [255, 255, 255] },
+                    styles: { fontSize: 9 },
+                    columnStyles: { 1: { halign: 'center' }, 2: { halign: 'center' } },
+                    margin: { left: margin, right: margin }
+                });
+                yPos = doc.lastAutoTable.finalY + 10;
+            }
+        } else {
+            doc.setFontSize(9);
+            doc.setTextColor(120, 120, 120);
+            doc.text('No process path risk data available.', margin, yPos + 5);
+            yPos += 15;
+        }
+
+        const leadingTable = [
+            ['Leading Indicators (Near Misses)', formatNumber(metrics.leadingIndicators?.leading || 0)],
+            ['Lagging Indicators (Injuries)', formatNumber(metrics.leadingIndicators?.lagging || 0)],
+            ['Action Closure Rate', `${metrics.actionClosureRate}%`]
+        ];
+        doc.autoTable({
+            startY: yPos,
+            head: [['Indicator', 'Value']],
+            body: leadingTable,
+            theme: 'plain',
+            styles: { fontSize: 9 },
+            columnStyles: { 1: { halign: 'right' } },
+            margin: { left: margin, right: margin }
+        });
+        yPos = doc.lastAutoTable.finalY + 10;
 
         const keyInsights = generateKeyInsights(type, metrics);
         yPos = addInsightBox(margin, yPos, contentWidth, 'Key Insights & Findings', keyInsights, '💡');
@@ -12481,25 +13625,217 @@ function legacyGenerateWBRReport() {
     showStatus('Generating Safety WBR Report...', 'info');
 
     try {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
+        const { jsPDF } = window.jspdf || {};
+        if (!jsPDF) {
+            throw new Error('jsPDF library not available');
+        }
+
+        const doc = new jsPDF({
+            orientation: 'portrait',
+            unit: 'mm',
+            format: 'a4'
+        });
+
+        doc.setFont('helvetica', 'normal');
+
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const pageHeight = doc.internal.pageSize.getHeight();
+        const margin = 15;
+        const contentWidth = pageWidth - margin * 2;
 
         const REPORT_COLORS = {
-            orange: '#FF9900',
-            darkBlue: '#232F3E',
-            lightBlue: '#146EB4',
-            gray: '#767676',
-            red: '#D13212',
-            green: '#067D62'
+            primary: '#FF9900',
+            secondary: '#232F3E',
+            tertiary: '#37475A',
+            accent: '#146EB4',
+            success: '#4CAF50',
+            warning: '#FFC107',
+            danger: '#B71C1C',
+            neutral: '#9E9E9E',
+            background: '#F5F5F5'
         };
 
         const injuryData = state.injury.filteredData || [];
         const nearMissData = state.nearMiss.filteredData || [];
-        const now = new Date();
-        const currentWeek = getReportWeekNumber(now);
-        const currentYear = now.getFullYear();
+        const combinedData = [...injuryData, ...nearMissData];
+
+        if (!combinedData.length) {
+            showStatus('No data available to generate the WBR report.', 'warning');
+            return;
+        }
+
+        const safetyKpis = calculateSafetyKPIs(injuryData, nearMissData);
+        const injuryKpis = safetyKpis.injury;
+        const nearMissKpis = safetyKpis.nearMiss;
+        const combinedKpis = safetyKpis.combined;
+
+        const siteComparison = combinedKpis.sitePerformance || [];
+        const processMatrix = combinedKpis.processMatrix || { matrix: [], processRisk: [] };
+        const primaryImpacts = combinedKpis.primaryImpacts || [];
+        const rootCauses = combinedKpis.rootCauses || [];
+        const weeklyTrend = (combinedKpis.weeklyTrend || []).slice(-12);
+
+        const totalSites = siteComparison.length;
+        const avgIncidentTotal = totalSites ? siteComparison.reduce((sum, item) => sum + (item.total || 0), 0) / totalSites : 0;
+        const avgSiteRisk = totalSites ? siteComparison.reduce((sum, item) => sum + (item.averageRisk || 0), 0) / totalSites : 0;
+
+        const formatTrend = (indicator, invert = false) => {
+            if (!indicator || Number.isNaN(indicator.percentChange)) {
+                return null;
+            }
+            const arrow = indicator.direction === 'up' ? '↑' : indicator.direction === 'down' ? '↓' : '↔';
+            const label = indicator.label || `${arrow} ${indicator.percentChange >= 0 ? '+' : ''}${indicator.percentChange}%`;
+            let color = REPORT_COLORS.neutral;
+            if (indicator.direction === 'up') {
+                color = invert ? REPORT_COLORS.success : REPORT_COLORS.danger;
+            } else if (indicator.direction === 'down') {
+                color = invert ? REPORT_COLORS.danger : REPORT_COLORS.success;
+            }
+            return { text: label, color };
+        };
+
+        const addHeader = (pageNum) => {
+            doc.setFillColor(...hexToRgb(REPORT_COLORS.primary));
+            doc.rect(0, 0, pageWidth, 35, 'F');
+
+            doc.setFillColor(...hexToRgb(REPORT_COLORS.secondary));
+            doc.rect(0, 0, 65, 35, 'F');
+
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(20);
+            doc.setFont('helvetica', 'bold');
+            doc.text('Weekly Business Review', pageWidth / 2, 18, { align: 'center' });
+
+            doc.setFontSize(11);
+            doc.setFont('helvetica', 'normal');
+            doc.text(`Reporting Period: ${getReportPeriod()}`, pageWidth / 2, 26, { align: 'center' });
+
+            doc.setFontSize(9);
+            doc.text(`Page ${pageNum}`, pageWidth - margin, 30, { align: 'right' });
+
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'bold');
+            doc.text('AMAZON', 10, 15);
+            doc.setFont('helvetica', 'normal');
+            doc.text('WHS Austria', 10, 21);
+        };
+
+        const addFooter = (pageNum) => {
+            const footerY = pageHeight - 12;
+            doc.setFillColor(...hexToRgb(REPORT_COLORS.secondary));
+            doc.rect(0, footerY - 3, pageWidth, 15, 'F');
+
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(8);
+            doc.setFont('helvetica', 'normal');
+            doc.text('Confidential - Internal Use Only', margin, footerY);
+            doc.text(`Generated: ${new Date().toLocaleString('en-GB')}`, pageWidth / 2, footerY, { align: 'center' });
+            doc.text('© 2024 Amazon.com, Inc.', pageWidth - margin, footerY, { align: 'right' });
+        };
+
+        const addSectionHeader = (title, yPos, icon = '') => {
+            doc.setFillColor(...hexToRgb(REPORT_COLORS.primary));
+            doc.roundedRect(margin - 5, yPos - 8, contentWidth + 10, 14, 3, 3, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(14);
+            doc.setFont('helvetica', 'bold');
+            doc.text(icon ? `${icon} ${title}` : title, margin, yPos);
+            return yPos + 15;
+        };
+
+        const drawSummaryCard = (x, y, width, height, card) => {
+            doc.setFillColor(255, 255, 255);
+            doc.setDrawColor(230, 230, 230);
+            doc.roundedRect(x, y, width, height, 3, 3, 'FD');
+
+            const accentColor = card.color || REPORT_COLORS.primary;
+            doc.setFillColor(...hexToRgb(accentColor));
+            doc.rect(x, y, width, 3, 'F');
+
+            if (card.icon) {
+                doc.setFont('helvetica', 'normal');
+                doc.setTextColor(...hexToRgb(REPORT_COLORS.secondary));
+                doc.setFontSize(12);
+                doc.text(card.icon, x + 5, y + 11);
+            }
+
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(...hexToRgb(REPORT_COLORS.secondary));
+            doc.setFontSize(card.fontSize || 16);
+            doc.text(String(card.value ?? 'N/A'), x + width / 2, y + height / 2, { align: 'center' });
+
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(9);
+            doc.setTextColor(120, 120, 120);
+            doc.text(card.label, x + width / 2, y + height - 4, { align: 'center' });
+
+            if (card.trend) {
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(8);
+                doc.setTextColor(...hexToRgb(card.trend.color || REPORT_COLORS.neutral));
+                doc.text(card.trend.text, x + width - 4, y + 8, { align: 'right' });
+            }
+        };
+
+        const drawProgressCard = (x, y, width, height, config) => {
+            const { label, value, max = 100, suffix = '', description = '', color = REPORT_COLORS.primary } = config;
+            doc.setFillColor(255, 255, 255);
+            doc.setDrawColor(230, 230, 230);
+            doc.roundedRect(x, y, width, height, 3, 3, 'FD');
+
+            doc.setFillColor(...hexToRgb(REPORT_COLORS.secondary));
+            doc.rect(x, y, width, 3, 'F');
+
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(11);
+            doc.setTextColor(...hexToRgb(REPORT_COLORS.secondary));
+            doc.text(label, x + 5, y + 10);
+
+            doc.setFontSize(16);
+            doc.text(`${Math.round(value)}${suffix}`, x + width - 5, y + 12, { align: 'right' });
+
+            if (description) {
+                doc.setFont('helvetica', 'normal');
+                doc.setFontSize(8);
+                doc.setTextColor(120, 120, 120);
+                doc.text(description, x + 5, y + 18);
+            }
+
+            const progressWidth = width - 10;
+            const barY = y + height - 9;
+            const ratio = max ? Math.max(0, Math.min(1, value / max)) : 0;
+
+            doc.setFillColor(235, 235, 235);
+            doc.roundedRect(x + 5, barY, progressWidth, 4, 2, 2, 'F');
+
+            doc.setFillColor(...hexToRgb(color));
+            doc.roundedRect(x + 5, barY, Math.max(6, progressWidth * ratio), 4, 2, 2, 'F');
+        };
+
+        const ensureHeadersForNewPages = () => {
+            const totalPages = doc.internal.getNumberOfPages();
+            if (totalPages > currentPage) {
+                for (let page = currentPage + 1; page <= totalPages; page++) {
+                    doc.setPage(page);
+                    addHeader(page);
+                    addFooter(page);
+                }
+                currentPage = totalPages;
+                doc.setPage(currentPage);
+            }
+        };
+
+        const goToNextPage = () => {
+            addFooter(currentPage);
+            doc.addPage();
+            currentPage = doc.internal.getNumberOfPages();
+            addHeader(currentPage);
+            return 45;
+        };
 
         function calculateWBRMetrics() {
+            const now = new Date();
+
             const totalIncidents = injuryData.length + nearMissData.length;
             const recordableIncidents = injuryData.filter(item => Number(item.recordable) === 1).length;
             const highRiskNearMiss = nearMissData.filter(item =>
@@ -12622,326 +13958,704 @@ function legacyGenerateWBRReport() {
             };
         }
 
-        function getReportWeekNumber(date) {
-            const tmp = new Date(date.valueOf());
-            const dayNum = (tmp.getDay() + 6) % 7;
-            tmp.setDate(tmp.getDate() - dayNum + 3);
-            const firstThursday = tmp.valueOf();
-            tmp.setMonth(0, 1);
-            const firstDay = tmp.getDay();
-            const dayOffset = firstDay === 0 ? -6 : 1;
-            tmp.setMonth(0, 1 + dayOffset);
-            if (tmp.getDay() !== 4) {
-                tmp.setMonth(0, 1 + dayOffset + ((4 - tmp.getDay()) + 7) % 7);
-            }
-            return 1 + Math.round((firstThursday - tmp) / (7 * 24 * 3600 * 1000));
-        }
-
-        function addHeader(pageNum) {
-            doc.setFillColor(...hexToRgb(REPORT_COLORS.darkBlue));
-            doc.rect(0, 0, 210, 25, 'F');
-
-            doc.setTextColor(255, 255, 255);
-            doc.setFontSize(16);
-            doc.setFont('helvetica', 'bold');
-            doc.text('Safety WBR Report - Executive Dashboard', 20, 16);
-
-            doc.setFontSize(10);
-            doc.setFont('helvetica', 'normal');
-            doc.text(`CW${currentWeek}-${currentYear} | Page ${pageNum}`, 150, 16);
-        }
-
-        function addSectionHeader(title, y) {
-            doc.setFillColor(...hexToRgb(REPORT_COLORS.orange));
-            doc.rect(20, y, 170, 8, 'F');
-            doc.setTextColor(255, 255, 255);
-            doc.setFontSize(12);
-            doc.setFont('helvetica', 'bold');
-            doc.text(title, 22, y + 6);
-            return y + 15;
-        }
-
-        function addMetricBox(x, y, width, height, label, value, color, trend = null) {
-            doc.setFillColor(250, 250, 250);
-            doc.setDrawColor(...hexToRgb(color));
-            doc.setLineWidth(2);
-            doc.rect(x, y, width, height, 'FD');
-
-            doc.setFillColor(...hexToRgb(color));
-            doc.rect(x, y, width, 4, 'F');
-
-            doc.setTextColor(...hexToRgb(REPORT_COLORS.darkBlue));
-            doc.setFontSize(18);
-            doc.setFont('helvetica', 'bold');
-            doc.text(value.toString(), x + width / 2, y + height / 2 + 2, { align: 'center' });
-
-            doc.setFontSize(9);
-            doc.setFont('helvetica', 'normal');
-            doc.text(label, x + width / 2, y + height - 4, { align: 'center' });
-
-            if (trend) {
-                doc.setFontSize(8);
-                const trendColor = trend.includes('↑') ? REPORT_COLORS.red : REPORT_COLORS.green;
-                doc.setTextColor(...hexToRgb(trendColor));
-                doc.text(trend, x + width - 5, y + 8, { align: 'right' });
-            }
-        }
-
         const metrics = calculateWBRMetrics();
+        const monthlyTrend = (metrics.monthlyTrend || []).slice(0, 6);
+        const recentIncidents = metrics.recentIncidents || [];
 
         let currentPage = 1;
         addHeader(currentPage);
-        let yPos = 35;
+        let yPos = 45;
 
-        doc.setTextColor(...hexToRgb(REPORT_COLORS.darkBlue));
-        doc.setFontSize(10);
-        const siteKeys = Object.keys(metrics.siteData);
-        const totalSites = siteKeys.length;
-        doc.text(`Report Generated: ${now.toLocaleString()}`, 20, yPos);
-        doc.text(`Period: Last 30 days | Total Sites: ${totalSites}`, 20, yPos + 6);
-        const sitesList = siteKeys.length > 0 ? siteKeys.join(', ') : 'No site data available';
-        const sitesText = doc.splitTextToSize(`Sites Included: ${sitesList}`, 170);
-        doc.text(sitesText, 20, yPos + 12);
-        const siteTextDimensions = doc.getTextDimensions(sitesText);
-        const siteTextHeight = (siteTextDimensions && siteTextDimensions.h) ? siteTextDimensions.h : 0;
-        yPos += 15 + siteTextHeight;
+        const recordableColor = injuryKpis.recordableTag === 'danger'
+            ? REPORT_COLORS.danger
+            : injuryKpis.recordableTag === 'warning'
+                ? REPORT_COLORS.warning
+                : REPORT_COLORS.success;
 
-        yPos = addSectionHeader('Key Performance Indicators', yPos);
-
-        const boxWidth = 42;
-        const boxHeight = 25;
-        const boxSpacing = 3;
-
-        addMetricBox(20, yPos, boxWidth, boxHeight, 'Total Incidents', metrics.totalIncidents, REPORT_COLORS.orange);
-        addMetricBox(20 + boxWidth + boxSpacing, yPos, boxWidth, boxHeight, 'Recordable Cases', metrics.recordableIncidents, REPORT_COLORS.red);
-        addMetricBox(20 + 2 * (boxWidth + boxSpacing), yPos, boxWidth, boxHeight, 'High Risk Near Miss', metrics.highRiskNearMiss, REPORT_COLORS.lightBlue);
-        addMetricBox(20 + 3 * (boxWidth + boxSpacing), yPos, boxWidth, boxHeight, 'TRIR', metrics.trir, REPORT_COLORS.darkBlue);
-
-        yPos += boxHeight + 10;
-
-        const nmRatioDisplay = metrics.nmRatio === 'N/A' ? 'N/A' : `${metrics.nmRatio}:1`;
-        addMetricBox(20, yPos, boxWidth, boxHeight, 'Near Miss Ratio', nmRatioDisplay, REPORT_COLORS.green);
-        addMetricBox(20 + boxWidth + boxSpacing, yPos, boxWidth, boxHeight, 'Avg Days Lost', metrics.avgDaysLost, REPORT_COLORS.gray);
-        addMetricBox(20 + 2 * (boxWidth + boxSpacing), yPos, boxWidth, boxHeight, 'Open Investigations', metrics.openInvestigations, REPORT_COLORS.orange);
-        addMetricBox(20 + 3 * (boxWidth + boxSpacing), yPos, boxWidth, boxHeight, 'Sites w/ Incidents', totalSites, REPORT_COLORS.darkBlue);
-
-        yPos += boxHeight + 15;
-
-        yPos = addSectionHeader('Site Performance Breakdown', yPos);
-
-        const siteTableData = Object.entries(metrics.siteData)
-            .sort(([, a], [, b]) => b.total - a.total)
-            .map(([site, data]) => {
-                const injuryRate = data.total > 0 ? ((data.injuries / data.total) * 100).toFixed(1) : '0.0';
-                const riskLevel = data.injuries >= 3 ? 'High Risk' :
-                    data.injuries >= 1 ? 'Medium Risk' : 'On Track';
-                const riskColor = data.injuries >= 3 ? '🔴' :
-                    data.injuries >= 1 ? '🟡' : '🟢';
-                return [
-                    site,
-                    data.injuries.toString(),
-                    data.nearMisses.toString(),
-                    data.total.toString(),
-                    `${injuryRate}%`,
-                    `${riskColor} ${riskLevel}`
-                ];
-            });
-
-        doc.autoTable({
-            startY: yPos,
-            head: [['Site', 'Injuries', 'Near Miss', 'Total', 'Injury Rate', 'Status']],
-            body: siteTableData,
-            theme: 'grid',
-            headStyles: {
-                fillColor: hexToRgb(REPORT_COLORS.darkBlue),
-                textColor: [255, 255, 255],
-                fontSize: 10
+        const summaryCards = [
+            {
+                label: 'Combined Safety Index',
+                value: Math.round(combinedKpis.safetyIndex || 0),
+                icon: '🎯',
+                color: REPORT_COLORS.primary,
+                trend: formatTrend(combinedKpis.trend, true)
             },
-            bodyStyles: { fontSize: 9 },
-            columnStyles: {
-                0: { cellWidth: 40 },
-                1: { cellWidth: 20, halign: 'center' },
-                2: { cellWidth: 20, halign: 'center' },
-                3: { cellWidth: 20, halign: 'center' },
-                4: { cellWidth: 30, halign: 'center' },
-                5: { cellWidth: 40 }
+            {
+                label: 'Total Incidents',
+                value: formatNumber(combinedKpis.totalIncidents || 0),
+                icon: '⚠️',
+                color: REPORT_COLORS.secondary,
+                trend: formatTrend(combinedKpis.trend)
             },
-            margin: { left: 20, right: 20 }
+            {
+                label: 'Recordable Rate',
+                value: `${injuryKpis.recordableRate?.toFixed(1) || '0.0'}%`,
+                icon: '🛡️',
+                color: recordableColor,
+                trend: formatTrend(injuryKpis.recordableTrend, true)
+            },
+            {
+                label: 'High Severity Cases',
+                value: formatNumber(combinedKpis.highSeverityCount || 0),
+                icon: '🚨',
+                color: REPORT_COLORS.danger,
+                trend: formatTrend(injuryKpis.severityTrend)
+            },
+            {
+                label: 'Average Risk Score',
+                value: (combinedKpis.averageRisk || 0).toFixed(1),
+                icon: '⚠️',
+                color: REPORT_COLORS.warning,
+                trend: formatTrend(nearMissKpis.riskTrend, true)
+            },
+            {
+                label: 'Action Closure Rate',
+                value: `${combinedKpis.closureRate || 0}%`,
+                icon: '✅',
+                color: REPORT_COLORS.success,
+                trend: formatTrend(nearMissKpis.closureTrend, true)
+            },
+            {
+                label: 'Near Miss : Injury',
+                value: nearMissKpis.ratio || 'N/A',
+                icon: '📈',
+                color: REPORT_COLORS.accent,
+                trend: formatTrend(nearMissKpis.ratioTrend, true)
+            },
+            {
+                label: 'Open Investigations',
+                value: formatNumber(metrics.openInvestigations || 0),
+                icon: '🕒',
+                color: REPORT_COLORS.neutral
+            }
+        ];
+
+        const cardsPerRow = 4;
+        const cardGap = 8;
+        const cardWidth = (contentWidth - cardGap * (cardsPerRow - 1)) / cardsPerRow;
+        const cardHeight = 28;
+
+        summaryCards.forEach((card, index) => {
+            const column = index % cardsPerRow;
+            const row = Math.floor(index / cardsPerRow);
+            const cardX = margin + column * (cardWidth + cardGap);
+            const cardY = yPos + row * (cardHeight + cardGap);
+            drawSummaryCard(cardX, cardY, cardWidth, cardHeight, card);
         });
 
-        yPos = doc.lastAutoTable.finalY + 15;
+        const summaryRows = Math.ceil(summaryCards.length / cardsPerRow);
+        yPos += summaryRows * (cardHeight + cardGap) + 5;
 
-        yPos = addSectionHeader('Primary Root Causes', yPos);
-
-        const rootCauseData = metrics.topRootCauses.map(([cause, count]) => [
-            cause.length > 50 ? `${cause.substring(0, 47)}...` : cause,
-            count.toString(),
-            metrics.totalIncidents > 0 ? `${((count / metrics.totalIncidents) * 100).toFixed(1)}%` : '0.0%'
-        ]);
-
-        doc.autoTable({
-            startY: yPos,
-            head: [['Root Cause', 'Count', 'Percentage']],
-            body: rootCauseData,
-            theme: 'grid',
-            headStyles: {
-                fillColor: hexToRgb(REPORT_COLORS.darkBlue),
-                textColor: [255, 255, 255],
-                fontSize: 10
-            },
-            bodyStyles: { fontSize: 9 },
-            columnStyles: {
-                0: { cellWidth: 90 },
-                1: { cellWidth: 30, halign: 'center' },
-                2: { cellWidth: 30, halign: 'center' }
-            },
-            margin: { left: 20, right: 20 }
-        });
-
-        doc.addPage();
-        currentPage++;
-        addHeader(currentPage);
-        yPos = 35;
-
-        yPos = addSectionHeader('High-Priority Incident Details (Last 2 Weeks)', yPos);
-
-        if (metrics.recentIncidents.length > 0) {
-            const incidentTableData = metrics.recentIncidents.map(incident => {
-                const isInjury = Boolean(incident.case_number);
-                const incidentDate = new Date(incident.incident_date || incident.nearmiss_date);
-                const dateLabel = isNaN(incidentDate) ? 'Unknown' : incidentDate.toLocaleDateString();
-                const site = incident.site || 'Unknown';
-                const severity = incident.severity || incident.potential_severity || 'Unknown';
-                const type = isInjury ? 'Injury' : 'Near Miss';
-                const status = !incident.rca_primary_cause || incident.rca_primary_cause === 'Not Determined'
-                    ? 'Investigation Open'
-                    : 'Root Cause Identified';
-                const description = incident.initial_info_incident_description ||
-                    incident.initial_info_nearmiss_type ||
-                    incident.description ||
-                    'No description available';
-                const summary = description.length > 90 ? `${description.substring(0, 87)}...` : description;
-
-                return [dateLabel, site, type, severity, status, summary];
-            });
-
-            doc.autoTable({
-                startY: yPos,
-                head: [['Date', 'Site', 'Type', 'Severity', 'Investigation', 'Summary']],
-                body: incidentTableData,
-                theme: 'grid',
-                headStyles: {
-                    fillColor: hexToRgb(REPORT_COLORS.darkBlue),
-                    textColor: [255, 255, 255],
-                    fontSize: 10
-                },
-                bodyStyles: { fontSize: 8 },
-                columnStyles: {
-                    0: { cellWidth: 22 },
-                    1: { cellWidth: 35 },
-                    2: { cellWidth: 20, halign: 'center' },
-                    3: { cellWidth: 20, halign: 'center' },
-                    4: { cellWidth: 35 },
-                    5: { cellWidth: 38 }
-                },
-                margin: { left: 20, right: 20 }
-            });
-
-            yPos = doc.lastAutoTable.finalY + 15;
-        } else {
-            doc.setTextColor(...hexToRgb(REPORT_COLORS.green));
-            doc.setFont('helvetica', 'normal');
-            doc.setFontSize(12);
-            doc.text('No high-priority incidents in the last 2 weeks', 20, yPos + 12);
-            yPos += 25;
+        if (yPos + 60 > pageHeight - margin) {
+            yPos = goToNextPage();
         }
 
-        yPos = addSectionHeader('Monthly Trend Analysis', yPos);
+        yPos = addSectionHeader('KPI Dashboard', yPos, '📈');
 
-        const monthlyTrendRows = metrics.monthlyTrend.slice(0, 6).map(data => {
-            const ratioText = data.ratio === 'N/A' ? 'N/A' : `${data.ratio}:1`;
+        const kpiWidth = (contentWidth - 10) / 2;
+        const kpiHeight = 30;
+
+        drawProgressCard(margin, yPos, kpiWidth, kpiHeight, {
+            label: 'Combined Safety Index',
+            value: combinedKpis.safetyIndex || 0,
+            max: 100,
+            color: combinedKpis.safetyIndex >= 80 ? REPORT_COLORS.success :
+                combinedKpis.safetyIndex >= 60 ? REPORT_COLORS.warning : REPORT_COLORS.danger,
+            description: 'Weighted score across recordable, risk and closure metrics'
+        });
+
+        drawProgressCard(margin + kpiWidth + 10, yPos, kpiWidth, kpiHeight, {
+            label: 'Action Item Closure Rate',
+            value: combinedKpis.closureRate || 0,
+            max: 100,
+            suffix: '%',
+            color: combinedKpis.closureRate >= 90 ? REPORT_COLORS.success :
+                combinedKpis.closureRate >= 80 ? REPORT_COLORS.warning : REPORT_COLORS.danger,
+            description: 'Completed actions vs total assigned'
+        });
+
+        yPos += kpiHeight + 10;
+
+        const miniMetrics = [
+            {
+                label: 'High Risk Events',
+                value: formatNumber((nearMissKpis.highRiskCount || 0) + (combinedKpis.highSeverityCount || 0)),
+                icon: '⚠️',
+                color: REPORT_COLORS.danger
+            },
+            {
+                label: 'Avg Severity Score',
+                value: (injuryKpis.severityScore || 0).toFixed(1),
+                icon: '🩺',
+                color: REPORT_COLORS.warning
+            },
+            {
+                label: 'DAFW Days',
+                value: formatNumber(injuryKpis.totalDafw || 0),
+                icon: '⏱️',
+                color: REPORT_COLORS.primary
+            },
+            {
+                label: 'Investigation Backlog',
+                value: formatNumber(metrics.openInvestigations || 0),
+                icon: '📋',
+                color: REPORT_COLORS.secondary
+            }
+        ];
+
+        const miniWidth = (contentWidth - cardGap * (miniMetrics.length - 1)) / miniMetrics.length;
+        const miniHeight = 24;
+
+        miniMetrics.forEach((card, index) => {
+            const cardX = margin + index * (miniWidth + cardGap);
+            drawSummaryCard(cardX, yPos, miniWidth, miniHeight, { ...card, fontSize: 14 });
+        });
+
+        yPos += miniHeight + 10;
+
+        if (yPos + 40 > pageHeight - margin) {
+            yPos = goToNextPage();
+            yPos = addSectionHeader('KPI Dashboard', yPos, '📈');
+        }
+
+        const leadingLaggingRows = [
+            ['Leading (Near Misses)', formatNumber(nearMissKpis.total || 0)],
+            ['High Risk Near Misses', formatNumber(nearMissKpis.highRiskCount || 0)],
+            ['Lagging (Injuries)', formatNumber(injuryKpis.totalIncidents || 0)],
+            ['Recordable Cases', formatNumber(injuryKpis.recordableCount || 0)]
+        ];
+
+        doc.autoTable({
+            startY: yPos,
+            head: [['Indicator', 'Value']],
+            body: leadingLaggingRows,
+            theme: 'grid',
+            headStyles: { fillColor: hexToRgb(REPORT_COLORS.secondary), textColor: [255, 255, 255], fontSize: 9 },
+            bodyStyles: { fontSize: 9 },
+            columnStyles: { 1: { halign: 'right' } },
+            margin: { left: margin, right: margin }
+        });
+        let tableBottom = doc.lastAutoTable.finalY;
+        ensureHeadersForNewPages();
+        yPos = tableBottom + 10;
+
+        const riskOutlookRows = [
+            ['Recordable Rate', `${injuryKpis.recordableRate?.toFixed(1) || '0.0'}%`, injuryKpis.recordableRate <= 5 ? '🟢 Within target' :
+                injuryKpis.recordableRate <= 8 ? '🟡 Monitor' : '🔴 Critical'],
+            ['Average Risk Score', (combinedKpis.averageRisk || 0).toFixed(1), combinedKpis.averageRisk <= 6 ? '🟢 Controlled' :
+                combinedKpis.averageRisk <= 8 ? '🟡 Watch' : '🔴 High'],
+            ['Safety Index', `${Math.round(combinedKpis.safetyIndex || 0)} / 100`, combinedKpis.safetyIndex >= 80 ? '🟢 Strong' :
+                combinedKpis.safetyIndex >= 60 ? '🟡 Moderate' : '🔴 Weak']
+        ];
+
+        doc.autoTable({
+            startY: yPos,
+            head: [['Risk Metric', 'Current Status', 'Assessment']],
+            body: riskOutlookRows,
+            theme: 'striped',
+            headStyles: { fillColor: hexToRgb(REPORT_COLORS.secondary), textColor: [255, 255, 255], fontSize: 9 },
+            bodyStyles: { fontSize: 9 },
+            columnStyles: { 1: { halign: 'right' } },
+            margin: { left: margin, right: margin }
+        });
+        tableBottom = doc.lastAutoTable.finalY;
+        ensureHeadersForNewPages();
+        yPos = tableBottom + 12;
+
+        if (yPos + 130 > pageHeight - margin) {
+            yPos = goToNextPage();
+        }
+
+        yPos = addSectionHeader('Analysis Charts', yPos, '📊');
+
+        const chartWidth = (contentWidth - 10) / 2;
+        const chartHeight = 60;
+
+        const drawChartOrMessage = (image, x, y, width, height, message) => {
+            if (image) {
+                doc.addImage(image, 'PNG', x, y, width, height);
+            } else {
+                doc.setFont('helvetica', 'normal');
+                doc.setFontSize(9);
+                doc.setTextColor(120, 120, 120);
+                doc.text(message, x, y + 5);
+            }
+        };
+
+        const weeklyImage = weeklyTrend.length ? createChartImage({
+            type: 'line',
+            data: {
+                labels: weeklyTrend.map(item => item.label),
+                datasets: [
+                    {
+                        label: 'Injuries',
+                        data: weeklyTrend.map(item => item.injuries),
+                        borderColor: REPORT_COLORS.danger,
+                        backgroundColor: 'rgba(183,28,28,0.08)',
+                        tension: 0.35,
+                        fill: false
+                    },
+                    {
+                        label: 'Near Misses',
+                        data: weeklyTrend.map(item => item.nearMisses),
+                        borderColor: REPORT_COLORS.primary,
+                        backgroundColor: 'rgba(255,153,0,0.08)',
+                        tension: 0.35,
+                        fill: false
+                    }
+                ]
+            },
+            options: {
+                plugins: { legend: { display: true, position: 'bottom' } },
+                scales: {
+                    x: { ticks: { maxRotation: 0 } },
+                    y: { beginAtZero: true }
+                }
+            }
+        }, 480, 220) : null;
+        drawChartOrMessage(weeklyImage, margin, yPos, chartWidth, chartHeight, 'Weekly trend data unavailable.');
+
+        const topImpacts = primaryImpacts.slice(0, 6);
+        const impactImage = topImpacts.length ? createChartImage({
+            type: 'doughnut',
+            data: {
+                labels: topImpacts.map(item => item.type),
+                datasets: [{
+                    data: topImpacts.map(item => item.count),
+                    backgroundColor: topImpacts.map((_, idx) =>
+                        idx % 3 === 0 ? REPORT_COLORS.primary :
+                            idx % 3 === 1 ? REPORT_COLORS.secondary : REPORT_COLORS.accent)
+                }]
+            },
+            options: { plugins: { legend: { position: 'bottom' } } }
+        }, 380, 220) : null;
+        drawChartOrMessage(impactImage, margin + chartWidth + 10, yPos, chartWidth, chartHeight, 'Impact distribution unavailable.');
+
+        yPos += chartHeight + 10;
+
+        const topSites = siteComparison.slice(0, 6);
+        const siteImage = topSites.length ? createChartImage({
+            type: 'bar',
+            data: {
+                labels: topSites.map(item => item.site),
+                datasets: [{
+                    label: 'Total Events',
+                    data: topSites.map(item => item.total || 0),
+                    backgroundColor: REPORT_COLORS.tertiary
+                }]
+            },
+            options: {
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { ticks: { maxRotation: 0 } },
+                    y: { beginAtZero: true }
+                }
+            }
+        }, 480, 220) : null;
+        drawChartOrMessage(siteImage, margin, yPos, chartWidth, chartHeight, 'Site ranking chart unavailable.');
+
+        const topRootCauses = rootCauses.slice(0, 6);
+        const paretoImage = topRootCauses.length ? createChartImage({
+            type: 'bar',
+            data: {
+                labels: topRootCauses.map(item => item.cause),
+                datasets: [{
+                    label: 'Incidents',
+                    data: topRootCauses.map(item => item.count),
+                    backgroundColor: REPORT_COLORS.primary
+                }]
+            },
+            options: {
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { ticks: { maxRotation: 0 } },
+                    y: { beginAtZero: true }
+                }
+            }
+        }, 480, 220) : null;
+        drawChartOrMessage(paretoImage, margin + chartWidth + 10, yPos, chartWidth, chartHeight, 'Root cause distribution unavailable.');
+
+        yPos += chartHeight + 15;
+
+        if (yPos + 90 > pageHeight - margin) {
+            yPos = goToNextPage();
+        }
+
+        yPos = addSectionHeader('Process Path Analysis', yPos, '🧭');
+
+        const matrixData = processMatrix.matrix || [];
+        if (matrixData.length) {
+            const matrixSize = 90;
+            const cellSize = matrixSize / 5;
+            const matrixX = margin + 25;
+            const matrixY = yPos + 4;
+            const severityLabels = ['A', 'B', 'C', 'D', 'Unknown'];
+            const likelihoodLabels = ['Rare', 'Unlikely', 'Possible', 'Likely', 'Almost Certain'];
+
+            for (let row = 0; row < 5; row++) {
+                for (let col = 0; col < 5; col++) {
+                    const value = matrixData[row][col] || 0;
+                    let fill = REPORT_COLORS.neutral;
+                    if (value >= 5) fill = REPORT_COLORS.danger;
+                    else if (value >= 3) fill = REPORT_COLORS.warning;
+                    else if (value > 0) fill = REPORT_COLORS.success;
+                    doc.setFillColor(...hexToRgb(fill));
+                    doc.rect(matrixX + col * cellSize, matrixY + row * cellSize, cellSize, cellSize, 'F');
+                    doc.setTextColor(fill === REPORT_COLORS.neutral ? 60 : 255);
+                    doc.setFontSize(8);
+                    doc.text(String(value), matrixX + col * cellSize + cellSize / 2, matrixY + row * cellSize + cellSize / 2 + 2, { align: 'center' });
+                }
+            }
+
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(9);
+            doc.setTextColor(...hexToRgb(REPORT_COLORS.secondary));
+            severityLabels.forEach((label, idx) => {
+                doc.text(label, matrixX - 6, matrixY + idx * cellSize + cellSize / 2 + 2, { align: 'right' });
+            });
+            likelihoodLabels.forEach((label, idx) => {
+                doc.text(label, matrixX + idx * cellSize + cellSize / 2, matrixY + matrixSize + 6, { align: 'center' });
+            });
+            doc.text('Severity', matrixX - 22, matrixY + matrixSize / 2, { align: 'center' });
+            doc.text('Likelihood', matrixX + matrixSize / 2, matrixY + matrixSize + 14, { align: 'center' });
+
+            yPos = matrixY + matrixSize + 18;
+
+            const processRows = (processMatrix.processRisk || []).slice(0, 8).map(item => [
+                item.process,
+                formatNumber(item.incidents || 0),
+                (item.risk || 0).toFixed(1)
+            ]);
+
+            if (processRows.length) {
+                doc.autoTable({
+                    startY: yPos,
+                    head: [['Process Path', 'Incidents', 'Avg Risk']],
+                    body: processRows,
+                    theme: 'striped',
+                    headStyles: { fillColor: hexToRgb(REPORT_COLORS.secondary), textColor: [255, 255, 255], fontSize: 9 },
+                    bodyStyles: { fontSize: 9 },
+                    columnStyles: { 1: { halign: 'center' }, 2: { halign: 'center' } },
+                    margin: { left: margin, right: margin }
+                });
+                tableBottom = doc.lastAutoTable.finalY;
+                ensureHeadersForNewPages();
+                yPos = tableBottom + 12;
+            } else {
+                yPos += 12;
+            }
+        } else {
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(9);
+            doc.setTextColor(120, 120, 120);
+            doc.text('Insufficient process path data to render matrix.', margin, yPos + 5);
+            yPos += 20;
+        }
+
+        if (yPos + 70 > pageHeight - margin) {
+            yPos = goToNextPage();
+        }
+
+        yPos = addSectionHeader('Site Comparison', yPos, '🏭');
+
+        const siteRows = siteComparison.slice(0, 10).map(entry => {
+            const ratio = entry.injuries ? (entry.nearMisses / entry.injuries).toFixed(1) :
+                entry.nearMisses > 0 ? 'N/A' : '0.0';
+            const tier = entry.total >= avgIncidentTotal * 1.2 || entry.averageRisk >= avgSiteRisk * 1.1
+                ? '🔴 Focus'
+                : entry.total >= avgIncidentTotal || entry.averageRisk >= avgSiteRisk
+                    ? '🟡 Watch'
+                    : '🟢 Leader';
             return [
-                data.label,
-                data.injuries.toString(),
-                data.nearMisses.toString(),
-                data.total.toString(),
-                ratioText
+                entry.site,
+                formatNumber(entry.injuries || 0),
+                formatNumber(entry.nearMisses || 0),
+                formatNumber(entry.total || 0),
+                (entry.averageRisk || 0).toFixed(1),
+                ratio === 'N/A' ? 'N/A' : `${ratio}:1`,
+                tier
             ];
         });
 
-        if (monthlyTrendRows.length > 0) {
+        if (siteRows.length) {
+            doc.autoTable({
+                startY: yPos,
+                head: [['Site', 'Injuries', 'Near Miss', 'Total', 'Avg Risk', 'NM Ratio', 'Tier']],
+                body: siteRows,
+                theme: 'grid',
+                headStyles: { fillColor: hexToRgb(REPORT_COLORS.secondary), textColor: [255, 255, 255], fontSize: 9 },
+                bodyStyles: { fontSize: 9 },
+                columnStyles: {
+                    1: { halign: 'center' },
+                    2: { halign: 'center' },
+                    3: { halign: 'center' },
+                    4: { halign: 'center' },
+                    5: { halign: 'center' }
+                },
+                margin: { left: margin, right: margin }
+            });
+            tableBottom = doc.lastAutoTable.finalY;
+            ensureHeadersForNewPages();
+            yPos = tableBottom + 12;
+        } else {
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(9);
+            doc.setTextColor(120, 120, 120);
+            doc.text('No site comparison data available for the selected filters.', margin, yPos + 5);
+            yPos += 18;
+        }
+
+        if (yPos + 60 > pageHeight - margin) {
+            yPos = goToNextPage();
+        }
+
+        yPos = addSectionHeader('Cross-site Benchmarking', yPos, '📊');
+
+        const benchmarkingRows = siteComparison.slice(0, 10).map(entry => {
+            const ratioValue = entry.injuries ? (entry.nearMisses / entry.injuries) : null;
+            let tier = 'Leader';
+            let focus = 'Sustain best practices';
+            let icon = '🟢';
+            if (entry.total >= avgIncidentTotal * 1.2 || entry.averageRisk >= avgSiteRisk * 1.1) {
+                tier = 'Critical Focus';
+                focus = 'Deploy immediate mitigation plan';
+                icon = '🔴';
+            } else if (entry.total >= avgIncidentTotal || entry.averageRisk >= avgSiteRisk) {
+                tier = 'Watch List';
+                focus = 'Targeted coaching & audits';
+                icon = '🟡';
+            }
+            return [
+                entry.site,
+                `${icon} ${tier}`,
+                ratioValue === null || Number.isNaN(ratioValue) ? 'N/A' : `${ratioValue.toFixed(1)}:1`,
+                (entry.averageRisk || 0).toFixed(1),
+                focus
+            ];
+        });
+
+        if (benchmarkingRows.length) {
+            doc.autoTable({
+                startY: yPos,
+                head: [['Site', 'Performance Tier', 'NM Ratio', 'Avg Risk', 'Focus Area']],
+                body: benchmarkingRows,
+                theme: 'striped',
+                headStyles: { fillColor: hexToRgb(REPORT_COLORS.secondary), textColor: [255, 255, 255], fontSize: 9 },
+                bodyStyles: { fontSize: 9 },
+                columnStyles: { 2: { halign: 'center' }, 3: { halign: 'center' } },
+                margin: { left: margin, right: margin }
+            });
+            tableBottom = doc.lastAutoTable.finalY;
+            ensureHeadersForNewPages();
+            yPos = tableBottom + 12;
+        } else {
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(9);
+            doc.setTextColor(120, 120, 120);
+            doc.text('Cross-site benchmarking cannot be calculated with the current dataset.', margin, yPos + 5);
+            yPos += 18;
+        }
+
+        if (yPos + 60 > pageHeight - margin) {
+            yPos = goToNextPage();
+        }
+
+        yPos = addSectionHeader('Primary Impact Analysis', yPos, '💥');
+
+        const impactRows = primaryImpacts.slice(0, 8).map(item => [
+            item.type,
+            formatNumber(item.count || 0),
+            `${item.percentage || 0}%`,
+            (item.averageRisk || 0).toFixed(1),
+            item.riskLevel
+        ]);
+
+        if (impactRows.length) {
+            doc.autoTable({
+                startY: yPos,
+                head: [['Impact Type', 'Count', '% Share', 'Avg Risk', 'Risk Level']],
+                body: impactRows,
+                theme: 'grid',
+                headStyles: { fillColor: hexToRgb(REPORT_COLORS.secondary), textColor: [255, 255, 255], fontSize: 9 },
+                bodyStyles: { fontSize: 9 },
+                columnStyles: {
+                    1: { halign: 'center' },
+                    2: { halign: 'center' },
+                    3: { halign: 'center' },
+                    4: { halign: 'center' }
+                },
+                willDrawCell: data => {
+                    if (data.section === 'body' && data.column.index === 4) {
+                        const risk = data.cell.raw;
+                        let fill = REPORT_COLORS.success;
+                        if (risk === 'Critical') fill = REPORT_COLORS.danger;
+                        else if (risk === 'High') fill = REPORT_COLORS.warning;
+                        else if (risk === 'Medium') fill = REPORT_COLORS.accent;
+                        data.cell.styles.fillColor = hexToRgb(fill);
+                        data.cell.styles.textColor = [255, 255, 255];
+                    }
+                },
+                margin: { left: margin, right: margin }
+            });
+            tableBottom = doc.lastAutoTable.finalY;
+            ensureHeadersForNewPages();
+            yPos = tableBottom + 12;
+        } else {
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(9);
+            doc.setTextColor(120, 120, 120);
+            doc.text('Primary impact information unavailable.', margin, yPos + 5);
+            yPos += 18;
+        }
+
+        if (yPos + 60 > pageHeight - margin) {
+            yPos = goToNextPage();
+        }
+
+        yPos = addSectionHeader('Combined Trending', yPos, '📈');
+
+        const trendRows = monthlyTrend.map(item => [
+            item.label,
+            formatNumber(item.injuries || 0),
+            formatNumber(item.nearMisses || 0),
+            formatNumber(item.total || 0),
+            item.ratio === 'N/A' ? 'N/A' : `${item.ratio}:1`
+        ]);
+
+        if (trendRows.length) {
             doc.autoTable({
                 startY: yPos,
                 head: [['Month', 'Injuries', 'Near Miss', 'Total', 'NM Ratio']],
-                body: monthlyTrendRows,
+                body: trendRows,
                 theme: 'grid',
-                headStyles: {
-                    fillColor: hexToRgb(REPORT_COLORS.darkBlue),
-                    textColor: [255, 255, 255],
-                    fontSize: 10
-                },
+                headStyles: { fillColor: hexToRgb(REPORT_COLORS.secondary), textColor: [255, 255, 255], fontSize: 9 },
                 bodyStyles: { fontSize: 9 },
-                columnStyles: {
-                    0: { cellWidth: 50 },
-                    1: { cellWidth: 25, halign: 'center' },
-                    2: { cellWidth: 25, halign: 'center' },
-                    3: { cellWidth: 25, halign: 'center' },
-                    4: { cellWidth: 35, halign: 'center' }
-                },
-                margin: { left: 20, right: 20 }
+                columnStyles: { 1: { halign: 'center' }, 2: { halign: 'center' }, 3: { halign: 'center' }, 4: { halign: 'center' } },
+                margin: { left: margin, right: margin }
             });
-
-            yPos = doc.lastAutoTable.finalY + 15;
+            tableBottom = doc.lastAutoTable.finalY;
+            ensureHeadersForNewPages();
+            yPos = tableBottom + 12;
         } else {
-            doc.setTextColor(...hexToRgb(REPORT_COLORS.gray));
             doc.setFont('helvetica', 'normal');
-            doc.setFontSize(10);
-            doc.text('Monthly trend data unavailable for the selected period', 20, yPos + 10);
-            yPos += 25;
+            doc.setFontSize(9);
+            doc.setTextColor(120, 120, 120);
+            doc.text('Monthly trend cannot be calculated due to missing data.', margin, yPos + 5);
+            yPos += 18;
         }
 
-        yPos = addSectionHeader('Data Insights Summary', yPos);
+        if (yPos + 60 > pageHeight - margin) {
+            yPos = goToNextPage();
+        }
 
-        doc.setTextColor(...hexToRgb(REPORT_COLORS.darkBlue));
+        yPos = addSectionHeader('Insights & Actions', yPos, '💡');
+
+        const findings = [
+            `Total of ${formatNumber(combinedKpis.totalIncidents || 0)} incidents recorded with ${formatNumber(combinedKpis.highSeverityCount || 0)} high-severity cases.`,
+            `Recordable rate sits at ${injuryKpis.recordableRate?.toFixed(1) || '0.0'}% (${injuryKpis.recordableTag === 'danger' ? 'critical' : injuryKpis.recordableTag === 'warning' ? 'watch' : 'good'} performance).`,
+            `Near miss to injury ratio is ${nearMissKpis.ratio || 'N/A'} supporting leading indicator engagement.`,
+            `${formatNumber(metrics.openInvestigations || 0)} investigations remain open; ensure closure cadence is maintained.`,
+            metrics.topRootCauses && metrics.topRootCauses.length
+                ? `Primary root cause: ${metrics.topRootCauses[0][0]} (${metrics.topRootCauses[0][1]} cases).`
+                : 'Root cause information limited for this period.'
+        ];
+
+        const actions = [
+            combinedKpis.safetyIndex < 70
+                ? 'Launch safety leadership walk at focus sites within the next week.'
+                : 'Sustain leadership engagement to preserve strong safety index results.',
+            injuryKpis.recordableRate > 8
+                ? 'Deploy targeted ergonomics and manual handling refresher training at high incident sites.'
+                : 'Continue proactive coaching to keep recordable rate within target.',
+            nearMissKpis.highRiskCount > 0
+                ? 'Escalate investigation of high-risk near misses and validate controls within 48 hours.'
+                : 'Promote ongoing near miss reporting with weekly recognition.',
+            processMatrix.processRisk && processMatrix.processRisk.length
+                ? `Prioritize mitigation for ${processMatrix.processRisk[0].process} (highest average risk ${processMatrix.processRisk[0].risk.toFixed(1)}).`
+                : 'Review process path data capture to enrich risk insights.',
+            recentIncidents.length
+                ? `Review ${recentIncidents[0].site || 'key'} site incident from ${formatDate(recentIncidents[0].incident_date || recentIncidents[0].nearmiss_date)} for immediate learnings.`
+                : 'No recent critical incidents; maintain vigilance.'
+        ];
+
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(11);
+        doc.setTextColor(...hexToRgb(REPORT_COLORS.secondary));
+        doc.text('Key Findings', margin, yPos + 5);
+
+        let insightY = yPos + 10;
         doc.setFont('helvetica', 'normal');
         doc.setFontSize(9);
+        doc.setTextColor(60, 60, 60);
+        findings.forEach(finding => {
+            const lines = doc.splitTextToSize(`• ${finding}`, contentWidth);
+            doc.text(lines, margin, insightY);
+            insightY += lines.length * 5 + 2;
+        });
 
-        const insights = [];
-        if (metrics.nmRatio === 'N/A') {
-            insights.push('Near miss ratio cannot be calculated because no injuries were reported.');
-        } else {
-            insights.push(`Near miss ratio stands at ${metrics.nmRatio}:1 across the reporting period.`);
-        }
-        insights.push(`Average days lost per injury: ${metrics.avgDaysLost} days.`);
-        insights.push(`${metrics.openInvestigations} investigations are pending root cause determination.`);
-        if (metrics.topRootCauses.length > 0) {
-            const [topCause, count] = metrics.topRootCauses[0];
-            insights.push(`Leading root cause: ${topCause} (${count} cases).`);
-        }
-        const sortedSitesForInsights = Object.entries(metrics.siteData).sort(([, a], [, b]) => b.total - a.total);
-        if (sortedSitesForInsights.length > 0) {
-            const [topSite, data] = sortedSitesForInsights[0];
-            insights.push(`${topSite} recorded the highest incident volume with ${data.total} total cases.`);
-        }
-        if (metrics.monthlyTrend.length > 0) {
-            const latestMonth = metrics.monthlyTrend[0];
-            insights.push(`${latestMonth.label} logged ${latestMonth.total} total events (${latestMonth.injuries} injuries, ${latestMonth.nearMisses} near misses).`);
-        }
-        if (metrics.totalDaysLost && Number(metrics.totalDaysLost) > 0) {
-            insights.push(`Total lost time across injuries reached ${metrics.totalDaysLost} days.`);
-        }
+        insightY += 2;
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(11);
+        doc.setTextColor(...hexToRgb(REPORT_COLORS.secondary));
+        doc.text('Recommended Actions', margin, insightY);
 
-        let insightY = yPos;
-        insights.forEach(insight => {
-            const insightText = doc.splitTextToSize(`• ${insight}`, 170);
-            doc.text(insightText, 22, insightY + 6);
-            insightY += insightText.length * 5 + 2;
+        insightY += 5;
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(9);
+        doc.setTextColor(60, 60, 60);
+        actions.forEach(action => {
+            const lines = doc.splitTextToSize(`• ${action}`, contentWidth);
+            doc.text(lines, margin, insightY);
+            insightY += lines.length * 5 + 2;
         });
 
         yPos = insightY + 5;
 
-        const fileName = `Safety_WBR_Report_CW${currentWeek}_${currentYear}.pdf`;
+        if (recentIncidents.length) {
+            if (yPos + 50 > pageHeight - margin) {
+                yPos = goToNextPage();
+            }
+
+            yPos = addSectionHeader('Recent High-Priority Incidents', yPos, '⚠️');
+
+            const recentRows = recentIncidents.map(incident => {
+                const isInjury = Boolean(incident.case_number);
+                const incidentDate = formatDate(incident.incident_date || incident.nearmiss_date);
+                const severity = incident.severity || incident.potential_severity || 'Unknown';
+                const site = incident.site || 'Unknown';
+                const description = incident.initial_info_incident_description ||
+                    incident.initial_info_nearmiss_type ||
+                    incident.description || 'No description provided';
+                const summary = description.length > 90 ? `${description.substring(0, 87)}…` : description;
+                return [
+                    incidentDate,
+                    site,
+                    isInjury ? 'Injury' : 'Near Miss',
+                    severity,
+                    summary
+                ];
+            });
+
+            doc.autoTable({
+                startY: yPos,
+                head: [['Date', 'Site', 'Type', 'Severity', 'Summary']],
+                body: recentRows,
+                theme: 'striped',
+                headStyles: { fillColor: hexToRgb(REPORT_COLORS.secondary), textColor: [255, 255, 255], fontSize: 9 },
+                bodyStyles: { fontSize: 8 },
+                columnStyles: { 2: { halign: 'center' }, 3: { halign: 'center' } },
+                margin: { left: margin, right: margin }
+            });
+            tableBottom = doc.lastAutoTable.finalY;
+            ensureHeadersForNewPages();
+            yPos = tableBottom + 10;
+        }
+
+        addFooter(currentPage);
+
+        const fileName = `Safety_WBR_Report_${new Date().toISOString().split('T')[0]}.pdf`;
         doc.save(fileName);
+        addToReportHistory('wbr', fileName);
 
         showStatus('Safety WBR Report generated successfully!', 'success');
     } catch (error) {
@@ -12949,7 +14663,6 @@ function legacyGenerateWBRReport() {
         showStatus('Error generating Safety WBR Report: ' + error.message, 'error');
     }
 }
-
 function getReportPeriod() {
     const allData = [...state.injury.filteredData, ...state.nearMiss.filteredData];
     if (allData.length === 0) return 'No data available';
@@ -13408,6 +15121,169 @@ function formatDate(date) {
 function formatNumber(num) {
     if (num === null || num === undefined) return '0';
     return num.toLocaleString();
+}
+
+function setElementText(id, value, fallback = '0') {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.textContent = value ?? fallback;
+}
+
+function applyTrendToElement(id, indicator, invert = false) {
+    const el = typeof id === 'string' ? document.getElementById(id) : id;
+    if (!el) return;
+    el.classList.remove('trend-positive', 'trend-negative', 'trend-flat');
+    if (!indicator || Number.isNaN(indicator.percentChange)) {
+        el.textContent = '—';
+        el.classList.add('trend-flat');
+        return;
+    }
+    const arrow = indicator.direction === 'up' ? '↑' : indicator.direction === 'down' ? '↓' : '↔';
+    const formatted = `${arrow} ${indicator.percentChange >= 0 ? '+' : ''}${indicator.percentChange}%`;
+    el.textContent = formatted;
+
+    if (indicator.direction === 'flat') {
+        el.classList.add('trend-flat');
+        return;
+    }
+
+    const isPositive = invert ? indicator.direction === 'up' : indicator.direction === 'down';
+    el.classList.add(isPositive ? 'trend-positive' : 'trend-negative');
+}
+
+function updateTagIndicator(id, status, label) {
+    const tag = document.getElementById(id);
+    if (!tag) return;
+    tag.classList.remove('success', 'warning', 'danger');
+    if (status) {
+        tag.classList.add(status);
+    }
+    if (label) {
+        tag.textContent = label;
+    }
+}
+
+function updateFootnote(id, entries) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (!entries || !entries.length) {
+        el.textContent = 'No data available';
+        return;
+    }
+
+    const first = entries[0];
+    let label;
+    let value;
+    if (Array.isArray(first)) {
+        [label, value] = first;
+    } else if (typeof first === 'object') {
+        label = first.type || first.process || first.site || first.cause || first.label || 'Unknown';
+        value = first.count ?? first.incidents ?? first.total ?? first.value ?? 0;
+    } else {
+        label = String(first);
+        value = '';
+    }
+    el.textContent = value !== undefined && value !== '' ? `Top: ${label} (${value})` : `Top: ${label}`;
+}
+
+function renderMiniBarChart(canvasId, labels = [], values = [], color = AMAZON_COLORS.orange) {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) return;
+
+    if (state.miniCharts && state.miniCharts[canvasId]) {
+        state.miniCharts[canvasId].destroy();
+        delete state.miniCharts[canvasId];
+    }
+
+    if (!labels.length || !values.length) {
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+        return;
+    }
+
+    const chart = new Chart(canvas.getContext('2d'), {
+        type: 'bar',
+        data: {
+            labels,
+            datasets: [{
+                data: values,
+                backgroundColor: color,
+                borderRadius: 6,
+                maxBarThickness: 22
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: context => `${context.parsed.y}`
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid: { display: false },
+                    ticks: {
+                        color: '#666',
+                        font: { size: 10 },
+                        maxRotation: 0,
+                        autoSkip: true
+                    }
+                },
+                y: { display: false }
+            }
+        }
+    });
+
+    if (!state.miniCharts) {
+        state.miniCharts = {};
+    }
+    state.miniCharts[canvasId] = chart;
+}
+
+function createChartImage(config, width = 480, height = 240) {
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    canvas.style.position = 'absolute';
+    canvas.style.left = '-9999px';
+    document.body.appendChild(canvas);
+
+    let chart;
+    try {
+        chart = new Chart(canvas.getContext('2d'), {
+            ...config,
+            options: {
+                responsive: false,
+                maintainAspectRatio: false,
+                animation: false,
+                ...(config.options || {})
+            }
+        });
+
+        chart.update();
+        return chart.toBase64Image('image/png', 1.0);
+    } catch (error) {
+        console.error('Chart image generation failed:', error);
+        return null;
+    } finally {
+        if (chart) {
+            try {
+                chart.destroy();
+            } catch (destroyError) {
+                console.warn('Chart cleanup error:', destroyError);
+            }
+        }
+        if (canvas.parentNode) {
+            canvas.parentNode.removeChild(canvas);
+        }
+    }
 }
 
 // Export individual functions for module pattern
