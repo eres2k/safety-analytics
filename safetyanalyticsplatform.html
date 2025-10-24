@@ -1313,6 +1313,116 @@
             font-size: 1.2rem;
             margin-right: var(--spacing-xs);
         }
+
+        /* Inspection Module Styles */
+        #inspections .alert-section {
+            background: #FFEBEE;
+            border-left: 4px solid #B71C1C;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .overdue-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .overdue-list li {
+            padding: 10px;
+            background: white;
+            margin: 8px 0;
+            border-radius: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .overdue-days {
+            color: #B71C1C;
+            font-weight: bold;
+            padding: 2px 8px;
+            background: #FFEBEE;
+            border-radius: 12px;
+        }
+
+        .inspection-status-badge {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .status-overdue { background: #FFEBEE; color: #B71C1C; }
+        .status-upcoming { background: #FFF8E1; color: #F57C00; }
+        .status-completed { background: #E8F5E9; color: #2E7D32; }
+        .status-scheduled { background: #E3F2FD; color: #1565C0; }
+
+        .notification-badge {
+            background: #B71C1C;
+            color: white;
+            border-radius: 12px;
+            padding: 0.2rem 0.6rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: none;
+        }
+
+        .notification-badge.active {
+            display: inline-flex;
+        }
+
+        .btn-large {
+            padding: 0.75rem 1.5rem;
+            font-size: 0.95rem;
+        }
+
+        /* WBR Report Styles */
+        .wbr-header {
+            background: linear-gradient(135deg, #FF9900, #FF6F00);
+            color: white;
+            padding: 30px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .wbr-section {
+            margin: 20px 0;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .wbr-metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .wbr-metric-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #FF9900;
+        }
+
+        .wbr-metric-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #232F3E;
+            margin: 10px 0;
+        }
+
+        .wbr-metric-label {
+            color: #666;
+            font-size: 0.9em;
+        }
     </style>
 </head>
 <body>
@@ -1342,6 +1452,7 @@
                     <span>❔</span>
                     <span>Help</span>
                 </button>
+                <span id="overdueBadge" class="notification-badge">0</span>
             </div>
         </div>
     </header>
@@ -1364,6 +1475,10 @@
             <div class="nav-tab" data-module="combined" onclick="switchModule('combined', event)">
                 <span class="nav-tab-icon">📈</span>
                 <span>Combined Analytics</span>
+            </div>
+            <div class="nav-tab" data-module="inspections" onclick="switchModule('inspections', event)">
+                <span class="nav-tab-icon">📋</span>
+                <span>Inspections</span>
             </div>
             <div class="nav-tab" data-module="reports" onclick="switchModule('reports', event)">
                 <span class="nav-tab-icon">📄</span>
@@ -2382,6 +2497,108 @@
             </div>
         </div>
 
+        <!-- Inspections Module -->
+        <div id="inspections" class="tab-content">
+            <div class="control-panel">
+                <div class="control-header">
+                    <h2 class="control-title">Austin Inspections Tracking</h2>
+                    <input type="file" id="inspectionsUpload" class="file-input" accept=".csv" onchange="handleFileUpload(event, 'inspections')">
+                    <label for="inspectionsUpload" class="btn btn-primary">
+                        <span>📁</span> Import Austin Inspections
+                    </label>
+                </div>
+
+                <!-- KPI Cards -->
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <div class="kpi-value" id="overdueInspections">0</div>
+                        <div class="kpi-label">Overdue Inspections</div>
+                        <div class="kpi-trend danger">⚠️ Require Immediate Action</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-value" id="upcomingInspections">0</div>
+                        <div class="kpi-label">Due This Week</div>
+                        <div class="kpi-trend warning">📅 Schedule Resources</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-value" id="completionRate">0%</div>
+                        <div class="kpi-label">Completion Rate</div>
+                        <div class="kpi-trend" id="completionTrend">MTD Performance</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-value" id="totalInspections">0</div>
+                        <div class="kpi-label">Total Inspections</div>
+                        <div class="kpi-trend">This Period</div>
+                    </div>
+                </div>
+
+                <!-- Filters -->
+                <div class="filters-container">
+                    <select id="inspectionSiteFilter" onchange="applyFilters('inspections')">
+                        <option value="">All Sites</option>
+                    </select>
+                    <select id="inspectionStatusFilter" onchange="applyFilters('inspections')">
+                        <option value="">All Statuses</option>
+                        <option value="overdue">Overdue</option>
+                        <option value="upcoming">Upcoming (7 days)</option>
+                        <option value="completed">Completed</option>
+                        <option value="scheduled">Scheduled</option>
+                    </select>
+                    <select id="inspectionTypeFilter" onchange="applyFilters('inspections')">
+                        <option value="">All Types</option>
+                    </select>
+                    <input type="date" id="inspectionDateFrom" onchange="applyFilters('inspections')">
+                    <input type="date" id="inspectionDateTo" onchange="applyFilters('inspections')">
+                </div>
+            </div>
+
+            <!-- Overdue Alert Section -->
+            <div class="alert-section" id="overdueAlert" style="display: none;">
+                <h3>🚨 Overdue Inspections - Immediate Action Required</h3>
+                <div id="overdueList"></div>
+            </div>
+
+            <!-- Charts Grid -->
+            <div class="chart-grid">
+                <div class="chart-container">
+                    <h3>Inspections by Site</h3>
+                    <canvas id="inspectionsBySite"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h3>Completion Status</h3>
+                    <canvas id="inspectionStatus"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h3>Weekly Trend</h3>
+                    <canvas id="inspectionTrend"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h3>Type Distribution</h3>
+                    <canvas id="inspectionTypes"></canvas>
+                </div>
+            </div>
+
+            <!-- Detailed Table -->
+            <div class="table-container">
+                <h3>Inspection Details</h3>
+                <table id="inspectionsTable">
+                    <thead>
+                        <tr>
+                            <th>Site</th>
+                            <th>Inspection Type</th>
+                            <th>Due Date</th>
+                            <th>Status</th>
+                            <th>Days Until Due</th>
+                            <th>Owner</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+                <div class="pagination" id="inspectionsPagination"></div>
+            </div>
+        </div>
+
         <!-- Reports Module -->
         <div id="reports" class="tab-content">
             <div class="control-panel">
@@ -2407,14 +2624,14 @@
                             <small style="font-size: 0.75rem; opacity: 0.8;">Trends & patterns</small>
                         </div>
                     </button>
-                    <button class="btn btn-primary" onclick="generateWBRReport()">
+                    <button class="btn btn-primary btn-large" onclick="generateWBRReport()">
                         <span>📊</span>
                         <div>
-                            <div>Safety WBR Report</div>
-                            <small style="font-size: 0.75rem; opacity: 0.8;">Weekly Business Review</small>
+                            <div>Generate Safety WBR</div>
+                            <small>Weekly Business Review for Leadership</small>
                         </div>
                     </button>
-                    <button class="btn btn-secondary" onclick="exportToExcel('all')">
+                    <button class="btn btn-secondary" onclick="exportCombinedData()">
                         <span>📊</span>
                         <div>
                             <div>Export All Data</div>
@@ -2671,6 +2888,15 @@ const state = {
         timelinePage: 1,
         qualityMetrics: {},
         sort: { column: 'nearmiss_date', direction: 'desc' }
+    },
+    inspections: {
+        rawData: [],
+        filteredData: [],
+        charts: {},
+        currentPage: 1,
+        overdueCount: 0,
+        upcomingCount: 0,
+        completedCount: 0
     },
     currentModule: 'overview',
     theme: 'light',
@@ -4821,6 +5047,8 @@ document.addEventListener('DOMContentLoaded', function() {
     if (savedTheme === 'dark') {
         toggleTheme();
     }
+
+    updateReportButtons();
 });
 
 // Standardized and categorized chart options for all views
@@ -4974,9 +5202,15 @@ function switchModule(module, evt) {
         updateNearMissCharts();
     } else if (module === 'combined') {
         updateCombinedAnalytics();
+    } else if (module === 'inspections') {
+        updateInspectionDashboard();
+        updateInspectionTable();
+        updateInspectionCharts();
     } else if (module === 'actions') {
         updateActionItems();
     }
+
+    updateReportButtons(module);
 }
 
 // Sub-view switching for Injury module
@@ -5037,6 +5271,22 @@ function handleFileUpload(event, type) {
     const reader = new FileReader();
     reader.onload = function(e) {
         const text = e.target.result;
+
+        if (type === 'inspections') {
+            const processed = processInspectionsData(text);
+            state.inspections.rawData = processed;
+            state.inspections.filteredData = [...processed];
+            populateInspectionFilters();
+            state.inspections.currentPage = 1;
+            updateInspectionDashboard();
+            updateInspectionTable();
+            updateInspectionCharts();
+            checkOverdueInspections();
+            updateReportButtons();
+            showStatus(`Loaded ${processed.length} inspection records successfully!`, 'success');
+            return;
+        }
+
         const headerLine = text.split(/\r?\n/)[0].toLowerCase();
         const injuryIndicators = ['incident_date', 'case_number', 'recordable'];
         const nearMissIndicators = ['nearmiss_date', 'incident_id', 'primary_impact'];
@@ -5073,9 +5323,11 @@ function handleDrop(event, type) {
     if (files.length > 0) {
         const file = files[0];
         if (file.type === 'text/csv' || file.name.endsWith('.csv')) {
-            const input = type === 'injury' ? 
-                document.getElementById('injuryFile') : 
-                document.getElementById('nearMissFile');
+            const input = type === 'injury' ?
+                document.getElementById('injuryFile') :
+                type === 'nearmiss' ?
+                    document.getElementById('nearMissFile') :
+                    document.getElementById('inspectionsUpload');
             
             const dataTransfer = new DataTransfer();
             dataTransfer.items.add(file);
@@ -5125,11 +5377,993 @@ function parseCSV(csvText, type) {
             
             updateOverview();
             initializeChartSelections();
+            updateReportButtons();
         },
         error: function(error) {
             showStatus('Failed to parse CSV: ' + error.message, 'error');
         }
     });
+}
+
+function processInspectionsData(csvData) {
+    const parsed = Papa.parse(csvData, {
+        header: true,
+        skipEmptyLines: true,
+        dynamicTyping: true
+    }).data;
+
+    return parsed
+        .filter(row => row && Object.values(row).some(value => value !== null && value !== undefined && value !== ''))
+        .map((row, index) => {
+            const dueValue = row['Due Date'] || row.due_date || row.dueDate || row.DueDate || row['due date'];
+            const dueDate = dueValue ? new Date(dueValue) : null;
+            const completeRaw = row.Complete ?? row.complete ?? row.Completed ?? row.completed ?? row.is_complete ?? 0;
+            const complete = Number.parseInt(completeRaw, 10);
+
+            const record = {
+                uid: row.id || row.ID || row.uid || `inspection-${index + 1}`,
+                site: row.Site || row.site || row.Location || 'Unknown',
+                inspection: row.Inspection || row.inspection || row.Type || row['Inspection Type'] || 'General Inspection',
+                dueDate: dueDate && !Number.isNaN(dueDate.getTime()) ? dueDate : null,
+                complete: Number.isNaN(complete) ? 0 : complete,
+                owner: row.Owner || row.owner || row.Assignee || 'TBD',
+                rawRow: row
+            };
+
+            record.status = determineInspectionStatus({ ...row, dueDate: dueValue, Complete: record.complete });
+            record.daysUntilDue = calculateDaysUntilDue(record.dueDate);
+            if (record.complete === 1) {
+                record.status = 'completed';
+            }
+
+            return record;
+        });
+}
+
+function determineInspectionStatus(row) {
+    const dueValue = row?.dueDate || row?.['Due Date'] || row?.due_date || row?.dueDate;
+    const dueDate = dueValue ? new Date(dueValue) : null;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (!dueDate || Number.isNaN(dueDate.getTime())) {
+        return (Number.parseInt(row?.Complete ?? row?.complete ?? 0, 10) === 1) ? 'completed' : 'scheduled';
+    }
+
+    dueDate.setHours(0, 0, 0, 0);
+    const complete = Number.parseInt(row?.Complete ?? row?.complete ?? row?.Completed ?? 0, 10);
+
+    if (complete === 1) return 'completed';
+    if (dueDate < today) return 'overdue';
+    if (dueDate - today < 7 * 24 * 60 * 60 * 1000) return 'upcoming';
+    return 'scheduled';
+}
+
+function calculateDaysUntilDue(dueDate) {
+    if (!dueDate) return 0;
+    const due = dueDate instanceof Date ? new Date(dueDate) : new Date(dueDate);
+    if (Number.isNaN(due.getTime())) return 0;
+    const today = new Date();
+    due.setHours(0, 0, 0, 0);
+    today.setHours(0, 0, 0, 0);
+    return Math.ceil((due - today) / (24 * 60 * 60 * 1000));
+}
+
+function populateInspectionFilters() {
+    const siteSelect = document.getElementById('inspectionSiteFilter');
+    const typeSelect = document.getElementById('inspectionTypeFilter');
+    if (!siteSelect || !typeSelect) return;
+
+    const currentSite = siteSelect.value;
+    const currentType = typeSelect.value;
+
+    siteSelect.innerHTML = '<option value="">All Sites</option>';
+    typeSelect.innerHTML = '<option value="">All Types</option>';
+
+    const sites = new Set();
+    const types = new Set();
+
+    state.inspections.rawData.forEach(row => {
+        if (row.site) sites.add(row.site);
+        if (row.inspection) {
+            const baseType = row.inspection.split('-')[0].trim();
+            if (baseType) types.add(baseType);
+        }
+    });
+
+    Array.from(sites).sort().forEach(site => {
+        const option = document.createElement('option');
+        option.value = site;
+        option.textContent = site;
+        siteSelect.appendChild(option);
+    });
+
+    Array.from(types).sort().forEach(type => {
+        const option = document.createElement('option');
+        option.value = type;
+        option.textContent = type;
+        typeSelect.appendChild(option);
+    });
+
+    if (currentSite && sites.has(currentSite)) siteSelect.value = currentSite;
+    if (currentType && types.has(currentType)) typeSelect.value = currentType;
+}
+
+function updateInspectionDashboard() {
+    const data = state.inspections.filteredData;
+    const total = data.length;
+    const overdue = data.filter(item => item.status === 'overdue');
+    const upcoming = data.filter(item => item.status === 'upcoming');
+    const completed = data.filter(item => item.status === 'completed');
+
+    state.inspections.overdueCount = overdue.length;
+    state.inspections.upcomingCount = upcoming.length;
+    state.inspections.completedCount = completed.length;
+
+    const overdueEl = document.getElementById('overdueInspections');
+    const upcomingEl = document.getElementById('upcomingInspections');
+    const completionRateEl = document.getElementById('completionRate');
+    const totalEl = document.getElementById('totalInspections');
+    const completionTrendEl = document.getElementById('completionTrend');
+
+    if (overdueEl) overdueEl.textContent = overdue.length;
+    if (upcomingEl) upcomingEl.textContent = upcoming.length;
+    if (totalEl) totalEl.textContent = total;
+
+    const completionRate = total > 0 ? ((completed.length / total) * 100).toFixed(0) : 0;
+    if (completionRateEl) completionRateEl.textContent = `${completionRate}%`;
+
+    const compliance = calculateInspectionCompliance();
+    if (completionTrendEl) {
+        completionTrendEl.textContent = `MTD: ${compliance.completed}/${compliance.total} completed`;
+    }
+
+    updateNotificationBadge(overdue.length);
+}
+
+function updateInspectionTable() {
+    const tbody = document.querySelector('#inspectionsTable tbody');
+    if (!tbody) return;
+
+    const data = state.inspections.filteredData;
+    const totalPages = Math.max(1, Math.ceil(data.length / state.itemsPerPage));
+    if (state.inspections.currentPage > totalPages) {
+        state.inspections.currentPage = totalPages;
+    }
+
+    if (data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:2rem;">No inspection data available. Upload CSV to begin analysis.</td></tr>';
+        updateInspectionPagination(0);
+        return;
+    }
+
+    const startIndex = (state.inspections.currentPage - 1) * state.itemsPerPage;
+    const pageData = data.slice(startIndex, startIndex + state.itemsPerPage);
+
+    tbody.innerHTML = pageData.map(item => {
+        const dueDate = item.dueDate instanceof Date && !Number.isNaN(item.dueDate.getTime())
+            ? item.dueDate.toLocaleDateString('en-GB')
+            : 'N/A';
+        const statusClass = `status-${item.status || 'scheduled'}`;
+        const daysLabel = typeof item.daysUntilDue === 'number'
+            ? item.daysUntilDue
+            : calculateDaysUntilDue(item.dueDate);
+        const actionHtml = item.complete === 1
+            ? '<span class="badge badge-success">Completed</span>'
+            : `<button class="btn btn-sm btn-outline" onclick="markInspectionComplete('${item.uid}')">Mark Complete</button>`;
+
+        return `
+            <tr>
+                <td>${item.site || 'Unknown'}</td>
+                <td>${item.inspection || 'Inspection'}</td>
+                <td>${dueDate}</td>
+                <td><span class="inspection-status-badge ${statusClass}">${(item.status || 'scheduled').toUpperCase()}</span></td>
+                <td>${typeof daysLabel === 'number' ? daysLabel : '0'}</td>
+                <td>${item.owner || 'TBD'}</td>
+                <td>${actionHtml}</td>
+            </tr>
+        `;
+    }).join('');
+
+    updateInspectionPagination(Math.ceil(data.length / state.itemsPerPage));
+}
+
+function updateInspectionPagination(totalPages) {
+    const pagination = document.getElementById('inspectionsPagination');
+    if (!pagination) return;
+
+    if (totalPages <= 1) {
+        pagination.innerHTML = totalPages === 0 ? '' : `<span class="pagination-info">Page 1 of 1</span>`;
+        return;
+    }
+
+    const prevDisabled = state.inspections.currentPage <= 1 ? 'disabled' : '';
+    const nextDisabled = state.inspections.currentPage >= totalPages ? 'disabled' : '';
+
+    pagination.innerHTML = `
+        <button class="btn btn-sm" onclick="changePage('inspections', -1)" ${prevDisabled}>Previous</button>
+        <span class="pagination-info">Page ${state.inspections.currentPage} of ${totalPages}</span>
+        <button class="btn btn-sm" onclick="changePage('inspections', 1)" ${nextDisabled}>Next</button>
+    `;
+}
+
+function updateInspectionCharts() {
+    const data = state.inspections.filteredData;
+    if (!Array.isArray(data) || data.length === 0) {
+        Object.keys(state.inspections.charts).forEach(id => {
+            const chart = state.inspections.charts[id];
+            if (chart) chart.destroy();
+        });
+        state.inspections.charts = {};
+        return;
+    }
+
+    const siteCounts = {};
+    const siteCompleted = {};
+    const siteOverdue = {};
+
+    data.forEach(item => {
+        const site = item.site || 'Unknown';
+        siteCounts[site] = (siteCounts[site] || 0) + 1;
+        if (item.complete === 1) {
+            siteCompleted[site] = (siteCompleted[site] || 0) + 1;
+        }
+        if (item.status === 'overdue') {
+            siteOverdue[site] = (siteOverdue[site] || 0) + 1;
+        }
+    });
+
+    updateChart('inspectionsBySite', 'bar', {
+        labels: Object.keys(siteCounts),
+        datasets: [
+            {
+                label: 'Total',
+                data: Object.values(siteCounts),
+                backgroundColor: '#232F3E'
+            },
+            {
+                label: 'Completed',
+                data: Object.keys(siteCounts).map(site => siteCompleted[site] || 0),
+                backgroundColor: '#4CAF50'
+            },
+            {
+                label: 'Overdue',
+                data: Object.keys(siteCounts).map(site => siteOverdue[site] || 0),
+                backgroundColor: '#B71C1C'
+            }
+        ]
+    });
+
+    const statusCounts = {
+        Completed: data.filter(i => i.status === 'completed').length,
+        Upcoming: data.filter(i => i.status === 'upcoming').length,
+        Overdue: data.filter(i => i.status === 'overdue').length,
+        Scheduled: data.filter(i => i.status === 'scheduled').length
+    };
+
+    updateChart('inspectionStatus', 'doughnut', {
+        labels: Object.keys(statusCounts),
+        datasets: [{
+            data: Object.values(statusCounts),
+            backgroundColor: ['#4CAF50', '#FFC107', '#B71C1C', '#2196F3']
+        }]
+    });
+
+    const weeklyData = generateWeeklyInspectionTrend(data);
+    updateChart('inspectionTrend', 'line', weeklyData);
+
+    const typeCounts = {};
+    data.forEach(item => {
+        const type = (item.inspection || 'General').split('-')[0].trim();
+        typeCounts[type] = (typeCounts[type] || 0) + 1;
+    });
+
+    const topTypes = Object.entries(typeCounts).sort((a, b) => b[1] - a[1]).slice(0, 6);
+    updateChart('inspectionTypes', 'pie', {
+        labels: topTypes.map(([label]) => label),
+        datasets: [{
+            data: topTypes.map(([, count]) => count),
+            backgroundColor: generateColorPalette(topTypes.length)
+        }]
+    });
+}
+
+function updateChart(chartId, chartType, dataConfig) {
+    const canvas = document.getElementById(chartId);
+    if (!canvas) return;
+
+    if (state.inspections.charts[chartId]) {
+        state.inspections.charts[chartId].destroy();
+    }
+
+    state.inspections.charts[chartId] = new Chart(canvas, {
+        type: chartType,
+        data: dataConfig,
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            },
+            scales: chartType === 'bar' || chartType === 'line' ? {
+                y: {
+                    beginAtZero: true,
+                    ticks: { precision: 0 }
+                }
+            } : {}
+        }
+    });
+}
+
+function generateWeeklyInspectionTrend(data) {
+    const bucket = new Map();
+    data.forEach(item => {
+        const due = item.dueDate instanceof Date ? item.dueDate : (item.dueDate ? new Date(item.dueDate) : null);
+        if (!due || Number.isNaN(due.getTime())) return;
+        const weekStart = getStartOfISOWeek(due);
+        const weekKey = `${weekStart.getFullYear()}-W${String(getISOWeek(weekStart)).padStart(2, '0')}`;
+        if (!bucket.has(weekKey)) {
+            bucket.set(weekKey, { total: 0, completed: 0 });
+        }
+        const entry = bucket.get(weekKey);
+        entry.total += 1;
+        if (item.status === 'completed') entry.completed += 1;
+    });
+
+    const sortedKeys = Array.from(bucket.keys()).sort();
+    const recentKeys = sortedKeys.slice(-12);
+
+    return {
+        labels: recentKeys,
+        datasets: [
+            {
+                label: 'Total Inspections',
+                data: recentKeys.map(key => bucket.get(key).total),
+                borderColor: '#232F3E',
+                backgroundColor: '#232F3E33',
+                tension: 0.3
+            },
+            {
+                label: 'Completed',
+                data: recentKeys.map(key => bucket.get(key).completed),
+                borderColor: '#4CAF50',
+                backgroundColor: '#4CAF5033',
+                tension: 0.3
+            }
+        ]
+    };
+}
+
+function generateColorPalette(count) {
+    const palette = ['#232F3E', '#FF9900', '#37475A', '#4CAF50', '#FFC107', '#B71C1C', '#2196F3', '#9C27B0'];
+    return Array.from({ length: count }, (_, index) => palette[index % palette.length]);
+}
+
+function calculateFirstAidersCoverage() {
+    const coverage = {
+        DVI1: 14.52,
+        DVI2: 14.29,
+        DVI3: 18.25,
+        DAP5: 21.43,
+        DAP8: 12.21
+    };
+    const sites = Object.keys(coverage);
+    const total = sites.reduce((sum, site) => sum + coverage[site], 0);
+    return (total / sites.length).toFixed(2);
+}
+
+function calculateFireMarshallsCoverage() {
+    const coverage = {
+        DVI1: 12.37,
+        DVI2: 10.88,
+        DVI3: 11.68,
+        DAP5: 10.2,
+        DAP8: 6.87
+    };
+    const sites = Object.keys(coverage);
+    const total = sites.reduce((sum, site) => sum + coverage[site], 0);
+    return (total / sites.length).toFixed(2);
+}
+
+function getNearMissHighlights() {
+    const highlights = [];
+    const nearMisses = state.nearMiss.filteredData.slice(0, 5);
+
+    nearMisses.forEach(nm => {
+        const riskValue = Number.parseFloat(nm.risk || 0);
+        const riskLevel = riskValue >= 7 ? '🔴 High Risk' : riskValue >= 4 ? '🟡 Medium Risk' : '🟢 Low Risk';
+        const status = nm.status || 'In Progress';
+        highlights.push(`${nm.site || 'Unknown'}: ${nm.initial_info_nearmiss_type || nm.primaryImpact || 'Incident'} (${riskLevel}, ${status})`);
+    });
+
+    return highlights.join('<br>') || 'No recent near misses';
+}
+
+function generateSiteBreakdown() {
+    const sites = ['DVI1', 'DVI2', 'DVI3', 'DAP5', 'DAP8'];
+    const breakdown = {};
+
+    sites.forEach(site => {
+        const siteInjuries = state.injury.filteredData.filter(i => i.site === site);
+        const siteNearMisses = state.nearMiss.filteredData.filter(n => n.site === site);
+        const siteInspections = state.inspections.filteredData.filter(i => i.site === site);
+
+        breakdown[site] = {
+            firstAiders: calculateSiteFirstAiders(site),
+            fireMarshalls: calculateSiteFireMarshalls(site),
+            nearMisses: siteNearMisses.length,
+            safetyObs: siteInspections.filter(i => (i.inspection || '').includes('CSO')).length,
+            openActions: siteInspections.filter(i => i.status === 'overdue').length,
+            openAudits: siteInspections.filter(i => i.status === 'overdue' && (i.inspection || '').includes('Audit')).length,
+            status: determineOverallStatus(site)
+        };
+    });
+
+    return breakdown;
+}
+
+function calculateSiteFirstAiders(site) {
+    const coverage = {
+        DVI1: 14.52,
+        DVI2: 14.29,
+        DVI3: 18.25,
+        DAP5: 21.43,
+        DAP8: 12.21
+    };
+    return (coverage[site] ?? 0).toFixed(2);
+}
+
+function calculateSiteFireMarshalls(site) {
+    const coverage = {
+        DVI1: 12.37,
+        DVI2: 10.88,
+        DVI3: 11.68,
+        DAP5: 10.2,
+        DAP8: 6.87
+    };
+    return (coverage[site] ?? 0).toFixed(2);
+}
+
+function determineOverallStatus(site) {
+    const overdueInspections = state.inspections.filteredData.filter(i => i.site === site && i.status === 'overdue').length;
+    const recordableIncidents = state.injury.filteredData.filter(i => i.site === site && i.recordable === 1).length;
+
+    if (overdueInspections > 3 || recordableIncidents > 2) return 'Critical';
+    if (overdueInspections > 0 || recordableIncidents > 0) return 'Warning';
+    return 'Healthy';
+}
+
+function calculateInspectionCompliance() {
+    const inspections = state.inspections.filteredData;
+    const today = new Date();
+    const thisMonth = today.getMonth();
+    const thisYear = today.getFullYear();
+
+    const monthly = inspections.filter(i => {
+        const dueDate = i.dueDate instanceof Date ? i.dueDate : (i.dueDate ? new Date(i.dueDate) : null);
+        if (!dueDate || Number.isNaN(dueDate.getTime())) return false;
+        return dueDate.getMonth() === thisMonth && dueDate.getFullYear() === thisYear;
+    });
+
+    const completed = monthly.filter(i => i.complete === 1).length;
+    const total = monthly.length;
+    const rate = total > 0 ? ((completed / total) * 100).toFixed(1) : '0.0';
+
+    return {
+        completed,
+        total,
+        rate,
+        overdue: monthly.filter(i => i.status === 'overdue').length
+    };
+}
+
+function checkOverdueInspections() {
+    const overdue = state.inspections.filteredData.filter(i => i.status === 'overdue');
+    const alertDiv = document.getElementById('overdueAlert');
+    const listDiv = document.getElementById('overdueList');
+    if (!alertDiv || !listDiv) return;
+
+    if (overdue.length === 0) {
+        alertDiv.style.display = 'none';
+        listDiv.innerHTML = '';
+        updateNotificationBadge(0);
+        return;
+    }
+
+    let html = '<ul class="overdue-list">';
+    overdue.forEach(inspection => {
+        const overdueDays = Number.isFinite(inspection.daysUntilDue) ? Math.abs(inspection.daysUntilDue) : 0;
+        html += `
+            <li>
+                <strong>${inspection.site || 'Unknown'}</strong> - ${inspection.inspection || 'Inspection'}
+                <span class="overdue-days">${overdueDays} days overdue</span>
+                <span class="owner">Owner: ${inspection.owner || 'TBD'}</span>
+            </li>
+        `;
+    });
+    html += '</ul>';
+
+    listDiv.innerHTML = html;
+    alertDiv.style.display = 'block';
+    updateNotificationBadge(overdue.length);
+}
+
+function updateNotificationBadge(count) {
+    const badge = document.getElementById('overdueBadge');
+    if (!badge) return;
+
+    if (count > 0) {
+        badge.textContent = `${count} ⚠️`;
+        badge.classList.add('active');
+    } else {
+        badge.textContent = '';
+        badge.classList.remove('active');
+    }
+}
+
+function markInspectionComplete(uid) {
+    const record = state.inspections.rawData.find(item => item.uid === uid);
+    if (!record) return;
+
+    record.complete = 1;
+    record.status = 'completed';
+    record.daysUntilDue = calculateDaysUntilDue(record.dueDate);
+
+    applyFilters('inspections');
+    showStatus('Inspection marked as completed', 'success');
+}
+
+function calculateOpenActions() {
+    return state.inspections.filteredData.filter(item => item.status !== 'completed').length;
+}
+
+function identifyBridgesRequired() {
+    const highRiskSites = state.inspections.filteredData
+        .filter(item => item.status === 'overdue')
+        .map(item => item.site)
+        .filter(Boolean);
+    const uniqueSites = Array.from(new Set(highRiskSites));
+    return uniqueSites.length > 0 ? uniqueSites.join(', ') : 'No';
+}
+
+function generateOpenActionsList() {
+    return state.inspections.filteredData
+        .filter(item => item.status === 'overdue' || item.status === 'upcoming')
+        .map(item => ({
+            site: item.site || 'Unknown',
+            action: item.inspection || 'Inspection',
+            owner: item.owner || 'TBD',
+            dueDate: item.dueDate instanceof Date && !Number.isNaN(item.dueDate.getTime())
+                ? item.dueDate.toLocaleDateString('en-GB')
+                : 'N/A',
+            status: item.status
+        }));
+}
+
+function generateRiskMatrix() {
+    const risks = [];
+    state.nearMiss.filteredData.forEach(nm => {
+        const riskValue = Number.parseFloat(nm.risk || 0);
+        if (riskValue >= 6) {
+            risks.push({
+                station: nm.site || 'Unknown',
+                area: nm.location || nm.initial_info_location_event || 'General',
+                mitigation: nm.mitigation || 'Review SOP and implement corrective actions',
+                owner: nm.owner || nm.supervisor || 'WHS',
+                status: nm.status || 'In Progress'
+            });
+        }
+    });
+
+    if (risks.length === 0) {
+        risks.push({
+            station: 'All Sites',
+            area: 'General Safety Culture',
+            mitigation: 'Continue leadership safety walks and reinforce observation reporting',
+            owner: 'Site Leadership',
+            status: 'On Track'
+        });
+    }
+
+    return risks;
+}
+
+function generateLeadershipAsks() {
+    const overdueSites = state.inspections.filteredData
+        .filter(item => item.status === 'overdue')
+        .map(item => item.site);
+    const unique = Array.from(new Set(overdueSites));
+
+    if (unique.length === 0) {
+        return [{ site: 'All Sites', request: 'Maintain current inspection cadence', reason: 'No overdue actions recorded' }];
+    }
+
+    return unique.map(site => ({
+        site,
+        request: 'Allocate additional inspection resources',
+        reason: `${state.inspections.filteredData.filter(item => item.site === site && item.status === 'overdue').length} overdue inspections requiring closure`
+    }));
+}
+
+function generateUpcomingEvents() {
+    const upcoming = state.inspections.filteredData
+        .filter(item => item.status === 'upcoming')
+        .slice(0, 10)
+        .map(item => ({
+            site: item.site || 'Unknown',
+            event: item.inspection || 'Inspection',
+            date: item.dueDate instanceof Date && !Number.isNaN(item.dueDate.getTime())
+                ? item.dueDate.toLocaleDateString('en-GB')
+                : 'N/A'
+        }));
+
+    if (upcoming.length === 0) {
+        return [{ site: 'All Sites', event: 'Leadership Safety Walks', date: new Date().toLocaleDateString('en-GB') }];
+    }
+
+    return upcoming;
+}
+
+function generateSiteTableRows(siteData) {
+    return Object.entries(siteData).map(([site, data]) => `
+        <tr>
+            <td>${site}</td>
+            <td>${data.firstAiders}%</td>
+            <td>${data.fireMarshalls}%</td>
+            <td>${data.nearMisses}</td>
+            <td>${data.safetyObs}</td>
+            <td>${data.openActions}</td>
+            <td>${data.openAudits}</td>
+            <td>${data.status}</td>
+        </tr>
+    `).join('');
+}
+
+function generateActionTableRows(actions) {
+    if (!Array.isArray(actions) || actions.length === 0) {
+        return '<tr><td colspan="5">No open actions identified</td></tr>';
+    }
+
+    return actions.map(action => `
+        <tr>
+            <td>${action.site}</td>
+            <td>${action.action}</td>
+            <td>${action.owner}</td>
+            <td>${action.dueDate}</td>
+            <td>${action.status}</td>
+        </tr>
+    `).join('');
+}
+
+function generateRiskTableRows(risks) {
+    if (!Array.isArray(risks) || risks.length === 0) {
+        return '<tr><td colspan="5">No high risks recorded</td></tr>';
+    }
+
+    return risks.map(risk => `
+        <tr class="${risk.status?.toLowerCase().includes('high') ? 'risk-high' : risk.status?.toLowerCase().includes('medium') ? 'risk-medium' : 'risk-low'}">
+            <td>${risk.station}</td>
+            <td>${risk.area}</td>
+            <td>${risk.mitigation}</td>
+            <td>${risk.owner}</td>
+            <td>${risk.status}</td>
+        </tr>
+    `).join('');
+}
+
+function generateLeadershipAskRows(asks) {
+    if (!Array.isArray(asks) || asks.length === 0) {
+        return '<tr><td colspan="3">No leadership requests at this time</td></tr>';
+    }
+
+    return asks.map(ask => `
+        <tr>
+            <td>${ask.site}</td>
+            <td>${ask.request}</td>
+            <td>${ask.reason}</td>
+        </tr>
+    `).join('');
+}
+
+function generateEventRows(events) {
+    if (!Array.isArray(events) || events.length === 0) {
+        return '<tr><td colspan="3">No upcoming events scheduled</td></tr>';
+    }
+
+    return events.map(event => `
+        <tr>
+            <td>${event.site}</td>
+            <td>${event.event}</td>
+            <td>${event.date}</td>
+        </tr>
+    `).join('');
+}
+
+function generateWBRSummaryData() {
+    const today = new Date();
+    const week = getISOWeek(today);
+    const compliance = calculateInspectionCompliance();
+
+    return [
+        {
+            Metric: 'Week',
+            Value: `CW${String(week).padStart(2, '0')}-${today.getFullYear()}`
+        },
+        {
+            Metric: 'Overdue Inspections',
+            Value: state.inspections.filteredData.filter(i => i.status === 'overdue').length
+        },
+        {
+            Metric: 'Upcoming Inspections (7d)',
+            Value: state.inspections.filteredData.filter(i => i.status === 'upcoming').length
+        },
+        {
+            Metric: 'Completed This Month',
+            Value: compliance.completed
+        },
+        {
+            Metric: 'Total Scheduled This Month',
+            Value: compliance.total
+        },
+        {
+            Metric: 'Compliance Rate %',
+            Value: compliance.rate
+        },
+        {
+            Metric: 'Open Actions',
+            Value: calculateOpenActions()
+        }
+    ];
+}
+
+function updateReportButtons() {
+    const wbrButton = document.querySelector('#reports .export-grid button[onclick="generateWBRReport()"]');
+    if (!wbrButton) return;
+
+    const hasData = state.injury.filteredData.length > 0 ||
+        state.nearMiss.filteredData.length > 0 ||
+        state.inspections.filteredData.length > 0;
+
+    wbrButton.disabled = !hasData;
+    wbrButton.setAttribute('aria-disabled', String(!hasData));
+    wbrButton.title = hasData ? 'Generate Weekly Business Review report' : 'Load safety data to enable WBR report generation';
+}
+
+function getWeekDateRange(referenceDate = new Date()) {
+    const start = getStartOfISOWeek(referenceDate);
+    const end = new Date(start);
+    end.setDate(end.getDate() + 6);
+    return `${start.toLocaleDateString('en-GB')} - ${end.toLocaleDateString('en-GB')}`;
+}
+
+function generateWBRReport() {
+    const injuryData = Array.isArray(state?.injury?.filteredData) ? state.injury.filteredData : [];
+    const nearMissData = Array.isArray(state?.nearMiss?.filteredData) ? state.nearMiss.filteredData : [];
+    const inspectionData = Array.isArray(state?.inspections?.filteredData) ? state.inspections.filteredData : [];
+
+    if (injuryData.length === 0 && nearMissData.length === 0 && inspectionData.length === 0) {
+        showStatus('No data available for WBR generation', 'warning');
+        return;
+    }
+
+    const today = new Date();
+    const currentWeek = getISOWeek(today);
+    const currentYear = today.getFullYear();
+
+    const wbrData = {
+        weekNumber: currentWeek,
+        year: currentYear,
+        dateRange: getWeekDateRange(today),
+        overview: {
+            firstAidersCoverage: calculateFirstAidersCoverage(),
+            fireMarshallsCoverage: calculateFireMarshallsCoverage(),
+            austinAuditsOpen: inspectionData.filter(i => i.status === 'overdue' && (i.inspection || '').includes('Audit')).length,
+            austinActionsOpen: calculateOpenActions(),
+            overdueActions: inspectionData.filter(i => i.status === 'overdue').length,
+            overdueAudits: inspectionData.filter(i => i.status === 'overdue' && (i.inspection || '').includes('Audit')).length,
+            bridgeRequired: identifyBridgesRequired(),
+            incidentsYTD: {
+                recordable: injuryData.filter(i => i.recordable === 1).length,
+                seriousNearMiss: nearMissData.filter(n => (n.severity || '').toString().toUpperCase() === 'A').length
+            },
+            nearMissReporting: {
+                target: 40,
+                actual: nearMissData.length
+            },
+            safetyObservations: {
+                target: 120,
+                actual: inspectionData.filter(i => (i.inspection || '').includes('CSO')).length
+            },
+            nearMissHighlights: getNearMissHighlights()
+        },
+        siteData: generateSiteBreakdown(),
+        openActions: generateOpenActionsList(),
+        risks: generateRiskMatrix(),
+        leadershipAsks: generateLeadershipAsks(),
+        upcomingEvents: generateUpcomingEvents()
+    };
+
+    generateWBRHTML(wbrData);
+}
+
+function generateWBRHTML(data) {
+    const html = `
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Safety WBR - Austria CW${data.weekNumber}-${data.year}</title>
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+        .header { background: #FF9900; color: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+        .header h1 { margin: 0; font-size: 24px; }
+        .section { background: white; padding: 20px; margin-bottom: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .section h2 { color: #232F3E; border-bottom: 2px solid #FF9900; padding-bottom: 10px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th { background: #232F3E; color: white; padding: 12px; text-align: left; }
+        td { padding: 10px; border-bottom: 1px solid #e0e0e0; }
+        tr:hover { background: #f9f9f9; }
+        .metric { display: inline-block; margin: 10px 20px 10px 0; }
+        .metric-label { color: #666; font-size: 12px; }
+        .metric-value { font-size: 24px; font-weight: bold; color: #232F3E; }
+        .status-green { color: #4CAF50; }
+        .status-yellow { color: #FFC107; }
+        .status-red { color: #B71C1C; }
+        .risk-high { background: #FFEBEE; }
+        .risk-medium { background: #FFF8E1; }
+        .risk-low { background: #E8F5E9; }
+        .emoji { font-size: 20px; margin-right: 8px; }
+        .flag-emoji { font-size: 24px; margin-right: 10px; }
+        .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 20px 0; }
+        .kpi-card { background: #f8f9fa; padding: 15px; border-radius: 8px; border-left: 4px solid #FF9900; }
+        @media print { 
+            .section { page-break-inside: avoid; }
+            body { background: white; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1><span class="flag-emoji">🇦🇹</span>Safety WBR – Austria (CW${data.weekNumber}-${data.year})</h1>
+        <p style="margin: 5px 0; opacity: 0.9;">${data.dateRange}</p>
+    </div>
+    <div class="section">
+        <h2><span class="emoji">📊</span>Austria Overview</h2>
+        <table>
+            <tr>
+                <th width="25%">Category</th>
+                <th>Details</th>
+            </tr>
+            <tr>
+                <td><strong>Compliance (Austria)</strong></td>
+                <td>
+                    First Aiders Coverage (FA): <span class="${data.overview.firstAidersCoverage >= 10 ? 'status-green' : 'status-red'}">${data.overview.firstAidersCoverage}%</span> (Target 10%)<br>
+                    Fire Marshalls Coverage (FM): <span class="${data.overview.fireMarshallsCoverage >= 10 ? 'status-green' : 'status-red'}">${data.overview.fireMarshallsCoverage}%</span> (Target 10%)<br>
+                    Austin Audits Open: <span class="${data.overview.austinAuditsOpen === 0 ? 'status-green' : 'status-red'}">${data.overview.austinAuditsOpen}</span><br>
+                    Austin Actions Open: ${data.overview.austinActionsOpen}<br>
+                    Overdue Actions: <span class="${data.overview.overdueActions === 0 ? 'status-green' : 'status-red'}">${data.overview.overdueActions}</span><br>
+                    Overdue Audits: <span class="${data.overview.overdueAudits === 0 ? 'status-green' : 'status-red'}">${data.overview.overdueAudits}</span><br>
+                    Bridge required: ${data.overview.bridgeRequired}
+                </td>
+            </tr>
+            <tr>
+                <td><strong>Education</strong></td>
+                <td>
+                    Incidents: ${data.overview.incidentsYTD.recordable} RI and ${data.overview.incidentsYTD.seriousNearMiss} SNM YTD<br>
+                    Near Miss Reporting: Target ${data.overview.nearMissReporting.target} vs Actual <span class="${data.overview.nearMissReporting.actual >= data.overview.nearMissReporting.target ? 'status-green' : 'status-yellow'}">${data.overview.nearMissReporting.actual}</span><br>
+                    Safety Observations: Target ${data.overview.safetyObservations.target} vs Actual <span class="${data.overview.safetyObservations.actual >= data.overview.safetyObservations.target ? 'status-green' : 'status-yellow'}">${data.overview.safetyObservations.actual}</span>
+                </td>
+            </tr>
+            <tr>
+                <td><strong>Near Misses</strong></td>
+                <td>${data.overview.nearMissHighlights}</td>
+            </tr>
+        </table>
+    </div>
+    <div class="section">
+        <h2><span class="emoji">🏭</span>Compliance Breakdown per Station</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Station</th>
+                    <th>FA Coverage</th>
+                    <th>FM Coverage</th>
+                    <th>Near Misses</th>
+                    <th>Safety Obs</th>
+                    <th>Open Actions</th>
+                    <th>Open Audits</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${generateSiteTableRows(data.siteData)}
+            </tbody>
+        </table>
+    </div>
+    <div class="section">
+        <h2><span class="emoji">📋</span>Open Actions</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Station</th>
+                    <th>Action</th>
+                    <th>Owner</th>
+                    <th>Due Date</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${generateActionTableRows(data.openActions)}
+            </tbody>
+        </table>
+    </div>
+    <div class="section">
+        <h2><span class="emoji">⚠️</span>Key Risks</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Station</th>
+                    <th>Risk Area</th>
+                    <th>Mitigation Plan</th>
+                    <th>Owner</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${generateRiskTableRows(data.risks)}
+            </tbody>
+        </table>
+    </div>
+    <div class="section">
+        <h2><span class="emoji">📌</span>Leadership Ask (Austria)</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Site</th>
+                    <th>Request</th>
+                    <th>Reason / Context</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${generateLeadershipAskRows(data.leadershipAsks)}
+            </tbody>
+        </table>
+    </div>
+    <div class="section">
+        <h2><span class="emoji">📅</span>Upcoming Events</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Site</th>
+                    <th>Event</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${generateEventRows(data.upcomingEvents)}
+            </tbody>
+        </table>
+    </div>
+    <div style="text-align: center; color: #666; margin-top: 40px; padding: 20px; border-top: 1px solid #e0e0e0;">
+        <p>Generated by Safety Analytics Platform | ${new Date().toLocaleString()}</p>
+        <p style="font-size: 12px;">This report contains placeholder data where actual metrics are unavailable. Please update with actual values before distribution.</p>
+    </div>
+</body>
+</html>`;
+
+    const blob = new Blob([html], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Safety_WBR_Austria_CW${data.weekNumber}_${data.year}.html`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    showStatus('Weekly Safety WBR report generated successfully', 'success');
 }
 
 // Initialize chart selections with categorized options
@@ -6578,19 +7812,57 @@ function applyFilters(type) {
         updateNearMissDashboard();
         updateNearMissTable();
         updateNearMissCharts();
+    } else if (type === 'inspections') {
+        const siteFilter = document.getElementById('inspectionSiteFilter').value;
+        const statusFilter = document.getElementById('inspectionStatusFilter').value;
+        const typeFilter = document.getElementById('inspectionTypeFilter').value;
+        const dateFrom = document.getElementById('inspectionDateFrom').value;
+        const dateTo = document.getElementById('inspectionDateTo').value;
+
+        state.inspections.filteredData = state.inspections.rawData.filter(row => {
+            if (siteFilter && row.site !== siteFilter) return false;
+            if (statusFilter && row.status !== statusFilter) return false;
+            if (typeFilter && (!row.inspection || !row.inspection.toLowerCase().includes(typeFilter.toLowerCase()))) return false;
+
+            if (dateFrom || dateTo) {
+                const due = row.dueDate instanceof Date ? row.dueDate : (row.dueDate ? new Date(row.dueDate) : null);
+                if (!due || isNaN(due)) return false;
+                if (dateFrom) {
+                    const fromDate = new Date(dateFrom);
+                    fromDate.setHours(0, 0, 0, 0);
+                    if (due < fromDate) return false;
+                }
+                if (dateTo) {
+                    const toDate = new Date(dateTo);
+                    toDate.setHours(23, 59, 59, 999);
+                    if (due > toDate) return false;
+                }
+            }
+
+            return true;
+        });
+
+        state.inspections.currentPage = 1;
+        updateInspectionDashboard();
+        updateInspectionTable();
+        updateInspectionCharts();
+        checkOverdueInspections();
     }
-    
+
     updateOverview();
     updateKPIs();
     // Ensure the combined analytics reflect the latest filtered data
     updateCombinedAnalytics();
+    updateReportButtons();
 
-    // Recalculate data quality metrics based on the filtered dataset
-    calculateQualityMetrics(type);
-    if (type === 'injury') {
-        updateInjuryQualityMetrics();
-    } else {
-        updateNearMissQualityMetrics();
+    if (type === 'injury' || type === 'nearmiss') {
+        // Recalculate data quality metrics based on the filtered dataset
+        calculateQualityMetrics(type);
+        if (type === 'injury') {
+            updateInjuryQualityMetrics();
+        } else {
+            updateNearMissQualityMetrics();
+        }
     }
 }
 
@@ -7086,19 +8358,31 @@ function updateNearMissTable() {
 
 // Pagination
 function changePage(type, direction) {
-    const data = type === 'injury' ? state.injury.filteredData : state.nearMiss.filteredData;
+    let data;
+    if (type === 'injury') {
+        data = state.injury.filteredData;
+    } else if (type === 'nearmiss') {
+        data = state.nearMiss.filteredData;
+    } else {
+        data = state.inspections.filteredData;
+    }
     const totalPages = Math.ceil(data.length / state.itemsPerPage);
-    
+
     if (type === 'injury') {
         state.injury.currentPage += direction;
         if (state.injury.currentPage < 1) state.injury.currentPage = 1;
         if (state.injury.currentPage > totalPages) state.injury.currentPage = totalPages;
         updateInjuryTable();
-    } else {
+    } else if (type === 'nearmiss') {
         state.nearMiss.currentPage += direction;
         if (state.nearMiss.currentPage < 1) state.nearMiss.currentPage = 1;
         if (state.nearMiss.currentPage > totalPages) state.nearMiss.currentPage = totalPages;
         updateNearMissTable();
+    } else if (type === 'inspections') {
+        state.inspections.currentPage += direction;
+        if (state.inspections.currentPage < 1) state.inspections.currentPage = 1;
+        if (state.inspections.currentPage > Math.max(totalPages, 1)) state.inspections.currentPage = Math.max(totalPages, 1);
+        updateInspectionTable();
     }
 }
 
@@ -10725,14 +12009,44 @@ function exportToExcel(type = 'all') {
             }
         }
         
+        if (type === 'inspections' || type === 'all') {
+            if (state.inspections.filteredData.length > 0) {
+                const inspectionSheet = XLSX.utils.json_to_sheet(state.inspections.filteredData.map(item => ({
+                    ...item,
+                    dueDate: item.dueDate instanceof Date && !Number.isNaN(item.dueDate.getTime()) ? item.dueDate.toISOString() : item.dueDate
+                })));
+                XLSX.utils.book_append_sheet(wb, inspectionSheet, 'Inspections');
+
+                const inspectionSummary = [['Inspection Compliance Summary'],
+                    ['Generated on:', new Date().toLocaleString()],
+                    ['Total Inspections:', state.inspections.filteredData.length],
+                    ['Overdue Inspections:', state.inspections.filteredData.filter(i => i.status === 'overdue').length],
+                    ['Upcoming (7d):', state.inspections.filteredData.filter(i => i.status === 'upcoming').length],
+                    ['Completed:', state.inspections.filteredData.filter(i => i.status === 'completed').length],
+                    ['Compliance Rate (%):', calculateInspectionCompliance().rate]
+                ];
+                const inspectionSummarySheet = XLSX.utils.aoa_to_sheet(inspectionSummary);
+                XLSX.utils.book_append_sheet(wb, inspectionSummarySheet, 'Inspection Summary');
+            }
+        }
+
+        if (type === 'all') {
+            const wbrSummary = generateWBRSummaryData();
+            if (Array.isArray(wbrSummary) && wbrSummary.length > 0) {
+                const summarySheet = XLSX.utils.json_to_sheet(wbrSummary);
+                XLSX.utils.book_append_sheet(wb, summarySheet, 'WBR Summary');
+            }
+        }
+
         if ((type === 'injury' && state.injury.filteredData.length === 0) ||
             (type === 'nearmiss' && state.nearMiss.filteredData.length === 0) ||
-            (type === 'all' && state.injury.filteredData.length === 0 && state.nearMiss.filteredData.length === 0)) {
+            (type === 'inspections' && state.inspections.filteredData.length === 0) ||
+            (type === 'all' && state.injury.filteredData.length === 0 && state.nearMiss.filteredData.length === 0 && state.inspections.filteredData.length === 0)) {
             showStatus('No data to export', 'error');
             return;
         }
-        
-        const filename = type === 'all' ? 
+
+        const filename = type === 'all' ?
             `safety_analysis_complete_${new Date().toISOString().split('T')[0]}.xlsx` :
             `${type}_analysis_${new Date().toISOString().split('T')[0]}.xlsx`;
         
@@ -10742,6 +12056,37 @@ function exportToExcel(type = 'all') {
         console.error('Export error:', error);
         showStatus('Error exporting data: ' + error.message, 'error');
     }
+}
+
+function exportCombinedData() {
+    const workbook = XLSX.utils.book_new();
+
+    if (state.injury.filteredData.length > 0) {
+        const injurySheet = XLSX.utils.json_to_sheet(state.injury.filteredData);
+        XLSX.utils.book_append_sheet(workbook, injurySheet, 'Injuries');
+    }
+
+    if (state.nearMiss.filteredData.length > 0) {
+        const nearMissSheet = XLSX.utils.json_to_sheet(state.nearMiss.filteredData);
+        XLSX.utils.book_append_sheet(workbook, nearMissSheet, 'Near Misses');
+    }
+
+    if (state.inspections.filteredData.length > 0) {
+        const inspectionsSheet = XLSX.utils.json_to_sheet(state.inspections.filteredData.map(item => ({
+            ...item,
+            dueDate: item.dueDate instanceof Date && !Number.isNaN(item.dueDate.getTime()) ? item.dueDate.toISOString() : item.dueDate
+        })));
+        XLSX.utils.book_append_sheet(workbook, inspectionsSheet, 'Inspections');
+    }
+
+    const wbrSummary = generateWBRSummaryData();
+    if (Array.isArray(wbrSummary) && wbrSummary.length > 0) {
+        const summarySheet = XLSX.utils.json_to_sheet(wbrSummary);
+        XLSX.utils.book_append_sheet(workbook, summarySheet, 'WBR Summary');
+    }
+
+    XLSX.writeFile(workbook, `Safety_Analytics_Export_${new Date().toISOString().split('T')[0]}.xlsx`);
+    showStatus('Complete safety data exported successfully', 'success');
 }
 
 function createInjurySummarySheet() {
@@ -13262,7 +14607,11 @@ function updateAllCharts() {
         updateNearMissCharts();
         updateNearMissAdvancedAnalytics();
     }
-    
+
+    if (state.inspections.filteredData.length > 0) {
+        updateInspectionCharts();
+    }
+
     // Update overview charts
     updateOverviewCharts();
     
@@ -13414,6 +14763,7 @@ function formatNumber(num) {
 window.SafetyAnalytics = {
     loadSampleData,
     exportToExcel,
+    exportCombinedData,
     generatePDFReport,
     generateInjuryReport,
     generateNearMissReport,
@@ -13438,6 +14788,7 @@ window.switchModule = switchModule;
 window.toggleTheme = toggleTheme;
 window.loadSampleData = loadSampleData;
 window.exportToExcel = exportToExcel;
+window.exportCombinedData = exportCombinedData;
 window.generatePDFReport = generatePDFReport;
 window.generateInjuryReport = generateInjuryReport;
 window.generateNearMissReport = generateNearMissReport;
@@ -13457,6 +14808,7 @@ window.captureAnalysisView = captureAnalysisView;
 window.captureChart = captureChart;
 window.captureChartWithTitle = captureChartWithTitle;
 window.markActionComplete = markActionComplete;
+window.markInspectionComplete = markInspectionComplete;
 window.switchInjuryView = switchInjuryView;
 window.switchNearMissView = switchNearMissView;
 window.viewDetails = viewDetails;
