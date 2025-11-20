@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MEU WHS COORDINATOR SIMULATOR</title>
+    <style>
+        :root {
+            --bg-color: #050505;
+            --terminal-green: #33ff00;
+            --alert-red: #ff003c;
+            --amazon-orange: #ff9900;
+            --corp-blue: #00a8ff;
+            --ui-panel: #111;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--terminal-green);
+            font-family: 'Courier New', Courier, monospace;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            text-shadow: 0 0 4px rgba(51, 255, 0, 0.4);
+            user-select: none;
+        }
+
+        /* CRT Overlay */
+        .scanlines {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.2));
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        /* Main Container */
+        #app-container {
+            width: 100%;
+            max-width: 800px;
+            height: 90vh;
+            border: 2px solid var(--amazon-orange);
+            background-color: var(--ui-panel);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 30px rgba(255, 153, 0, 0.1);
+        }
+
+        /* SCREENS */
+        .screen {
+            width: 100%;
+            height: 100%;
+            display: none; /* Hidden by default */
+            flex-direction: column;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .screen.active {
+            display: flex;
+        }
+
+        /* --- INTRO SCREEN --- */
+        #intro-screen {
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .title-main {
+            font-size: 32px;
+            font-weight: 900;
+            color: var(--amazon-orange);
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+        }
+
+        .title-sub {
+            font-size: 14px;
+            color: var(--terminal-green);
+            margin-bottom: 40px;
+            opacity: 0.8;
+        }
+
+        .blink { animation: blink 1s infinite; }
+        @keyframes blink { 50% { opacity: 0; } }
+
+        .intro-btn {
+            background: transparent;
+            border: 2px solid var(--terminal-green);
+            color: var(--terminal-green);
+            padding: 15px 30px;
+            font-family: inherit;
+            font-size: 18px;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: 0.2s;
+        }
+        .intro-btn:hover {
+            background: var(--terminal-green);
+            color: black;
+            box-shadow: 0 0 15px var(--terminal-green);
+        }
+
+        /* --- GAME SCREEN --- */
+        #game-screen {
+            display: none;
+            grid-template-rows: 50px 1fr 120px 100px;
+            gap: 10px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--amazon-orange);
+            padding-bottom: 10px;
+            font-weight: bold;
+        }
+
+        #log-area {
+            flex-grow: 1;
+            border: 1px solid #333;
+            background: #000;
+            overflow-y: auto;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+        }
+
+        .log-line {
+            margin-bottom: 8px;
+            padding-left: 10px;
+            border-left: 2px solid var(--terminal-green);
+            line-height: 1.4;
+            animation: fadeIn 0.3s ease-out;
+        }
+        .log-line.danger { border-color: var(--alert-red); color: #ffb3b3; }
+        .log-line.system { border-color: var(--amazon-orange); color: #ffe6b3; }
+        .log-line.boss { border-color: var(--corp-blue); color: #aaddff; font-style: italic; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Stats */
+        #stats-area {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            padding: 10px;
+            background: #0a0a0a;
+            border: 1px solid #333;
+        }
+
+        .stat-item { display: flex; flex-direction: column; justify-content: center; }
+        .stat-label { font-size: 10px; color: #888; text-transform: uppercase; }
+        .stat-bar-bg { width: 100%; height: 10px; background: #222; margin-top: 5px; }
+        .stat-bar-fill { height: 100%; width: 50%; transition: width 0.3s; }
+        
+        /* Critical Warning Animation */
+        .critical .stat-bar-fill {
+            background: var(--alert-red) !important;
+            animation: pulse 0.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        /* Controls */
+        #controls-area {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            padding-top: 10px;
+        }
+
+        .game-btn {
+            background: rgba(0, 255, 65, 0.05);
+            border: 1px solid var(--terminal-green);
+            color: var(--terminal-green);
+            padding: 10px;
+            font-family: inherit;
+            font-size: 12px;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: all 0.1s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+        .game-btn:hover { background: var(--terminal-green); color: black; }
+        .game-btn:active { transform: translateY(2px); }
+        .game-btn.risk { border-color: var(--alert-red); color: var(--alert-red); }
+        .game-btn.risk:hover { background: var(--alert-red); color: white; }
+
+        /* Boss Overlay */
+        #boss-visual {
+            display: none;
+            text-align: center;
+            color: var(--corp-blue);
+            border: 1px dashed var(--corp-blue);
+            padding: 10px;
+            margin-bottom: 10px;
+            font-size: 10px;
+            white-space: pre;
+        }
+
+        .hidden { display: none !important; }
+        
+        /* Shake Animation */
+        .shake { animation: shake 0.5s; }
+        @keyframes shake {
+            0% { transform: translate(1px, 1px) rotate(0deg); }
+            10% { transform: translate(-1px, -2px) rotate(-1deg); }
+            20% { transform: translate(-3px, 0px) rotate(1deg); }
+            30% { transform: translate(3px, 2px) rotate(0deg); }
+            40% { transform: translate(1px, -1px) rotate(1deg); }
+            50% { transform: translate(-1px, 2px) rotate(-1deg); }
+            60% { transform: translate(-3px, 1px) rotate(0deg); }
+            70% { transform: translate(3px, 1px) rotate(-1deg); }
+            80% { transform: translate(-1px, -1px) rotate(1deg); }
+            90% { transform: translate(1px, 2px) rotate(0deg); }
+            100% { transform: translate(1px, -2px) rotate(-1deg); }
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="scanlines"></div>
+
+<div id="app-container">
+    
+    <!-- INTRO SCREEN -->
+    <div id="intro-screen" class="screen active">
+        <div class="title-main">MEU WHS COORDINATOR<br>SIMULATOR</div>
+        <div class="title-sub">by @eeesener</div>
+        <br>
+        <div style="font-size: 12px; color: #888; margin-bottom: 20px;">
+            > INITIALIZING WHS_PROTOCOL_v9.2...<br>
+            > WARNING: ETHICS MODULE CORRUPTED<br>
+            > PROTOCOL: SURVIVE 12 SHIFTS<br>
+            > NOTE: IF METRICS DROP < 30%, INTERVENTION IS IMMEDIATE<br>
+            > READY.
+        </div>
+        <button id="btn-start-game" class="intro-btn blink">START SHIFT</button>
+    </div>
+
+    <!-- GAME SCREEN -->
+    <div id="game-screen" class="screen">
+        <header>
+            <span id="header-title">AMZN_LOGISTICS_OS</span>
+            <span id="header-day">SHIFT: 1</span>
+        </header>
+
+        <div id="log-area">
+            <!-- Logs go here -->
+            <div id="boss-visual">
+      /---\
+     | o o |
+     |  ^  |
+    _|  -  |_   SIMON UNGLAUBE
+   / |  $  | \  [SR. WHS LEAD]
+  /  |_____|  \
+            </div>
+        </div>
+
+        <div id="stats-area">
+            <div class="stat-item" id="stat-container-prod">
+                <div class="stat-label">Corporate Approval (Productivity)</div>
+                <div class="stat-bar-bg"><div id="bar-prod" class="stat-bar-fill" style="background: var(--amazon-orange);"></div></div>
+                <div id="val-prod" style="text-align: right; font-size: 12px;">50%</div>
+            </div>
+            <div class="stat-item" id="stat-container-safe">
+                <div class="stat-label">Worker Survival (Safety)</div>
+                <div class="stat-bar-bg"><div id="bar-safe" class="stat-bar-fill" style="background: var(--terminal-green);"></div></div>
+                <div id="val-safe" style="text-align: right; font-size: 12px;">50%</div>
+            </div>
+        </div>
+
+        <div id="controls-area">
+            <button id="btn-choice-1" class="game-btn">OPTION 1</button>
+            <button id="btn-choice-2" class="game-btn risk">OPTION 2</button>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    /* --- AUDIO ENGINE --- */
+    let audioCtx;
+    const sfx = {
+        init: () => {
+            if (!audioCtx) {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                audioCtx = new AudioContext();
+            }
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+        },
+        play: (type) => {
+            if (!audioCtx) return;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            const now = audioCtx.currentTime;
+            
+            if (type === 'click') {
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(800, now);
+                osc.frequency.exponentialRampToValueAtTime(400, now + 0.1);
+                gain.gain.setValueAtTime(0.05, now);
+                gain.gain.linearRampToValueAtTime(0, now + 0.1);
+                osc.start(now);
+                osc.stop(now + 0.1);
+            } else if (type === 'alert') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(200, now);
+                osc.frequency.linearRampToValueAtTime(150, now + 0.15);
+                gain.gain.setValueAtTime(0.1, now);
+                gain.gain.linearRampToValueAtTime(0, now + 0.3);
+                osc.start(now);
+                osc.stop(now + 0.3);
+            } else if (type === 'win') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(440, now);
+                osc.frequency.setValueAtTime(880, now + 0.1);
+                gain.gain.setValueAtTime(0.1, now);
+                gain.gain.linearRampToValueAtTime(0, now + 0.4);
+                osc.start(now);
+                osc.stop(now + 0.4);
+            } else if (type === 'lose') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(100, now);
+                osc.frequency.linearRampToValueAtTime(50, now + 0.4);
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.linearRampToValueAtTime(0, now + 0.5);
+                osc.start(now);
+                osc.stop(now + 0.5);
+            }
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+        }
+    };
+
+    /* --- SCENARIO LIBRARY --- */
+    const scenarios = [
+        { id: "glitter", text: "⚠️ ALERT: A pallet of 'Organic Glitter' burst in Aisle 4. It's beautiful, but slippery.", opts: [{ txt: "Close Aisle (Safe)", p: -20, s: 15, resp: "Aisle closed. Operations is mad. Zero sparkle injuries." }, { txt: "Ignore (Speed)", p: 15, s: -25, resp: "Work continues. Employees are sparkling. Fall risk critical." }] },
+        { id: "coffee", text: "⚠️ ALERT: The coffee machine is broken. Mutiny is 98% likely.", opts: [{ txt: "Call Tech (Downtime)", p: -25, s: 10, resp: "Everyone is grumpy and slow, but hydrated with water." }, { txt: "Issue Energy Drinks", p: 25, s: -15, resp: "Productivity up 200%. Heart rates also up 200%." }] },
+        { id: "klingon", text: "⚠️ ALERT: Scanners are glitching and only displaying Klingon.", opts: [{ txt: "Reboot (Slow)", p: -30, s: 5, resp: "System rebooted. Lost 20 mins. English restored." }, { txt: "Guess Buttons", p: 20, s: -20, resp: "Packages flying everywhere. Qapla'!" }] },
+        { id: "conveyor", text: "⚠️ ALERT: Conveyor Belt 3 is screaming. It might be a bearing, or a soul.", opts: [{ txt: "Stop & Grease", p: -15, s: 10, resp: "Silence is golden. Sanity restored." }, { txt: "Turn up Radio", p: 5, s: -10, resp: "You blasted pop music. Now we have two annoying noises." }] },
+        { id: "bubblewrap", text: "⚠️ ALERT: We ran out of bubble wrap. Fragile items are next.", opts: [{ txt: "Halt Packing", p: -25, s: 5, resp: "Line stopped. Safe but unprofitable." }, { txt: "Use Shredded Paper", p: 15, s: -15, resp: "Messy, but works. Customers will be confused." }] },
+        { id: "peacock", text: "⚠️ ALERT: An 'Emotional Support Peacock' has entered the fulfillment floor.", opts: [{ txt: "Evacuate Sector", p: -20, s: 15, resp: "Peacock removed safely. Delivery times delayed by 'Birds'." }, { txt: "Put Vest on Bird", p: 10, s: -10, resp: "The bird is now an associate. It pecked a scanner." }] },
+        { id: "lava", text: "⚠️ ALERT: Team Building exercise 'The Floor is Lava' has been taken literally.", opts: [{ txt: "Stop Game", p: -10, s: 10, resp: "Fun cancelled. Everyone back to the floor (which is not lava)." }, { txt: "Provide Grapples", p: 15, s: -20, resp: "Pickers are swinging from rafters. Efficiency is... surprisingly high." }] },
+        { id: "ai_hal", text: "⚠️ ALERT: The AI Manager 'CAL-9000' refuses to open the pod bay doors.", opts: [{ txt: "Manual Override", p: -30, s: 20, resp: "You pried the doors open. CAL-9000 is judging you." }, { txt: "Argue with AI", p: 10, s: -15, resp: "You debated philosophy. The AI is depressed but working." }] },
+        { id: "jousting", text: "⚠️ ALERT: Night shift is hosting a 'Forklift Jousting' tournament.", opts: [{ txt: "Fire Everyone", p: -50, s: 40, resp: "Shift cancelled. Safety restored. Morale destroyed." }, { txt: "Place Bet on Red", p: 20, s: -30, resp: "You won $50. Two forklifts are totaled." }] },
+        { id: "ghost", text: "⚠️ ALERT: Aisle 13 is reportedly haunted. Packages are floating.", opts: [{ txt: "Exorcism (HR)", p: -20, s: 5, resp: "HR read the handbook to the ghost. It left." }, { txt: "Ignore Physics", p: 15, s: -10, resp: "Floating packages are easier to load. Win-win?" }] },
+        { id: "bees", text: "⚠️ ALERT: A shipment of 'Live Bees' was dropped. They are angry.", opts: [{ txt: "Evacuate", p: -40, s: 30, resp: "Building cleared. Bees control the facility now." }, { txt: "Work Faster", p: 20, s: -40, resp: "Fear is a great motivator. Throughput at 110%." }] },
+        { id: "toilet", text: "⚠️ ALERT: Driver requests bathroom break. Route calculation says 'Impossible'.", opts: [{ txt: "Grant Break", p: -15, s: 10, resp: "Driver relieved. Package late. Customer crying." }, { txt: "Send Empty Bottle", p: 15, s: -20, resp: "Problem 'solved'. Dignity lost. Speed maintained." }] },
+        { id: "heatwave", text: "⚠️ ALERT: Heatwave. Floor temp is 40°C. AC is broken.", opts: [{ txt: "Buy Fans", p: -20, s: 20, resp: "Fans installed. Budget blown. People are conscious." }, { txt: "Think Cool Thoughts", p: 10, s: -30, resp: "You sent a motivational email. 3 people fainted." }] },
+        { id: "wires", text: "⚠️ ALERT: Exposed wiring near the water cooler. It's sparking rhythmically.", opts: [{ txt: "Cut Power", p: -30, s: 30, resp: "Power cut. Safety ensured. Robots are confused." }, { txt: "Put 'Do Not Touch' Sign", p: 10, s: -20, resp: "Sign posted. Sparks add ambiance." }] },
+        { id: "pizza", text: "⚠️ ALERT: Morale is critical. Union whispers detected.", opts: [{ txt: "Raise Wages", p: -40, s: 20, resp: "Corporate rejected it. You look weak." }, { txt: "Pizza Party", p: 10, s: -10, resp: "Two pepperonis per person. Revolution delayed." }] },
+        // New Scenarios
+        { id: "portal", text: "⚠️ ALERT: A loading bay door opened into a hell dimension. Demons are stealing parcels.", opts: [{ txt: "Close Door", p: -20, s: 20, resp: "Door sealed. We lost 500 packages to the abyss." }, { txt: "Charge Demons Shipping", p: 30, s: -30, resp: "Demons signed up for Prime. Loading dock is on fire, but profitable." }] },
+        { id: "gravity", text: "⚠️ ALERT: Gravity generator malfunction. Sector 7 is zero-g.", opts: [{ txt: "Fix Generator", p: -25, s: 15, resp: "Gravity restored. Heavy boxes fell on toes." }, { txt: "3D Maneuver Gear", p: 20, s: -25, resp: "Staff flying around like anime characters. Vomit everywhere." }] },
+        { id: "timeloop", text: "⚠️ ALERT: Packer #442 is stuck in a time loop, packing the same box forever.", opts: [{ txt: "Break Loop", p: -15, s: 10, resp: "Loop broken. Packer is confused but free." }, { txt: "Infinite Stats", p: 40, s: -10, resp: "He packed 10,000 boxes in 1 minute. Reality is cracking." }] },
+        { id: "mimic", text: "⚠️ ALERT: Several boxes are actually 'Mimics' that bite.", opts: [{ txt: "Burn Boxes", p: -30, s: 20, resp: "Mimics destroyed. Also destroyed valid PS5s." }, { txt: "Feed Them", p: 10, s: -30, resp: "You fed them expired sandwiches. They are now loyal pets." }] },
+        { id: "oxygen", text: "⚠️ ALERT: Corporate suggests 'Oxygen Subscription' to cut costs.", opts: [{ txt: "Reject Idea", p: -20, s: 10, resp: "Air remains free. CFO hates you." }, { txt: "Implement Pay-Per-Breath", p: 30, s: -40, resp: "Profits skyrocketed. Staff turning blue." }] },
+        { id: "teleport", text: "⚠️ ALERT: Teleporter accident. Jeff from Accounting merged with a stapler.", opts: [{ txt: "Medical Leave", p: -20, s: 10, resp: "Jeff sent to hospital. Stapler removed surgically." }, { txt: "Promote Jeffler", p: 15, s: -15, resp: "He staples documents with his face now. Very efficient." }] },
+        { id: "mold", text: "⚠️ ALERT: The mold in the breakroom fridge has achieved sentience.", opts: [{ txt: "Hazmat Clean", p: -25, s: 20, resp: "Mold incinerated. It screamed." }, { txt: "Negotiate", p: 10, s: -20, resp: "The Mold is now the Union Rep. Demands moisture." }] },
+        { id: "clones", text: "⚠️ ALERT: The 3D Printer is printing clones of the CEO.", opts: [{ txt: "Unplug Machine", p: -15, s: 10, resp: "Cloning stopped. The clones are wandering aimlessly." }, { txt: "Staff The Clones", p: 30, s: -30, resp: "Cheap labor! But they all want the corner office." }] },
+        { id: "floor_grease", text: "⚠️ ALERT: Janitor replaced floor wax with industrial grease.", opts: [{ txt: "Close Floor", p: -30, s: 25, resp: "Floor scrubbed. Zero injuries." }, { txt: "Issue Skates", p: 25, s: -35, resp: "Fastest picking times ever. Wall collisions frequent." }] },
+        { id: "darkness", text: "⚠️ ALERT: Lights out in Aisle 9. 'Something' is watching from the dark.", opts: [{ txt: "Fix Lights", p: -20, s: 10, resp: "Lights on. It was just a pile of coats. Or was it?" }, { txt: "Night Vision Goggles", p: 15, s: -20, resp: "Goggles issued. Staff reports 'too many eyes' in the dark." }] },
+        { id: "ratking", text: "⚠️ ALERT: The rats have formed a monarchy and declared independence.", opts: [{ txt: "Call Exterminator", p: -15, s: 15, resp: "War declared. Rats retreated." }, { txt: "Sign Treaty", p: 10, s: -10, resp: "We trade cheese for labor. They have tiny vests." }] }
+    ];
+
+    /* --- GAME ENGINE --- */
+    const state = {
+        phase: 'INTRO', 
+        day: 1,
+        prod: 50,
+        safe: 50,
+        currentScenario: null,
+        bossIndex: 0,
+        deck: [],
+        history: [],
+        bossQuestions: [],
+        earlyBossTriggered: false
+    };
+
+    // DOM Elements
+    const elApp = document.getElementById('app-container');
+    const elIntro = document.getElementById('intro-screen');
+    const elGame = document.getElementById('game-screen');
+    const elLog = document.getElementById('log-area');
+    const elBtn1 = document.getElementById('btn-choice-1');
+    const elBtn2 = document.getElementById('btn-choice-2');
+    const elBossVis = document.getElementById('boss-visual');
+    const elHeaderDay = document.getElementById('header-day');
+
+    // Helpers
+    function addLog(text, type = '') {
+        const div = document.createElement('div');
+        div.className = `log-line ${type}`;
+        div.textContent = text;
+        elLog.appendChild(div);
+        elLog.scrollTop = elLog.scrollHeight;
+    }
+
+    function updateDisplay() {
+        state.prod = Math.min(100, Math.max(0, state.prod));
+        state.safe = Math.min(100, Math.max(0, state.safe));
+
+        document.getElementById('bar-prod').style.width = state.prod + '%';
+        document.getElementById('val-prod').textContent = state.prod + '%';
+        document.getElementById('bar-safe').style.width = state.safe + '%';
+        document.getElementById('val-safe').textContent = state.safe + '%';
+        
+        // Panic visual
+        const prodContainer = document.getElementById('stat-container-prod');
+        const safeContainer = document.getElementById('stat-container-safe');
+        
+        if (state.prod < 30) prodContainer.classList.add('critical');
+        else prodContainer.classList.remove('critical');
+        
+        if (state.safe < 30) safeContainer.classList.add('critical');
+        else safeContainer.classList.remove('critical');
+
+        if (state.phase === 'BOSS') {
+            elHeaderDay.textContent = state.earlyBossTriggered ? "EMERGENCY INTERVENTION" : "PERFORMANCE REVIEW";
+            elHeaderDay.style.color = "var(--alert-red)";
+            elBossVis.style.display = 'block';
+        } else {
+            elHeaderDay.textContent = "SHIFT: " + state.day;
+            elHeaderDay.style.color = "black";
+            elBossVis.style.display = 'none';
+        }
+    }
+
+    function checkGameOver() {
+        if (state.prod <= 0) return "FIRED: Productivity hit 0%. You were replaced by a script.";
+        if (state.safe <= 0) return "DISASTER: Safety hit 0%. The warehouse burned down.";
+        return null;
+    }
+
+    function initGame() {
+        sfx.init();
+        sfx.play('click');
+        
+        state.phase = 'GAME';
+        state.day = 1;
+        state.prod = 50;
+        state.safe = 50;
+        state.bossIndex = 0;
+        state.history = [];
+        state.earlyBossTriggered = false;
+        state.deck = [...scenarios].sort(() => Math.random() - 0.5); 
+        
+        elIntro.classList.remove('active');
+        elGame.style.display = 'grid';
+        
+        elLog.replaceChildren(); 
+        addLog("SYSTEM: Shift Manager initialized.", "system");
+        addLog("MISSION: Survive 12 shifts.", "system");
+        
+        nextTurn();
+    }
+
+    function nextTurn() {
+        updateDisplay();
+        const failMsg = checkGameOver();
+        if (failMsg) {
+            triggerGameOver(failMsg);
+            return;
+        }
+
+        if (state.phase === 'GAME') {
+            // CHECK FOR EARLY BOSS TRIGGER (< 30%)
+            if ((state.prod < 30 || state.safe < 30) && !state.earlyBossTriggered) {
+                state.earlyBossTriggered = true;
+                startBoss("INTERVENTION");
+                return;
+            }
+
+            // End of run check
+            if (state.day > 12) {
+                startBoss("REVIEW");
+                return;
+            }
+            
+            // Normal Turn
+            const scenario = state.deck[state.day - 1] || state.deck[0]; // Fallback if run out
+            state.currentScenario = scenario;
+            
+            addLog("--------------------", "system");
+            sfx.play('alert');
+            addLog(scenario.text, "danger");
+            
+            setupButtons(
+                scenario.opts[0].txt, () => resolveTurn(0),
+                scenario.opts[1].txt, () => resolveTurn(1)
+            );
+        } else if (state.phase === 'BOSS') {
+            if (state.bossIndex >= state.bossQuestions.length) {
+                if (state.earlyBossTriggered) {
+                     // Survived intervention
+                     triggerGameOver("PROBATION: Simon let you live. You are on thin ice.", true);
+                } else {
+                     // Survived full run
+                     triggerGameOver("PROMOTED: You survived Simon Unglaube. But at what cost?", true);
+                }
+                return;
+            }
+
+            const q = state.bossQuestions[state.bossIndex];
+            state.currentScenario = { opts: q.opts }; 
+            
+            addLog("--------------------", "system");
+            sfx.play('alert');
+            addLog(q.text, "boss");
+            
+            setupButtons(
+                q.opts[0].txt, () => resolveTurn(0),
+                q.opts[1].txt, () => resolveTurn(1)
+            );
+        }
+    }
+
+    // --- DYNAMIC BOSS GENERATION ---
+    function generateBossQuestions() {
+        const history = state.history;
+        const q = [];
+
+        // 1. Check for "Early Intervention" Context
+        if (state.earlyBossTriggered) {
+             if (state.prod < 30) {
+                 q.push({
+                    text: "SIMON: 'I am interrupting your shift because your metrics are abysmal. You are costing me money. Give me one reason why I shouldn't fire you right now.'",
+                    opts: [
+                        { txt: "I prioritize safety", p: -10, s: 0, resp: "Simon sighs. 'Safety is a luxury for profitable companies. We are not profitable today.'" },
+                        { txt: "I will double speed", p: 30, s: -30, resp: "Simon taps the desk. 'Desperation. I can work with that.'" }
+                    ]
+                 });
+             } else {
+                 q.push({
+                    text: "SIMON: 'INTERVENTION ALERT. Your safety score is critical. Legal is breathing down my neck. Are you trying to get us shut down?'",
+                    opts: [
+                        { txt: "Just bad luck", p: 0, s: -10, resp: "Simon glares. 'Luck is for losers. Manage the risk.'" },
+                        { txt: "I'll fix it", p: -20, s: 30, resp: "Simon nods. 'Fix it. Or I fix you.'" }
+                    ]
+                 });
+             }
+        }
+
+        // 2. Contextual Questions
+        const timeloop = history.find(h => h.id === 'timeloop' && h.choiceIdx === 1);
+        if (timeloop) {
+            q.push({
+                text: "SIMON: 'You trapped Packer #442 in an infinite time loop to boost numbers. Effectively, you enslaved him in eternity. Thoughts?'",
+                opts: [
+                    { txt: "He is Employee of the Month", p: 10, s: -10, resp: "Simon smirks. 'He certainly has perfect attendance.'" },
+                    { txt: "It was an accident", p: -10, s: 0, resp: "Simon rolls his eyes. 'Own your brilliance.'" }
+                ]
+            });
+        }
+
+        const gravity = history.find(h => h.id === 'gravity' && h.choiceIdx === 1);
+        if (gravity) {
+            q.push({
+                text: "SIMON: 'Zero-G operations. Innovative, but the vomit cleanup cost was astronomical. Was the verticality worth it?'",
+                opts: [
+                    { txt: "Yes, utilized 3D space", p: 20, s: -10, resp: "Simon notes 'Spatial Awareness' in your file." },
+                    { txt: "No", p: -10, s: 10, resp: "Simon nods. 'Gravity is free. Anti-gravity is expensive.'" }
+                ]
+            });
+        }
+
+        // 3. General Questions
+        q.push({
+            text: "SIMON: 'Final question. A robot and a human are falling into a vat of acid. You can only save one. The robot has the Q3 projections on its hard drive.'",
+            opts: [
+                { txt: "Save Human", p: -20, s: 20, resp: "Simon sighs. 'We have backups of the human in HR files. We do not have backups of Q3.'" },
+                { txt: "Save Robot", p: 20, s: -20, resp: "Simon winks. 'Data is forever. Flesh is temporary.'" }
+            ]
+        });
+
+        return q;
+    }
+
+    function startBoss(mode) {
+        state.phase = 'BOSS';
+        state.bossQuestions = generateBossQuestions();
+        state.bossIndex = 0;
+        
+        elApp.classList.add('shake');
+        setTimeout(() => elApp.classList.remove('shake'), 500);
+        
+        const alertMsg = mode === "INTERVENTION" ? "⚠️ EMERGENCY INTERVENTION TRIGGERED" : "⚠️ INCOMING CALL: SENIOR LEADERSHIP";
+        addLog(alertMsg, "danger");
+        
+        setTimeout(nextTurn, 1500);
+    }
+
+    function setupButtons(txt1, fn1, txt2, fn2) {
+        elBtn1.textContent = txt1;
+        elBtn1.onclick = fn1;
+        elBtn1.classList.remove('hidden');
+        
+        elBtn2.textContent = txt2;
+        elBtn2.onclick = fn2;
+        elBtn2.classList.remove('hidden');
+    }
+
+    function resolveTurn(choiceIndex) {
+        sfx.play('click');
+        
+        let choice;
+        if (state.phase === 'GAME') {
+             choice = state.currentScenario.opts[choiceIndex];
+             state.history.push({
+                 id: state.currentScenario.id,
+                 text: state.currentScenario.text,
+                 choiceIdx: choiceIndex,
+                 choiceTxt: choice.txt
+             });
+             state.day++;
+        } else {
+             choice = state.currentScenario.opts[choiceIndex];
+             state.bossIndex++;
+        }
+        
+        state.prod += choice.p;
+        state.safe += choice.s;
+        
+        addLog("> ACTION: " + choice.txt, "system");
+        addLog(choice.resp, choice.p < 0 ? "danger" : "system");
+        
+        updateDisplay();
+
+        elBtn1.textContent = "NEXT...";
+        elBtn1.onclick = nextTurn;
+        elBtn2.classList.add('hidden');
+    }
+
+    function triggerGameOver(msg, win = false) {
+        state.phase = 'END';
+        sfx.play(win ? 'win' : 'lose');
+        addLog("====================", "system");
+        addLog(msg, win ? "system" : "danger");
+        
+        elBtn1.textContent = "REBOOT SYSTEM";
+        elBtn1.onclick = () => location.reload();
+        elBtn1.classList.remove('hidden');
+        elBtn2.classList.add('hidden');
+    }
+
+    // --- INITIALIZATION ---
+    document.getElementById('btn-start-game').addEventListener('click', initGame);
+
+</script>
+
+</body>
+</html>
