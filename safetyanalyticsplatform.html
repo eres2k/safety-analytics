@@ -55,27 +55,91 @@
         
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Amazon Ember', sans-serif;
-            background-color: var(--bg-secondary);
+            background: linear-gradient(135deg, var(--bg-secondary), #eef1f5);
             color: var(--text-primary);
             line-height: 1.5;
             transition: var(--transition);
+            min-height: 100vh;
         }
 
-        /* Compact Header */
+        .app-shell {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            min-height: 100vh;
+            gap: var(--spacing-md);
+        }
+
+        .sidebar {
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            background: var(--bg-primary);
+            border-right: 1px solid rgba(0,0,0,0.05);
+            box-shadow: 0 4px 18px var(--shadow);
+            padding: var(--spacing-lg) var(--spacing-md);
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-lg);
+            z-index: 120;
+        }
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        .sidebar-title {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .sidebar-title h1 {
+            font-size: 1.1rem;
+            margin: 0;
+        }
+
+        .sidebar-subtitle {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        .sidebar-summary {
+            background: linear-gradient(135deg, rgba(255, 153, 0, 0.08), rgba(35, 47, 62, 0.08));
+            border: 1px solid rgba(255, 153, 0, 0.2);
+            border-radius: 12px;
+            padding: var(--spacing-md);
+            box-shadow: 0 8px 20px var(--shadow);
+        }
+
+        .sidebar-summary h3 {
+            margin-bottom: var(--spacing-xs);
+            font-size: 0.95rem;
+        }
+
+        .sidebar-summary p {
+            margin: 0;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Header */
         .header {
             background: linear-gradient(90deg, var(--amazon-blue) 0%, var(--amazon-blue-dark) 100%);
             color: white;
-            padding: 0.75rem 0;
+            padding: 1rem 0;
             position: sticky;
             top: 0;
             z-index: 100;
-            box-shadow: 0 2px 8px var(--shadow);
+            box-shadow: 0 10px 30px var(--shadow);
+            border-radius: 0 0 18px 18px;
         }
 
         .header-content {
             max-width: 1400px;
             margin: 0 auto;
-            padding: 0 var(--spacing-md);
+            padding: 0 var(--spacing-lg);
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -89,24 +153,29 @@
         }
 
         .amazon-logo {
-            height: 32px;
-            display: flex;
+            height: 38px;
+            width: 38px;
+            display: inline-flex;
             align-items: center;
+            justify-content: center;
             font-weight: bold;
             font-size: 1.5rem;
             color: var(--amazon-orange);
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
         }
 
         .header h1 {
             font-size: 1.25rem;
-            font-weight: 400;
+            font-weight: 600;
             display: flex;
             align-items: center;
             gap: var(--spacing-sm);
         }
 
         .header-subtitle {
-            font-size: 0.85rem;
+            font-size: 0.9rem;
             opacity: 0.9;
             display: flex;
             align-items: center;
@@ -123,57 +192,58 @@
         .mode-toggle {
             background: rgba(255,255,255,0.1);
             border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 20px;
-            padding: 0.4rem 0.8rem;
+            border-radius: 24px;
+            padding: 0.45rem 0.9rem;
             color: white;
             cursor: pointer;
             display: flex;
             align-items: center;
             gap: var(--spacing-xs);
             transition: var(--transition);
-            font-size: 0.85rem;
+            font-size: 0.9rem;
         }
 
         .mode-toggle:hover {
             background: rgba(255,255,255,0.2);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 18px var(--shadow);
         }
 
-        /* Compact Navigation */
+        /* Navigation */
         .nav-container {
             background: var(--bg-primary);
             box-shadow: 0 1px 4px var(--shadow);
-            position: sticky;
-            top: 56px;
-            z-index: 90;
+            border-radius: 12px;
+            padding: var(--spacing-sm);
         }
 
         .nav-tabs {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 var(--spacing-md);
             display: flex;
-            gap: 0;
-            overflow-x: auto;
-            scrollbar-width: thin;
+            flex-direction: column;
+            gap: 4px;
         }
 
         .nav-tab {
-            padding: 0.6rem 1.2rem;
+            padding: 0.75rem 0.9rem;
             cursor: pointer;
             transition: var(--transition);
             white-space: nowrap;
-            font-weight: 500;
-            font-size: 0.9rem;
+            font-weight: 600;
+            font-size: 0.95rem;
             position: relative;
-            background: transparent;
-            color: var(--text-secondary);
-            border-bottom: 3px solid transparent;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            border: 1px solid transparent;
         }
 
         .nav-tab .notification-badge {
             position: absolute;
-            top: 6px;
-            right: 8px;
+            top: 8px;
+            right: 10px;
             background: var(--danger);
             color: #fff;
             border-radius: 999px;
@@ -185,29 +255,79 @@
             justify-content: center;
             min-width: 18px;
             height: 18px;
+            box-shadow: 0 6px 12px var(--shadow);
         }
 
         .nav-tab:hover {
             color: var(--amazon-orange);
-            background: var(--bg-secondary);
+            background: rgba(255, 153, 0, 0.08);
+            border-color: rgba(255,153,0,0.25);
+            transform: translateX(4px);
         }
 
         .nav-tab.active {
             color: var(--amazon-orange);
-            border-bottom-color: var(--amazon-orange);
-            font-weight: 600;
+            background: linear-gradient(135deg, rgba(255,153,0,0.16), rgba(35,47,62,0.08));
+            border-color: rgba(255,153,0,0.35);
+            box-shadow: 0 10px 24px var(--shadow);
         }
 
         .nav-tab-icon {
             font-size: 1rem;
-            margin-right: var(--spacing-xs);
         }
 
         /* Container */
         .container {
             max-width: 1400px;
             margin: 0 auto;
-            padding: var(--spacing-lg) var(--spacing-md);
+            padding: var(--spacing-lg) var(--spacing-lg) var(--spacing-xl);
+        }
+
+        .main-area {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .content-area {
+            flex: 1;
+            padding: 0 var(--spacing-lg);
+        }
+
+        .main-area, .content-area {
+            background: radial-gradient(circle at 20% 20%, rgba(255,153,0,0.06), transparent 35%),
+                        radial-gradient(circle at 80% 10%, rgba(35,47,62,0.05), transparent 30%),
+                        var(--bg-secondary);
+        }
+
+        .card, .metric-card, .chart-card, .table-container, .control-panel, .upload-area {
+            animation: fadeInUp 0.35s ease;
+            animation-fill-mode: both;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 1100px) {
+            .app-shell {
+                grid-template-columns: 240px 1fr;
+            }
+        }
+
+        @media (max-width: 900px) {
+            .app-shell {
+                grid-template-columns: 1fr;
+            }
+            .sidebar {
+                position: relative;
+                height: auto;
+            }
+            .header-content {
+                flex-direction: column;
+                align-items: flex-start;
+            }
         }
 
         /* Compact Cards */
@@ -315,14 +435,15 @@
         .btn {
             padding: 0.5rem 1rem;
             border: none;
-            border-radius: 4px;
+            border-radius: 10px;
             font-size: 0.85rem;
-            font-weight: 500;
+            font-weight: 600;
             cursor: pointer;
             transition: var(--transition);
             display: inline-flex;
             align-items: center;
             gap: var(--spacing-xs);
+            box-shadow: 0 6px 14px var(--shadow);
         }
 
         .btn-primary {
@@ -333,6 +454,7 @@
         .btn-primary:hover {
             background: var(--amazon-orange-dark);
             transform: translateY(-1px);
+            box-shadow: 0 10px 20px var(--shadow-hover);
         }
 
         .btn-secondary {
@@ -343,6 +465,7 @@
         .btn-secondary:hover {
             background: var(--amazon-blue-dark);
             transform: translateY(-1px);
+            box-shadow: 0 10px 20px var(--shadow-hover);
         }
 
         .btn-outline {
@@ -354,6 +477,7 @@
         .btn-outline:hover {
             background: var(--amazon-orange);
             color: white;
+            box-shadow: 0 10px 20px var(--shadow-hover);
         }
 
         .btn-sm {
@@ -1443,71 +1567,91 @@
     </style>
 </head>
 <body>
-    <!-- Header -->
-    <header class="header">
-        <div class="header-content">
-            <div class="header-title">
+    <div class="app-shell">
+        <aside class="sidebar">
+            <div class="sidebar-header">
                 <div class="amazon-logo">
                     <span class="amazon-smile">→</span>
-                    <span>amazon</span>
                 </div>
-                <div>
-                    <h1>Safety Analytics Platform</h1>
-                    <div class="header-subtitle">
-                        <span>WHS Austria</span>
-                        <span style="opacity: 0.7;">|</span>
-                        <span>Developed by Erwin Esener @eeesener</span>
+                <div class="sidebar-title">
+                    <h1>Safety Analytics</h1>
+                    <span class="sidebar-subtitle">WHS Austria • Amazon WHS</span>
+                </div>
+            </div>
+            <div class="sidebar-summary">
+                <h3>Dashboard Navigator</h3>
+                <p>Switch between modules, monitor KPIs, and keep every workflow intact while enjoying the refreshed layout.</p>
+            </div>
+            <nav class="nav-container">
+                <div class="nav-tabs">
+                    <div class="nav-tab active" data-module="overview" onclick="switchModule('overview', event)">
+                        <span class="nav-tab-icon">📊</span>
+                        <span>Overview</span>
+                    </div>
+                    <div class="nav-tab" data-module="injury" onclick="switchModule('injury', event)">
+                        <span class="nav-tab-icon">🏥</span>
+                        <span>Injury & Illness</span>
+                    </div>
+                    <div class="nav-tab" data-module="nearmiss" onclick="switchModule('nearmiss', event)">
+                        <span class="nav-tab-icon">⚠️</span>
+                        <span>Near Miss</span>
+                    </div>
+                    <div class="nav-tab" data-module="combined" onclick="switchModule('combined', event)">
+                        <span class="nav-tab-icon">📈</span>
+                        <span>Combined Analytics</span>
+                    </div>
+                    <div class="nav-tab" data-module="inspections" onclick="switchModule('inspections', event)">
+                        <span class="nav-tab-icon">📋</span>
+                        <span>Inspections</span>
+                    </div>
+                    <div class="nav-tab" data-module="reports" onclick="switchModule('reports', event)">
+                        <span class="nav-tab-icon">📄</span>
+                        <span>Reports</span>
+                    </div>
+                    <div class="nav-tab" data-module="actions" onclick="switchModule('actions', event)">
+                        <span class="nav-tab-icon">✅</span>
+                        <span>Actions</span>
                     </div>
                 </div>
+            </nav>
+            <div class="sidebar-summary">
+                <h3>Quick Tips</h3>
+                <p>Upload CSVs, apply filters, and export reports exactly as before—now with clearer spacing and smoother micro-interactions.</p>
             </div>
-            <div class="header-actions">
-                <button class="mode-toggle" onclick="toggleTheme()">
-                    <span id="themeIcon">🌙</span>
-                    <span id="themeText">Dark Mode</span>
-                </button>
-                <button class="mode-toggle" onclick="openHelpModal()">
-                    <span>❔</span>
-                    <span>Help</span>
-                </button>
-            </div>
-        </div>
-    </header>
+        </aside>
+        <div class="main-area">
+            <!-- Header -->
+            <header class="header">
+                <div class="header-content">
+                    <div class="header-title">
+                        <div class="amazon-logo">
+                            <span class="amazon-smile">→</span>
+                            <span>amazon</span>
+                        </div>
+                        <div>
+                            <h1>Safety Analytics Platform</h1>
+                            <div class="header-subtitle">
+                                <span>WHS Austria</span>
+                                <span style="opacity: 0.7;">|</span>
+                                <span>Developed by Erwin Esener @eeesener</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="header-actions">
+                        <button class="mode-toggle" onclick="toggleTheme()">
+                            <span id="themeIcon">🌙</span>
+                            <span id="themeText">Dark Mode</span>
+                        </button>
+                        <button class="mode-toggle" onclick="openHelpModal()">
+                            <span>❔</span>
+                            <span>Help</span>
+                        </button>
+                    </div>
+                </div>
+            </header>
 
-    <!-- Navigation -->
-    <nav class="nav-container">
-        <div class="nav-tabs">
-            <div class="nav-tab active" data-module="overview" onclick="switchModule('overview', event)">
-                <span class="nav-tab-icon">📊</span>
-                <span>Overview</span>
-            </div>
-            <div class="nav-tab" data-module="injury" onclick="switchModule('injury', event)">
-                <span class="nav-tab-icon">🏥</span>
-                <span>Injury & Illness</span>
-            </div>
-            <div class="nav-tab" data-module="nearmiss" onclick="switchModule('nearmiss', event)">
-                <span class="nav-tab-icon">⚠️</span>
-                <span>Near Miss</span>
-            </div>
-            <div class="nav-tab" data-module="combined" onclick="switchModule('combined', event)">
-                <span class="nav-tab-icon">📈</span>
-                <span>Combined Analytics</span>
-            </div>
-            <div class="nav-tab" data-module="inspections" onclick="switchModule('inspections', event)">
-                <span class="nav-tab-icon">📋</span>
-                <span>Inspections</span>
-            </div>
-            <div class="nav-tab" data-module="reports" onclick="switchModule('reports', event)">
-                <span class="nav-tab-icon">📄</span>
-                <span>Reports</span>
-            </div>
-            <div class="nav-tab" data-module="actions" onclick="switchModule('actions', event)">
-                <span class="nav-tab-icon">✅</span>
-                <span>Actions</span>
-            </div>
-        </div>
-    </nav>
-
-    <div class="container">
+            <div class="content-area">
+                <div class="container">
         <!-- Status Message Container -->
         <div id="statusContainer"></div>
 
@@ -2712,6 +2856,7 @@
                 </div>
             </div>
         </div>
+    </div>
     </div>
 
     <!-- Help Modal -->
