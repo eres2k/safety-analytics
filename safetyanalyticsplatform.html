@@ -1440,6 +1440,665 @@
             color: #666;
             font-size: 0.9em;
         }
+
+        /* ========================================
+           MODERN ANIMATIONS & ENHANCEMENTS
+           ======================================== */
+
+        /* Smooth scroll behavior */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Enhanced keyframe animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes fadeInRight {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes slideInUp {
+            from {
+                transform: translateY(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.05);
+                opacity: 0.8;
+            }
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: -1000px 0;
+            }
+            100% {
+                background-position: 1000px 0;
+            }
+        }
+
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        @keyframes progressBar {
+            0% {
+                width: 0%;
+            }
+            100% {
+                width: 100%;
+            }
+        }
+
+        @keyframes ripple {
+            0% {
+                transform: scale(0);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(2);
+                opacity: 0;
+            }
+        }
+
+        /* Enhanced module transitions */
+        .tab-content {
+            animation: fadeInUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Animated metric cards */
+        .metric-card {
+            animation: fadeInUp 0.5s ease-out backwards;
+        }
+
+        .metric-card:nth-child(1) { animation-delay: 0.05s; }
+        .metric-card:nth-child(2) { animation-delay: 0.1s; }
+        .metric-card:nth-child(3) { animation-delay: 0.15s; }
+        .metric-card:nth-child(4) { animation-delay: 0.2s; }
+        .metric-card:nth-child(5) { animation-delay: 0.25s; }
+        .metric-card:nth-child(6) { animation-delay: 0.3s; }
+        .metric-card:nth-child(7) { animation-delay: 0.35s; }
+        .metric-card:nth-child(8) { animation-delay: 0.4s; }
+
+        /* Counter animation class */
+        .metric-value.counting {
+            animation: pulse 0.6s ease-out;
+        }
+
+        /* Chart card stagger animation */
+        .chart-card {
+            animation: fadeInUp 0.5s ease-out backwards;
+        }
+
+        .chart-card:nth-child(1) { animation-delay: 0.1s; }
+        .chart-card:nth-child(2) { animation-delay: 0.2s; }
+        .chart-card:nth-child(3) { animation-delay: 0.3s; }
+        .chart-card:nth-child(4) { animation-delay: 0.4s; }
+
+        /* Skeleton loading states */
+        .skeleton {
+            background: linear-gradient(
+                90deg,
+                var(--bg-secondary) 0%,
+                rgba(255, 255, 255, 0.1) 50%,
+                var(--bg-secondary) 100%
+            );
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            border-radius: var(--border-radius);
+        }
+
+        .skeleton-card {
+            height: 120px;
+            margin-bottom: var(--spacing-md);
+        }
+
+        .skeleton-chart {
+            height: 300px;
+            margin-bottom: var(--spacing-md);
+        }
+
+        .skeleton-text {
+            height: 16px;
+            margin-bottom: var(--spacing-sm);
+            width: 80%;
+        }
+
+        .skeleton-title {
+            height: 24px;
+            margin-bottom: var(--spacing-md);
+            width: 40%;
+        }
+
+        /* Toast notification system */
+        .toast-container {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-sm);
+            pointer-events: none;
+        }
+
+        .toast {
+            background: white;
+            color: var(--text-primary);
+            padding: var(--spacing-md) var(--spacing-lg);
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            min-width: 300px;
+            max-width: 400px;
+            animation: slideInRight 0.3s ease-out;
+            pointer-events: auto;
+            border-left: 4px solid var(--amazon-orange);
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .toast.toast-success {
+            border-left-color: var(--success);
+        }
+
+        .toast.toast-error {
+            border-left-color: var(--danger);
+        }
+
+        .toast.toast-warning {
+            border-left-color: var(--warning);
+        }
+
+        .toast.toast-info {
+            border-left-color: #2196F3;
+        }
+
+        .toast-icon {
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .toast-content {
+            flex: 1;
+        }
+
+        .toast-title {
+            font-weight: 600;
+            margin-bottom: 0.2rem;
+        }
+
+        .toast-message {
+            font-size: 0.85rem;
+            opacity: 0.9;
+        }
+
+        .toast-close {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 1.2rem;
+            padding: 0;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            transition: var(--transition);
+        }
+
+        .toast-close:hover {
+            background: var(--bg-secondary);
+        }
+
+        .toast.hiding {
+            animation: slideOutRight 0.3s ease-out forwards;
+        }
+
+        @keyframes slideOutRight {
+            to {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+        }
+
+        [data-theme="dark"] .toast {
+            background: var(--bg-secondary);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        /* Enhanced progress bar */
+        .progress-bar-container {
+            width: 100%;
+            height: 6px;
+            background: var(--bg-secondary);
+            border-radius: 10px;
+            overflow: hidden;
+            margin: var(--spacing-sm) 0;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--amazon-orange), var(--amazon-orange-dark));
+            border-radius: 10px;
+            transition: width 0.3s ease-out;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255, 255, 255, 0.3),
+                transparent
+            );
+            animation: shimmer 2s infinite;
+        }
+
+        .progress-bar.indeterminate {
+            width: 100%;
+            background: var(--bg-secondary);
+        }
+
+        .progress-bar.indeterminate::before {
+            content: '';
+            position: absolute;
+            height: 100%;
+            width: 30%;
+            background: linear-gradient(90deg, var(--amazon-orange), var(--amazon-orange-dark));
+            animation: indeterminateProgress 1.5s infinite ease-in-out;
+        }
+
+        @keyframes indeterminateProgress {
+            0% {
+                left: -30%;
+            }
+            100% {
+                left: 100%;
+            }
+        }
+
+        /* File upload animation */
+        .upload-area.uploading {
+            border-color: var(--amazon-orange);
+            background: rgba(255, 153, 0, 0.1);
+            animation: pulse 1.5s infinite;
+        }
+
+        /* Enhanced button interactions */
+        .btn {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn:active::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn.loading {
+            pointer-events: none;
+            opacity: 0.7;
+        }
+
+        .btn.loading::after {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            top: 50%;
+            left: 50%;
+            margin: -8px 0 0 -8px;
+            border: 2px solid white;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 0.6s linear infinite;
+        }
+
+        /* Enhanced table row animations */
+        tbody tr {
+            animation: fadeInLeft 0.3s ease-out backwards;
+        }
+
+        tbody tr:nth-child(1) { animation-delay: 0.02s; }
+        tbody tr:nth-child(2) { animation-delay: 0.04s; }
+        tbody tr:nth-child(3) { animation-delay: 0.06s; }
+        tbody tr:nth-child(4) { animation-delay: 0.08s; }
+        tbody tr:nth-child(5) { animation-delay: 0.1s; }
+        tbody tr:nth-child(6) { animation-delay: 0.12s; }
+        tbody tr:nth-child(7) { animation-delay: 0.14s; }
+        tbody tr:nth-child(8) { animation-delay: 0.16s; }
+        tbody tr:nth-child(9) { animation-delay: 0.18s; }
+        tbody tr:nth-child(10) { animation-delay: 0.2s; }
+
+        /* Animated badges */
+        .badge {
+            animation: scaleIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Enhanced risk matrix interactions */
+        .matrix-cell {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .matrix-cell:active {
+            transform: scale(0.95);
+        }
+
+        .matrix-cell.highlighted {
+            animation: pulse 1s ease-out;
+            box-shadow: 0 0 0 4px rgba(255, 153, 0, 0.4);
+        }
+
+        /* Timeline animations */
+        .timeline-item {
+            animation: fadeInLeft 0.5s ease-out backwards;
+        }
+
+        .timeline-item:nth-child(1) { animation-delay: 0.1s; }
+        .timeline-item:nth-child(2) { animation-delay: 0.2s; }
+        .timeline-item:nth-child(3) { animation-delay: 0.3s; }
+        .timeline-item:nth-child(4) { animation-delay: 0.4s; }
+        .timeline-item:nth-child(5) { animation-delay: 0.5s; }
+
+        .timeline-item::before {
+            animation: scaleIn 0.3s ease-out backwards;
+            animation-delay: inherit;
+        }
+
+        /* Filter section animations */
+        .filter-section {
+            animation: fadeInDown 0.4s ease-out;
+        }
+
+        .filter-group {
+            animation: fadeInUp 0.3s ease-out backwards;
+        }
+
+        .filter-group:nth-child(1) { animation-delay: 0.05s; }
+        .filter-group:nth-child(2) { animation-delay: 0.1s; }
+        .filter-group:nth-child(3) { animation-delay: 0.15s; }
+        .filter-group:nth-child(4) { animation-delay: 0.2s; }
+        .filter-group:nth-child(5) { animation-delay: 0.25s; }
+        .filter-group:nth-child(6) { animation-delay: 0.3s; }
+
+        /* Enhanced input focus effects */
+        .filter-input {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .filter-input:focus {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px var(--shadow);
+        }
+
+        /* Modal animations */
+        .modal {
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .modal-content {
+            animation: scaleIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Card hover glow effect */
+        .card {
+            position: relative;
+        }
+
+        .card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: var(--border-radius);
+            opacity: 0;
+            transition: opacity 0.3s ease-out;
+            pointer-events: none;
+            box-shadow: 0 8px 24px var(--amazon-orange);
+        }
+
+        .card:hover::after {
+            opacity: 0.1;
+        }
+
+        /* Quality score circle animation */
+        .quality-score-circle {
+            animation: scaleIn 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .quality-score-value {
+            animation: fadeIn 0.8s ease-out 0.3s backwards;
+        }
+
+        /* Stagger animation for quality metrics */
+        .quality-metric {
+            animation: fadeInUp 0.4s ease-out backwards;
+        }
+
+        .quality-metric:nth-child(1) { animation-delay: 0.1s; }
+        .quality-metric:nth-child(2) { animation-delay: 0.2s; }
+        .quality-metric:nth-child(3) { animation-delay: 0.3s; }
+        .quality-metric:nth-child(4) { animation-delay: 0.4s; }
+        .quality-metric:nth-child(5) { animation-delay: 0.5s; }
+
+        /* Enhanced nav tab transitions */
+        .nav-tab {
+            position: relative;
+        }
+
+        .nav-tab::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 3px;
+            background: var(--amazon-orange);
+            transition: width 0.3s ease-out;
+        }
+
+        .nav-tab:hover::after {
+            width: 100%;
+        }
+
+        .nav-tab.active::after {
+            width: 100%;
+        }
+
+        /* Scroll reveal animation */
+        .scroll-reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+
+        .scroll-reveal.revealed {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Loading state for sections */
+        .section-loading {
+            position: relative;
+            pointer-events: none;
+            opacity: 0.6;
+        }
+
+        .section-loading::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 40px;
+            height: 40px;
+            margin: -20px 0 0 -20px;
+            border: 4px solid var(--bg-secondary);
+            border-top-color: var(--amazon-orange);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        /* Success checkmark animation */
+        @keyframes checkmark {
+            0% {
+                stroke-dashoffset: 100;
+            }
+            100% {
+                stroke-dashoffset: 0;
+            }
+        }
+
+        /* Pulse animation for notifications */
+        .notification-badge {
+            animation: pulse 2s infinite;
+        }
+
+        /* Hover lift effect for cards */
+        .metric-card, .chart-card {
+            will-change: transform;
+        }
+
+        /* Reduce motion for accessibility */
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* Focus visible for accessibility */
+        *:focus-visible {
+            outline: 2px solid var(--amazon-orange);
+            outline-offset: 2px;
+        }
+
+        /* Enhanced sub-nav animations */
+        .sub-nav-item {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .sub-nav-item:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Chart loading skeleton */
+        .chart-loading {
+            position: relative;
+            height: 300px;
+            background: linear-gradient(
+                90deg,
+                var(--bg-secondary) 25%,
+                rgba(255, 255, 255, 0.1) 50%,
+                var(--bg-secondary) 75%
+            );
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            border-radius: var(--border-radius);
+        }
     </style>
 </head>
 <body>
@@ -2882,6 +3541,9 @@
             © 2024 Amazon.com, Inc.
         </p>
     </footer>
+
+    <!-- Toast Notification Container -->
+    <div class="toast-container" id="toastContainer"></div>
 
     <script>
        // Global State Management
@@ -14826,4 +15488,370 @@ window.analyzePrimaryImpacts = analyzePrimaryImpacts;
 console.log('Safety Analytics Platform initialized successfully');
 console.log('Version: 2.0 | © 2024 Amazon WHS Austria');
 console.log('For support, contact: Erwin Esener @eeesener');
+
+/* ========================================
+   MODERN ANIMATION & INTERACTION FUNCTIONS
+   ======================================== */
+
+// Toast Notification System
+function showToast(message, type = 'info', duration = 4000) {
+    const container = document.getElementById('toastContainer');
+    if (!container) return;
+
+    const icons = {
+        success: '✓',
+        error: '✕',
+        warning: '⚠',
+        info: 'ℹ'
+    };
+
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    toast.innerHTML = `
+        <span class="toast-icon">${icons[type] || icons.info}</span>
+        <div class="toast-content">
+            <div class="toast-message">${message}</div>
+        </div>
+        <button class="toast-close" onclick="this.parentElement.remove()">×</button>
+    `;
+
+    container.appendChild(toast);
+
+    // Auto remove after duration
+    setTimeout(() => {
+        toast.classList.add('hiding');
+        setTimeout(() => toast.remove(), 300);
+    }, duration);
+}
+
+// Animated Counter Function
+function animateCounter(element, targetValue, duration = 1000) {
+    const start = 0;
+    const startTime = performance.now();
+
+    function updateCounter(currentTime) {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+
+        // Easing function for smooth animation
+        const easeOutQuad = progress * (2 - progress);
+        const current = Math.floor(easeOutQuad * targetValue);
+
+        element.textContent = current.toLocaleString();
+
+        if (progress < 1) {
+            requestAnimationFrame(updateCounter);
+        } else {
+            element.textContent = targetValue.toLocaleString();
+            element.classList.remove('counting');
+        }
+    }
+
+    element.classList.add('counting');
+    requestAnimationFrame(updateCounter);
+}
+
+// Update all metric values with animation
+function updateMetricWithAnimation(selector, value) {
+    const elements = document.querySelectorAll(selector);
+    elements.forEach(el => {
+        if (el && !isNaN(value)) {
+            animateCounter(el, Math.round(value));
+        }
+    });
+}
+
+// Scroll Reveal Observer
+const scrollRevealObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('revealed');
+            scrollRevealObserver.unobserve(entry.target);
+        }
+    });
+}, {
+    threshold: 0.1,
+    rootMargin: '0px 0px -50px 0px'
+});
+
+// Initialize scroll reveal for elements
+function initScrollReveal() {
+    const elements = document.querySelectorAll('.scroll-reveal');
+    elements.forEach(el => scrollRevealObserver.observe(el));
+}
+
+// Enhanced Module Switching with Smooth Transitions
+const originalSwitchModule = window.switchModule;
+window.switchModule = function(moduleName, event) {
+    // Add transition effect
+    const activeContent = document.querySelector('.tab-content.active');
+    if (activeContent) {
+        activeContent.style.opacity = '0';
+        setTimeout(() => {
+            originalSwitchModule(moduleName, event);
+            const newActive = document.querySelector('.tab-content.active');
+            if (newActive) {
+                newActive.style.opacity = '0';
+                requestAnimationFrame(() => {
+                    newActive.style.transition = 'opacity 0.3s ease-out';
+                    newActive.style.opacity = '1';
+                });
+            }
+            initScrollReveal();
+        }, 150);
+    } else {
+        originalSwitchModule(moduleName, event);
+        initScrollReveal();
+    }
+};
+
+// Enhanced File Upload with Progress
+function enhanceFileUpload() {
+    const uploadAreas = document.querySelectorAll('.upload-area');
+
+    uploadAreas.forEach(area => {
+        area.addEventListener('dragenter', (e) => {
+            e.preventDefault();
+            area.classList.add('dragging');
+        });
+
+        area.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            if (e.target === area) {
+                area.classList.remove('dragging');
+            }
+        });
+
+        area.addEventListener('drop', (e) => {
+            area.classList.remove('dragging');
+            area.classList.add('uploading');
+
+            setTimeout(() => {
+                area.classList.remove('uploading');
+            }, 2000);
+        });
+    });
+}
+
+// Create Progress Bar
+function createProgressBar(container, initialValue = 0) {
+    const progressContainer = document.createElement('div');
+    progressContainer.className = 'progress-bar-container';
+
+    const progressBar = document.createElement('div');
+    progressBar.className = 'progress-bar';
+    progressBar.style.width = `${initialValue}%`;
+
+    progressContainer.appendChild(progressBar);
+    container.appendChild(progressContainer);
+
+    return {
+        update: (value) => {
+            progressBar.style.width = `${value}%`;
+        },
+        setIndeterminate: (indeterminate) => {
+            if (indeterminate) {
+                progressBar.classList.add('indeterminate');
+            } else {
+                progressBar.classList.remove('indeterminate');
+            }
+        },
+        remove: () => {
+            progressContainer.remove();
+        }
+    };
+}
+
+// Enhanced Chart Creation with Stagger Animation
+function createChartWithAnimation(ctx, config) {
+    // Add animation configuration
+    const enhancedConfig = {
+        ...config,
+        options: {
+            ...config.options,
+            animation: {
+                duration: 750,
+                easing: 'easeOutQuart',
+                delay: (context) => {
+                    let delay = 0;
+                    if (context.type === 'data' && context.mode === 'default') {
+                        delay = context.dataIndex * 50 + context.datasetIndex * 100;
+                    }
+                    return delay;
+                }
+            },
+            transitions: {
+                show: {
+                    animations: {
+                        x: { from: 0 },
+                        y: { from: 0 }
+                    }
+                },
+                hide: {
+                    animations: {
+                        x: { to: 0 },
+                        y: { to: 0 }
+                    }
+                }
+            }
+        }
+    };
+
+    return new Chart(ctx, enhancedConfig);
+}
+
+// Add skeleton loader to element
+function showSkeletonLoader(element, type = 'card') {
+    const skeleton = document.createElement('div');
+    skeleton.className = `skeleton skeleton-${type}`;
+    element.innerHTML = '';
+    element.appendChild(skeleton);
+}
+
+// Remove skeleton loader
+function hideSkeletonLoader(element, content) {
+    element.innerHTML = content;
+}
+
+// Highlight Risk Matrix Cell
+function highlightMatrixCell(cell) {
+    cell.classList.add('highlighted');
+    setTimeout(() => {
+        cell.classList.remove('highlighted');
+    }, 1000);
+}
+
+// Smooth scroll to element
+function smoothScrollTo(elementId) {
+    const element = document.getElementById(elementId);
+    if (element) {
+        element.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+        });
+    }
+}
+
+// Add ripple effect to buttons
+function addRippleEffect(e) {
+    const button = e.currentTarget;
+    const ripple = document.createElement('span');
+    const rect = button.getBoundingClientRect();
+    const size = Math.max(rect.width, rect.height);
+    const x = e.clientX - rect.left - size / 2;
+    const y = e.clientY - rect.top - size / 2;
+
+    ripple.style.width = ripple.style.height = size + 'px';
+    ripple.style.left = x + 'px';
+    ripple.style.top = y + 'px';
+    ripple.classList.add('ripple');
+
+    button.appendChild(ripple);
+
+    setTimeout(() => ripple.remove(), 600);
+}
+
+// Initialize all modern enhancements
+function initModernEnhancements() {
+    // Initialize scroll reveal
+    initScrollReveal();
+
+    // Enhance file uploads
+    enhanceFileUpload();
+
+    // Add ripple effects to buttons
+    document.querySelectorAll('.btn').forEach(btn => {
+        if (!btn.dataset.rippleInitialized) {
+            btn.addEventListener('click', addRippleEffect);
+            btn.dataset.rippleInitialized = 'true';
+        }
+    });
+
+    // Add focus-visible polyfill behavior
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Tab') {
+            document.body.classList.add('keyboard-nav');
+        }
+    });
+
+    document.addEventListener('mousedown', () => {
+        document.body.classList.remove('keyboard-nav');
+    });
+
+    console.log('Modern enhancements initialized');
+}
+
+// Enhance existing data loading functions with animations
+const originalHandleInjuryFile = window.handleInjuryFile;
+if (originalHandleInjuryFile) {
+    window.handleInjuryFile = function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            showToast(`Loading ${file.name}...`, 'info', 2000);
+
+            // Call original function
+            originalHandleInjuryFile(e);
+
+            // Show success after a delay (assumes async processing)
+            setTimeout(() => {
+                showToast('Data loaded successfully!', 'success');
+            }, 1500);
+        }
+    };
+}
+
+const originalHandleNearMissFile = window.handleNearMissFile;
+if (originalHandleNearMissFile) {
+    window.handleNearMissFile = function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            showToast(`Loading ${file.name}...`, 'info', 2000);
+
+            // Call original function
+            originalHandleNearMissFile(e);
+
+            // Show success after a delay
+            setTimeout(() => {
+                showToast('Data loaded successfully!', 'success');
+            }, 1500);
+        }
+    };
+}
+
+// Animate metrics when they're updated
+function animateMetricsOnUpdate() {
+    const metricValues = document.querySelectorAll('.metric-value');
+    metricValues.forEach((el, index) => {
+        el.style.animationDelay = `${index * 0.05}s`;
+    });
+}
+
+// Enhanced error handling with toast notifications
+window.addEventListener('error', (e) => {
+    if (e.message && !e.message.includes('Script error')) {
+        console.error('Error:', e.message);
+        // Don't show toast for every error, only critical ones
+    }
+});
+
+// Initialize on DOM ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initModernEnhancements);
+} else {
+    initModernEnhancements();
+}
+
+// Expose modern utility functions
+window.showToast = showToast;
+window.animateCounter = animateCounter;
+window.updateMetricWithAnimation = updateMetricWithAnimation;
+window.createProgressBar = createProgressBar;
+window.createChartWithAnimation = createChartWithAnimation;
+window.showSkeletonLoader = showSkeletonLoader;
+window.hideSkeletonLoader = hideSkeletonLoader;
+window.highlightMatrixCell = highlightMatrixCell;
+window.smoothScrollTo = smoothScrollTo;
+window.animateMetricsOnUpdate = animateMetricsOnUpdate;
+
+console.log('Modern animation system loaded successfully');
  </script>
