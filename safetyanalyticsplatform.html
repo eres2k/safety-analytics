@@ -24,27 +24,39 @@
             --danger: #FF5722;
             --critical: #B71C1C;
             --bg-primary: #ffffff;
-            --bg-secondary: #f5f5f5;
-            --text-primary: #212121;
-            --text-secondary: #757575;
+            --bg-secondary: #f0f2f5;
+            --bg-glass: rgba(255, 255, 255, 0.7);
+            --bg-glass-strong: rgba(255, 255, 255, 0.85);
+            --text-primary: #1d1d1f;
+            --text-secondary: #6e6e73;
             --shadow: rgba(0,0,0,0.08);
-            --shadow-hover: rgba(0,0,0,0.12);
-            --border-radius: 8px;
-            --transition: all 0.2s ease;
+            --shadow-hover: rgba(0,0,0,0.15);
+            --shadow-glass: rgba(0,0,0,0.1);
+            --border-radius: 16px;
+            --border-radius-sm: 12px;
+            --border-radius-lg: 20px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-fast: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
             --spacing-xs: 0.25rem;
             --spacing-sm: 0.5rem;
             --spacing-md: 1rem;
             --spacing-lg: 1.5rem;
             --spacing-xl: 2rem;
+            --blur-sm: 10px;
+            --blur-md: 20px;
+            --blur-lg: 30px;
         }
 
         [data-theme="dark"] {
             --bg-primary: #1a1a1a;
             --bg-secondary: #2d2d2d;
-            --text-primary: #ffffff;
-            --text-secondary: #b0b0b0;
-            --shadow: rgba(255,255,255,0.05);
-            --shadow-hover: rgba(255,255,255,0.1);
+            --bg-glass: rgba(30, 30, 30, 0.7);
+            --bg-glass-strong: rgba(30, 30, 30, 0.85);
+            --text-primary: #f5f5f7;
+            --text-secondary: #a1a1a6;
+            --shadow: rgba(0,0,0,0.3);
+            --shadow-hover: rgba(0,0,0,0.5);
+            --shadow-glass: rgba(0,0,0,0.5);
         }
 
         * {
@@ -55,10 +67,15 @@
         
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Amazon Ember', sans-serif;
-            background-color: var(--bg-secondary);
+            background: linear-gradient(135deg, #f0f2f5 0%, #e8eaf0 50%, #f5f5f7 100%);
+            background-attachment: fixed;
             color: var(--text-primary);
-            line-height: 1.5;
+            line-height: 1.6;
             transition: var(--transition);
+        }
+
+        [data-theme="dark"] body {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #1f1f1f 100%);
         }
 
         /* Compact Header */
@@ -210,17 +227,31 @@
             padding: var(--spacing-lg) var(--spacing-md);
         }
 
-        /* Compact Cards */
+        /* Glass Morphism Cards */
         .card {
-            background: var(--bg-primary);
+            background: var(--bg-glass);
+            backdrop-filter: blur(var(--blur-md)) saturate(180%);
+            -webkit-backdrop-filter: blur(var(--blur-md)) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.3);
             border-radius: var(--border-radius);
-            padding: var(--spacing-md);
-            box-shadow: 0 1px 4px var(--shadow);
+            padding: var(--spacing-lg);
+            box-shadow: 0 8px 32px var(--shadow-glass);
             transition: var(--transition);
         }
 
         .card:hover {
-            box-shadow: 0 4px 12px var(--shadow-hover);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px var(--shadow-hover);
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+
+        [data-theme="dark"] .card {
+            background: var(--bg-glass);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        [data-theme="dark"] .card:hover {
+            border-color: rgba(255, 255, 255, 0.2);
         }
 
         /* Compact Metrics Grid */
@@ -232,19 +263,37 @@
         }
 
         .metric-card {
-            background: var(--bg-primary);
+            background: var(--bg-glass-strong);
+            backdrop-filter: blur(var(--blur-md)) saturate(180%);
+            -webkit-backdrop-filter: blur(var(--blur-md)) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.3);
             border-radius: var(--border-radius);
-            padding: var(--spacing-md);
+            padding: var(--spacing-lg);
             position: relative;
             overflow: hidden;
-            box-shadow: 0 1px 4px var(--shadow);
+            box-shadow: 0 8px 32px var(--shadow-glass);
             transition: var(--transition);
-            border-left: 4px solid var(--amazon-orange);
+        }
+
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(180deg, var(--amazon-orange) 0%, var(--amazon-orange-dark) 100%);
         }
 
         .metric-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px var(--shadow-hover);
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 12px 40px var(--shadow-hover);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        [data-theme="dark"] .metric-card {
+            background: var(--bg-glass);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .metric-icon {
@@ -287,13 +336,21 @@
             color: var(--danger);
         }
 
-        /* Compact Control Panel */
+        /* Glass Control Panel */
         .control-panel {
-            background: var(--bg-primary);
+            background: var(--bg-glass);
+            backdrop-filter: blur(var(--blur-md)) saturate(180%);
+            -webkit-backdrop-filter: blur(var(--blur-md)) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.3);
             border-radius: var(--border-radius);
-            padding: var(--spacing-md);
+            padding: var(--spacing-lg);
             margin-bottom: var(--spacing-lg);
-            box-shadow: 0 1px 4px var(--shadow);
+            box-shadow: 0 8px 32px var(--shadow-glass);
+        }
+
+        [data-theme="dark"] .control-panel {
+            background: var(--bg-glass);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .control-header {
@@ -454,10 +511,25 @@
         }
 
         .chart-card {
-            background: var(--bg-primary);
+            background: var(--bg-glass);
+            backdrop-filter: blur(var(--blur-md)) saturate(180%);
+            -webkit-backdrop-filter: blur(var(--blur-md)) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.3);
             border-radius: var(--border-radius);
-            padding: var(--spacing-md);
-            box-shadow: 0 1px 4px var(--shadow);
+            padding: var(--spacing-lg);
+            box-shadow: 0 8px 32px var(--shadow-glass);
+            transition: var(--transition);
+        }
+
+        .chart-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px var(--shadow-hover);
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+
+        [data-theme="dark"] .chart-card {
+            background: var(--bg-glass);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .chart-header {
@@ -679,35 +751,73 @@
             font-size: 0.85rem;
         }
 
-        /* Quality Assessment Styles */
+        /* Glass Quality Assessment Styles */
         .quality-score-card {
-            background: linear-gradient(135deg, var(--amazon-blue) 0%, var(--amazon-blue-dark) 100%);
+            background: linear-gradient(135deg, rgba(35, 47, 62, 0.95) 0%, rgba(55, 71, 90, 0.95) 100%);
+            backdrop-filter: blur(var(--blur-lg)) saturate(180%);
+            -webkit-backdrop-filter: blur(var(--blur-lg)) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             color: white;
-            border-radius: var(--border-radius);
-            padding: var(--spacing-lg);
+            border-radius: var(--border-radius-lg);
+            padding: var(--spacing-xl);
             text-align: center;
             margin-bottom: var(--spacing-lg);
-            display: flex;
-            justify-content: center;
+            box-shadow: 0 12px 48px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .quality-score-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 153, 0, 0.1) 0%, transparent 70%);
+            animation: qualityGlow 8s ease-in-out infinite;
+        }
+
+        @keyframes qualityGlow {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            50% { transform: translate(10%, 10%) rotate(180deg); }
         }
 
         .quality-score-value {
-            font-size: 3rem;
-            font-weight: 700;
-            margin: 0;
+            font-size: 4rem;
+            font-weight: 800;
+            margin: var(--spacing-md) 0;
+            position: relative;
+            z-index: 1;
+            background: linear-gradient(135deg, #fff 0%, var(--amazon-orange) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .quality-metrics {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
             gap: var(--spacing-md);
-            margin-top: var(--spacing-md);
+            margin-top: var(--spacing-xl);
+            position: relative;
+            z-index: 1;
         }
 
         .quality-metric {
-            background: rgba(255, 255, 255, 0.1);
-            padding: var(--spacing-md);
-            border-radius: var(--border-radius);
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(var(--blur-sm));
+            -webkit-backdrop-filter: blur(var(--blur-sm));
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: var(--spacing-lg);
+            border-radius: var(--border-radius-sm);
+            transition: var(--transition);
+        }
+
+        .quality-metric:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-4px);
+            border-color: rgba(255, 255, 255, 0.4);
         }
 
         .quality-metrics-container {
@@ -872,6 +982,141 @@
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
+        }
+
+        /* Collapsible & Draggable Dashboard Styles */
+        .dashboard-section {
+            position: relative;
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .dashboard-section.collapsed .dashboard-content {
+            display: none;
+        }
+
+        .dashboard-section.dragging {
+            opacity: 0.5;
+            transform: scale(0.95);
+        }
+
+        .dashboard-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--spacing-md) var(--spacing-lg);
+            background: var(--bg-glass-strong);
+            backdrop-filter: blur(var(--blur-md)) saturate(180%);
+            -webkit-backdrop-filter: blur(var(--blur-md)) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: var(--border-radius);
+            cursor: move;
+            margin-bottom: var(--spacing-sm);
+            box-shadow: 0 4px 16px var(--shadow-glass);
+            transition: var(--transition);
+        }
+
+        .dashboard-header:hover {
+            background: rgba(255, 255, 255, 0.9);
+            border-color: rgba(255, 255, 255, 0.5);
+            box-shadow: 0 6px 20px var(--shadow-hover);
+        }
+
+        .dashboard-header-left {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+
+        .dashboard-drag-handle {
+            color: var(--text-secondary);
+            cursor: grab;
+            padding: var(--spacing-xs);
+            transition: var(--transition-fast);
+        }
+
+        .dashboard-drag-handle:active {
+            cursor: grabbing;
+        }
+
+        .dashboard-drag-handle:hover {
+            color: var(--amazon-orange);
+        }
+
+        .dashboard-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .dashboard-controls {
+            display: flex;
+            gap: var(--spacing-sm);
+            align-items: center;
+        }
+
+        .dashboard-btn {
+            background: rgba(255, 153, 0, 0.1);
+            border: 1px solid rgba(255, 153, 0, 0.2);
+            border-radius: 8px;
+            padding: 0.4rem 0.6rem;
+            cursor: pointer;
+            color: var(--amazon-orange);
+            transition: var(--transition-fast);
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .dashboard-btn:hover {
+            background: rgba(255, 153, 0, 0.2);
+            border-color: rgba(255, 153, 0, 0.4);
+            transform: scale(1.05);
+        }
+
+        .dashboard-btn.collapse-btn {
+            background: transparent;
+            border: none;
+            padding: 0.3rem;
+            color: var(--text-secondary);
+        }
+
+        .dashboard-btn.collapse-btn:hover {
+            color: var(--amazon-orange);
+            background: rgba(255, 153, 0, 0.1);
+        }
+
+        .dashboard-content {
+            animation: slideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .drag-placeholder {
+            background: rgba(255, 153, 0, 0.1);
+            border: 2px dashed var(--amazon-orange);
+            border-radius: var(--border-radius);
+            margin-bottom: var(--spacing-lg);
+            transition: var(--transition-fast);
+        }
+
+        [data-theme="dark"] .dashboard-header {
+            background: rgba(30, 30, 30, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        [data-theme="dark"] .dashboard-header:hover {
+            background: rgba(45, 45, 45, 0.9);
         }
 
         /* Responsive Design */
@@ -1939,40 +2184,86 @@
 
             <!-- Quality Assessment View -->
             <div id="injuryQuality" class="injury-view hidden">
-                <div class="quality-score-card">
-                    <h3>Data Quality Assessment</h3>
-                    <div class="quality-score-value" id="injuryQualityScore">0%</div>
-                    <div class="quality-metrics">
-                        <div class="quality-metric">
-                            <div style="font-size: 1.5rem; font-weight: 700;" id="injuryCompleteness">0%</div>
-                            <div style="font-size: 0.85rem;">Completeness</div>
+                <!-- Overall Quality Score -->
+                <div class="dashboard-section" data-section-id="injury-quality-score">
+                    <div class="dashboard-header">
+                        <div class="dashboard-header-left">
+                            <i class="fas fa-grip-vertical dashboard-drag-handle"></i>
+                            <h3 class="dashboard-title"><i class="fas fa-chart-line"></i> Overall Quality Score</h3>
                         </div>
-                        <div class="quality-metric">
-                            <div style="font-size: 1.5rem; font-weight: 700;" id="injuryAccuracy">0%</div>
-                            <div style="font-size: 0.85rem;">Accuracy</div>
+                        <div class="dashboard-controls">
+                            <button class="dashboard-btn collapse-btn" onclick="toggleDashboardSection(this)">
+                                <i class="fas fa-chevron-up"></i>
+                            </button>
                         </div>
-                        <div class="quality-metric">
-                            <div style="font-size: 1.5rem; font-weight: 700;" id="injuryConsistency">0%</div>
-                            <div style="font-size: 0.85rem;">Consistency</div>
-                        </div>
-                        <div class="quality-metric">
-                            <div style="font-size: 1.5rem; font-weight: 700;" id="injuryTimeliness">0%</div>
-                            <div style="font-size: 0.85rem;">Timeliness</div>
+                    </div>
+                    <div class="dashboard-content">
+                        <div class="quality-score-card">
+                            <h3 style="font-size: 1.2rem; margin-bottom: 0.5rem; opacity: 0.9; position: relative; z-index: 1;">Injury Data Quality Assessment</h3>
+                            <div class="quality-score-value" id="injuryQualityScore">0%</div>
+                            <div class="quality-metrics">
+                                <div class="quality-metric">
+                                    <div style="font-size: 2rem; font-weight: 700;" id="injuryCompleteness">0%</div>
+                                    <div style="font-size: 0.9rem; opacity: 0.9; margin-top: 0.5rem;">Completeness</div>
+                                </div>
+                                <div class="quality-metric">
+                                    <div style="font-size: 2rem; font-weight: 700;" id="injuryAccuracy">0%</div>
+                                    <div style="font-size: 0.9rem; opacity: 0.9; margin-top: 0.5rem;">Accuracy</div>
+                                </div>
+                                <div class="quality-metric">
+                                    <div style="font-size: 2rem; font-weight: 700;" id="injuryConsistency">0%</div>
+                                    <div style="font-size: 0.9rem; opacity: 0.9; margin-top: 0.5rem;">Consistency</div>
+                                </div>
+                                <div class="quality-metric">
+                                    <div style="font-size: 2rem; font-weight: 700;" id="injuryTimeliness">0%</div>
+                                    <div style="font-size: 0.9rem; opacity: 0.9; margin-top: 0.5rem;">Timeliness</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="card" style="margin-top: 1rem;">
-                    <h4 style="margin-bottom: 1rem;">Quality Issues Detected</h4>
-                    <div id="injuryQualityIssues">
-                        <p style="color: var(--text-secondary);">Quality assessment will appear after data is loaded.</p>
+                <!-- Quality Issues -->
+                <div class="dashboard-section" data-section-id="injury-quality-issues">
+                    <div class="dashboard-header">
+                        <div class="dashboard-header-left">
+                            <i class="fas fa-grip-vertical dashboard-drag-handle"></i>
+                            <h3 class="dashboard-title"><i class="fas fa-exclamation-triangle"></i> Quality Issues Detected</h3>
+                        </div>
+                        <div class="dashboard-controls">
+                            <button class="dashboard-btn collapse-btn" onclick="toggleDashboardSection(this)">
+                                <i class="fas fa-chevron-up"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="dashboard-content">
+                        <div class="card">
+                            <div id="injuryQualityIssues">
+                                <p style="color: var(--text-secondary); text-align: center; padding: 2rem;">Quality assessment will appear after data is loaded.</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="card" style="margin-top: 1rem;">
-                    <h4 style="margin-bottom: 1rem;">Duplicate Detection</h4>
-                    <div id="injuryDuplicates">
-                        <p style="color: var(--text-secondary);">Duplicate analysis will appear after data is loaded.</p>
+                <!-- Duplicate Detection -->
+                <div class="dashboard-section" data-section-id="injury-duplicates">
+                    <div class="dashboard-header">
+                        <div class="dashboard-header-left">
+                            <i class="fas fa-grip-vertical dashboard-drag-handle"></i>
+                            <h3 class="dashboard-title"><i class="fas fa-copy"></i> Duplicate Detection</h3>
+                        </div>
+                        <div class="dashboard-controls">
+                            <button class="dashboard-btn collapse-btn" onclick="toggleDashboardSection(this)">
+                                <i class="fas fa-chevron-up"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="dashboard-content">
+                        <div class="card">
+                            <div id="injuryDuplicates">
+                                <p style="color: var(--text-secondary); text-align: center; padding: 2rem;">Duplicate analysis will appear after data is loaded.</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -2281,50 +2572,127 @@
 
             <!-- Quality Assessment View -->
             <div id="nearMissQuality" class="nearmiss-view hidden">
-                <div class="quality-score-card">
-                    <h3>Data Quality Assessment</h3>
-                    <div class="quality-score-value" id="nearMissQualityScore">0%</div>
-                    <div class="quality-metrics">
-                        <div class="quality-metric">
-                            <div style="font-size: 1.5rem; font-weight: 700;" id="nearMissCompleteness">0%</div>
-                            <div style="font-size: 0.85rem;">Completeness</div>
+                <!-- Overall Quality Score -->
+                <div class="dashboard-section" data-section-id="nearmiss-quality-score">
+                    <div class="dashboard-header">
+                        <div class="dashboard-header-left">
+                            <i class="fas fa-grip-vertical dashboard-drag-handle"></i>
+                            <h3 class="dashboard-title"><i class="fas fa-chart-line"></i> Overall Quality Score</h3>
                         </div>
-                        <div class="quality-metric">
-                            <div style="font-size: 1.5rem; font-weight: 700;" id="nearMissAccuracy">0%</div>
-                            <div style="font-size: 0.85rem;">Accuracy</div>
+                        <div class="dashboard-controls">
+                            <button class="dashboard-btn collapse-btn" onclick="toggleDashboardSection(this)">
+                                <i class="fas fa-chevron-up"></i>
+                            </button>
                         </div>
-                        <div class="quality-metric">
-                            <div style="font-size: 1.5rem; font-weight: 700;" id="nearMissConsistency">0%</div>
-                            <div style="font-size: 0.85rem;">Consistency</div>
-                        </div>
-                        <div class="quality-metric">
-                            <div style="font-size: 1.5rem; font-weight: 700;" id="nearMissTimeliness">0%</div>
-                            <div style="font-size: 0.85rem;">Timeliness</div>
+                    </div>
+                    <div class="dashboard-content">
+                        <div class="quality-score-card">
+                            <h3 style="font-size: 1.2rem; margin-bottom: 0.5rem; opacity: 0.9; position: relative; z-index: 1;">Near Miss Data Quality Assessment</h3>
+                            <div class="quality-score-value" id="nearMissQualityScore">0%</div>
+                            <div class="quality-metrics">
+                                <div class="quality-metric">
+                                    <div style="font-size: 2rem; font-weight: 700;" id="nearMissCompleteness">0%</div>
+                                    <div style="font-size: 0.9rem; opacity: 0.9; margin-top: 0.5rem;">Completeness</div>
+                                </div>
+                                <div class="quality-metric">
+                                    <div style="font-size: 2rem; font-weight: 700;" id="nearMissAccuracy">0%</div>
+                                    <div style="font-size: 0.9rem; opacity: 0.9; margin-top: 0.5rem;">Accuracy</div>
+                                </div>
+                                <div class="quality-metric">
+                                    <div style="font-size: 2rem; font-weight: 700;" id="nearMissConsistency">0%</div>
+                                    <div style="font-size: 0.9rem; opacity: 0.9; margin-top: 0.5rem;">Consistency</div>
+                                </div>
+                                <div class="quality-metric">
+                                    <div style="font-size: 2rem; font-weight: 700;" id="nearMissTimeliness">0%</div>
+                                    <div style="font-size: 0.9rem; opacity: 0.9; margin-top: 0.5rem;">Timeliness</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="card" style="margin-top: 1rem;">
-                    <h4 style="margin-bottom: 1rem;">Quality Issues Detected</h4>
-                    <div id="nearMissQualityIssues">
-                        <p style="color: var(--text-secondary);">Quality assessment will appear after data is loaded.</p>
+                <!-- Quality Issues -->
+                <div class="dashboard-section" data-section-id="nearmiss-quality-issues">
+                    <div class="dashboard-header">
+                        <div class="dashboard-header-left">
+                            <i class="fas fa-grip-vertical dashboard-drag-handle"></i>
+                            <h3 class="dashboard-title"><i class="fas fa-exclamation-triangle"></i> Quality Issues Detected</h3>
+                        </div>
+                        <div class="dashboard-controls">
+                            <button class="dashboard-btn collapse-btn" onclick="toggleDashboardSection(this)">
+                                <i class="fas fa-chevron-up"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="dashboard-content">
+                        <div class="card">
+                            <div id="nearMissQualityIssues">
+                                <p style="color: var(--text-secondary); text-align: center; padding: 2rem;">Quality assessment will appear after data is loaded.</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-        <div class="card" style="margin-top: 1rem;">
-                    <h4 style="margin-bottom: 1rem;">Duplicate Detection</h4>
-                    <div id="nearMissDuplicates">
-                        <p style="color: var(--text-secondary);">Duplicate analysis will appear after data is loaded.</p>
+                <!-- Duplicate Detection -->
+                <div class="dashboard-section" data-section-id="nearmiss-duplicates">
+                    <div class="dashboard-header">
+                        <div class="dashboard-header-left">
+                            <i class="fas fa-grip-vertical dashboard-drag-handle"></i>
+                            <h3 class="dashboard-title"><i class="fas fa-copy"></i> Duplicate Detection</h3>
+                        </div>
+                        <div class="dashboard-controls">
+                            <button class="dashboard-btn collapse-btn" onclick="toggleDashboardSection(this)">
+                                <i class="fas fa-chevron-up"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="dashboard-content">
+                        <div class="card">
+                            <div id="nearMissDuplicates">
+                                <p style="color: var(--text-secondary); text-align: center; padding: 2rem;">Duplicate analysis will appear after data is loaded.</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <!-- Word count and heat map for near miss quality -->
-                <div class="card" style="margin-top: 1rem;">
-                    <h4 style="margin-bottom: 1rem;">Word Count Summary</h4>
-                    <p id="nearMissWordCount" style="font-size: 0.9rem; color: var(--text-secondary);">Word count analysis will appear after data is loaded.</p>
+
+                <!-- Word Count Summary -->
+                <div class="dashboard-section" data-section-id="nearmiss-word-count">
+                    <div class="dashboard-header">
+                        <div class="dashboard-header-left">
+                            <i class="fas fa-grip-vertical dashboard-drag-handle"></i>
+                            <h3 class="dashboard-title"><i class="fas fa-file-word"></i> Word Count Summary</h3>
+                        </div>
+                        <div class="dashboard-controls">
+                            <button class="dashboard-btn collapse-btn" onclick="toggleDashboardSection(this)">
+                                <i class="fas fa-chevron-up"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="dashboard-content">
+                        <div class="card">
+                            <p id="nearMissWordCount" style="font-size: 0.95rem; color: var(--text-secondary); text-align: center; padding: 2rem;">Word count analysis will appear after data is loaded.</p>
+                        </div>
+                    </div>
                 </div>
-                <div class="card" style="margin-top: 1rem;">
-                    <h4 style="margin-bottom: 1rem;">Word Heat Map</h4>
-                    <div id="nearMissWordHeatMap" class="word-heatmap"></div>
+
+                <!-- Word Heat Map -->
+                <div class="dashboard-section" data-section-id="nearmiss-word-heatmap">
+                    <div class="dashboard-header">
+                        <div class="dashboard-header-left">
+                            <i class="fas fa-grip-vertical dashboard-drag-handle"></i>
+                            <h3 class="dashboard-title"><i class="fas fa-fire"></i> Word Heat Map</h3>
+                        </div>
+                        <div class="dashboard-controls">
+                            <button class="dashboard-btn collapse-btn" onclick="toggleDashboardSection(this)">
+                                <i class="fas fa-chevron-up"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="dashboard-content">
+                        <div class="card">
+                            <div id="nearMissWordHeatMap" class="word-heatmap" style="min-height: 100px;"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -14822,8 +15190,129 @@ window.createProcessPathMatrix = createProcessPathMatrix;
 window.calculateTrendIndicators = calculateTrendIndicators;
 window.analyzePrimaryImpacts = analyzePrimaryImpacts;
 
+// ==========================================
+// Dashboard Collapsible & Draggable Functionality
+// ==========================================
+
+/**
+ * Toggle dashboard section collapse/expand
+ */
+function toggleDashboardSection(button) {
+    const section = button.closest('.dashboard-section');
+    const icon = button.querySelector('i');
+
+    section.classList.toggle('collapsed');
+
+    // Update icon
+    if (section.classList.contains('collapsed')) {
+        icon.className = 'fas fa-chevron-down';
+    } else {
+        icon.className = 'fas fa-chevron-up';
+    }
+
+    // Save state to localStorage
+    const sectionId = section.getAttribute('data-section-id');
+    if (sectionId) {
+        const collapsed = section.classList.contains('collapsed');
+        localStorage.setItem(`dashboard-section-${sectionId}`, collapsed ? 'collapsed' : 'expanded');
+    }
+}
+
+/**
+ * Initialize drag and drop functionality for dashboard sections
+ */
+function initializeDashboardDragDrop() {
+    const sections = document.querySelectorAll('.dashboard-section');
+
+    sections.forEach(section => {
+        const header = section.querySelector('.dashboard-header');
+        const dragHandle = section.querySelector('.dashboard-drag-handle');
+
+        if (!header || !dragHandle) return;
+
+        // Make section draggable
+        section.setAttribute('draggable', 'true');
+
+        // Drag start
+        section.addEventListener('dragstart', (e) => {
+            section.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/html', section.innerHTML);
+        });
+
+        // Drag end
+        section.addEventListener('dragend', (e) => {
+            section.classList.remove('dragging');
+        });
+
+        // Drag over
+        section.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            const afterElement = getDragAfterElement(section.parentElement, e.clientY);
+            const dragging = document.querySelector('.dragging');
+
+            if (afterElement == null) {
+                section.parentElement.appendChild(dragging);
+            } else {
+                section.parentElement.insertBefore(dragging, afterElement);
+            }
+        });
+    });
+}
+
+/**
+ * Get element after which to insert dragged element
+ */
+function getDragAfterElement(container, y) {
+    const draggableElements = [...container.querySelectorAll('.dashboard-section:not(.dragging)')];
+
+    return draggableElements.reduce((closest, child) => {
+        const box = child.getBoundingClientRect();
+        const offset = y - box.top - box.height / 2;
+
+        if (offset < 0 && offset > closest.offset) {
+            return { offset: offset, element: child };
+        } else {
+            return closest;
+        }
+    }, { offset: Number.NEGATIVE_INFINITY }).element;
+}
+
+/**
+ * Restore dashboard section states from localStorage
+ */
+function restoreDashboardStates() {
+    const sections = document.querySelectorAll('.dashboard-section');
+
+    sections.forEach(section => {
+        const sectionId = section.getAttribute('data-section-id');
+        if (sectionId) {
+            const state = localStorage.getItem(`dashboard-section-${sectionId}`);
+            if (state === 'collapsed') {
+                const button = section.querySelector('.collapse-btn');
+                if (button) {
+                    toggleDashboardSection(button);
+                }
+            }
+        }
+    });
+}
+
+// Initialize dashboard functionality on page load
+document.addEventListener('DOMContentLoaded', () => {
+    initializeDashboardDragDrop();
+    restoreDashboardStates();
+});
+
+// Expose functions to window
+window.toggleDashboardSection = toggleDashboardSection;
+window.initializeDashboardDragDrop = initializeDashboardDragDrop;
+window.restoreDashboardStates = restoreDashboardStates;
+
 // Log initialization complete
 console.log('Safety Analytics Platform initialized successfully');
 console.log('Version: 2.0 | © 2024 Amazon WHS Austria');
 console.log('For support, contact: Erwin Esener @eeesener');
- </script>
+</script>
+</body>
+</html>
