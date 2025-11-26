@@ -1633,6 +1633,91 @@
             color: white;
         }
 
+        /* Dashboard Color Legend Bar */
+        .wbr-color-legend-bar {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 12px 20px;
+            margin-bottom: var(--spacing-lg);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .wbr-color-legend-bar .legend-title {
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: var(--amazon-blue);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .wbr-color-legend-bar .legend-items-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            align-items: flex-start;
+        }
+
+        .wbr-color-legend-bar .legend-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .wbr-color-legend-bar .legend-group-title {
+            font-weight: 600;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .wbr-color-legend-bar .legend-item-inline {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.8rem;
+            color: var(--text-primary);
+        }
+
+        .wbr-color-legend-bar .color-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        .wbr-color-legend-bar .legend-divider {
+            width: 1px;
+            height: 80px;
+            background: #dee2e6;
+            align-self: center;
+        }
+
+        @media (max-width: 1200px) {
+            .wbr-color-legend-bar .legend-items-row {
+                gap: 15px;
+            }
+            .wbr-color-legend-bar .legend-divider {
+                display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .wbr-color-legend-bar .legend-items-row {
+                flex-direction: column;
+                gap: 12px;
+            }
+            .wbr-color-legend-bar .legend-group {
+                flex-direction: row;
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+        }
+
         /* Noteworthy Near Misses Section */
         .wbr-noteworthy-card {
             background: linear-gradient(135deg, #fff8e1 0%, #fff3cd 100%);
@@ -2579,10 +2664,6 @@
             <div class="nav-tab" data-module="reports" onclick="switchModule('reports', event)">
                 <span class="nav-tab-icon">📄</span>
                 <span>Reports</span>
-            </div>
-            <div class="nav-tab" data-module="actions" onclick="switchModule('actions', event)">
-                <span class="nav-tab-icon">✅</span>
-                <span>Actions</span>
             </div>
         </div>
     </nav>
@@ -3703,6 +3784,15 @@
                     <p class="wbr-subtitle">Your Weekly Business Review Intelligence Dashboard</p>
                 </div>
                 <div class="wbr-filter-section">
+                    <label for="wbrTimePeriodFilter">Period:</label>
+                    <select id="wbrTimePeriodFilter" class="wbr-station-select" onchange="applyWBRTimePeriodFilter()">
+                        <option value="all">All Time</option>
+                        <option value="week">Last Week</option>
+                        <option value="month">Last Month</option>
+                        <option value="ytd">Year to Date</option>
+                    </select>
+                </div>
+                <div class="wbr-filter-section">
                     <label for="wbrStationFilter">Station:</label>
                     <select id="wbrStationFilter" class="wbr-station-select" onchange="applyWBRStationFilter()">
                         <option value="">All Stations</option>
@@ -3715,6 +3805,43 @@
                     <button class="btn btn-secondary" onclick="refreshWBRData()">
                         <span>🔄</span> Refresh Data
                     </button>
+                </div>
+            </div>
+
+            <!-- Dashboard Color Legend -->
+            <div class="wbr-color-legend-bar">
+                <div class="legend-title">Dashboard Color Guide:</div>
+                <div class="legend-items-row">
+                    <div class="legend-group">
+                        <span class="legend-group-title">Severity</span>
+                        <div class="legend-item-inline"><span class="color-dot" style="background: #B71C1C;"></span><span>A - Critical</span></div>
+                        <div class="legend-item-inline"><span class="color-dot" style="background: #FF9800;"></span><span>B - High</span></div>
+                        <div class="legend-item-inline"><span class="color-dot" style="background: #FFC107;"></span><span>C - Medium</span></div>
+                        <div class="legend-item-inline"><span class="color-dot" style="background: #4CAF50;"></span><span>D - Low</span></div>
+                    </div>
+                    <div class="legend-divider"></div>
+                    <div class="legend-group">
+                        <span class="legend-group-title">Risk Score</span>
+                        <div class="legend-item-inline"><span class="color-dot" style="background: #B71C1C;"></span><span>20-25 (Critical)</span></div>
+                        <div class="legend-item-inline"><span class="color-dot" style="background: #FF9800;"></span><span>15-19 (High)</span></div>
+                        <div class="legend-item-inline"><span class="color-dot" style="background: #FFC107;"></span><span>8-14 (Medium)</span></div>
+                        <div class="legend-item-inline"><span class="color-dot" style="background: #4CAF50;"></span><span>1-7 (Low)</span></div>
+                    </div>
+                    <div class="legend-divider"></div>
+                    <div class="legend-group">
+                        <span class="legend-group-title">NM:Injury Ratio</span>
+                        <div class="legend-item-inline"><span class="color-dot" style="background: #B71C1C;"></span><span>&lt;5:1 (Critical)</span></div>
+                        <div class="legend-item-inline"><span class="color-dot" style="background: #FFC107;"></span><span>5-10:1 (Caution)</span></div>
+                        <div class="legend-item-inline"><span class="color-dot" style="background: #4CAF50;"></span><span>&gt;10:1 (Good)</span></div>
+                    </div>
+                    <div class="legend-divider"></div>
+                    <div class="legend-group">
+                        <span class="legend-group-title">Data Quality</span>
+                        <div class="legend-item-inline"><span class="color-dot" style="background: #4CAF50;"></span><span>90%+ (Excellent)</span></div>
+                        <div class="legend-item-inline"><span class="color-dot" style="background: #FFC107;"></span><span>70-89% (Good)</span></div>
+                        <div class="legend-item-inline"><span class="color-dot" style="background: #FF9800;"></span><span>50-69% (Fair)</span></div>
+                        <div class="legend-item-inline"><span class="color-dot" style="background: #B71C1C;"></span><span>&lt;50% (Poor)</span></div>
+                    </div>
                 </div>
             </div>
 
@@ -3975,49 +4102,6 @@
                 </div>
             </div>
 
-            <!-- Action Item Accountability - "The Chaser" -->
-            <div class="wbr-card wbr-chaser-card full-width">
-                <div class="wbr-card-header">
-                    <h3><span class="card-icon">👊</span> Action Accountability Tracker - "Who Owes Me?"</h3>
-                    <div class="chaser-actions">
-                        <button class="btn btn-sm btn-outline" onclick="sendReminderEmails()">
-                            <span>📧</span> Send Reminders
-                        </button>
-                        <button class="btn btn-sm btn-primary" onclick="exportChaserReport()">
-                            <span>📋</span> Export List
-                        </button>
-                    </div>
-                </div>
-                <div class="chaser-container">
-                    <div class="chaser-summary-cards">
-                        <div class="chaser-summary-card overdue">
-                            <span class="summary-icon">🚨</span>
-                            <div class="summary-content">
-                                <span class="summary-value" id="chaserOverdueCount">0</span>
-                                <span class="summary-label">Overdue Actions</span>
-                            </div>
-                        </div>
-                        <div class="chaser-summary-card due-soon">
-                            <span class="summary-icon">⏰</span>
-                            <div class="summary-content">
-                                <span class="summary-value" id="chaserDueSoonCount">0</span>
-                                <span class="summary-label">Due This Week</span>
-                            </div>
-                        </div>
-                        <div class="chaser-summary-card on-track">
-                            <span class="summary-icon">✅</span>
-                            <div class="summary-content">
-                                <span class="summary-value" id="chaserOnTrackCount">0</span>
-                                <span class="summary-label">On Track</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="chaser-owner-list" id="chaserOwnerList">
-                        <p class="no-data-msg">Load action data to see owner accountability breakdown</p>
-                    </div>
-                </div>
-            </div>
-
             <!-- Predictive Analytics - "Crystal Ball" -->
             <div class="wbr-card wbr-predictive-card full-width">
                 <div class="wbr-card-header">
@@ -4152,47 +4236,6 @@
             </div>
         </div>
 
-        <!-- Action Tracking Module -->
-        <div id="actions" class="tab-content">
-            <div class="control-panel">
-                <div class="control-header">
-                    <h2 class="control-title">Action Item Tracking</h2>
-                    <button class="btn btn-primary" onclick="addNewAction()">
-                        <span>➕</span> Add Action
-                    </button>
-                </div>
-            </div>
-
-            <div class="card">
-                <h4 style="color: var(--danger); margin-bottom: 1rem;">
-                    <span style="margin-right: 0.5rem;">🚨</span>
-                    Immediate Actions Required
-                </h4>
-                <div id="immediateActions">
-                    <p style="color: var(--text-secondary);">No immediate actions identified. Load data to see recommendations.</p>
-                </div>
-            </div>
-
-            <div class="card" style="margin-top: 1rem;">
-                <h4 style="color: var(--warning); margin-bottom: 1rem;">
-                    <span style="margin-right: 0.5rem;">⚡</span>
-                    Short-term Actions (30 days)
-                </h4>
-                <div id="shortTermActions">
-                    <p style="color: var(--text-secondary);">Actions will be generated based on data analysis.</p>
-                </div>
-            </div>
-
-            <div class="card" style="margin-top: 1rem;">
-                <h4 style="color: #2196F3; margin-bottom: 1rem;">
-                    <span style="margin-right: 0.5rem;">🎯</span>
-                    Long-term Improvements
-                </h4>
-                <div id="longTermActions">
-                    <p style="color: var(--text-secondary);">Strategic improvements will be suggested based on trends.</p>
-                </div>
-            </div>
-        </div>
     </div>
 
     <!-- Help Modal -->
@@ -16273,26 +16316,76 @@ const wbrDashboardState = {
     charts: {},
     actionItems: [],
     predictions: [],
-    selectedStation: '' // '' means all stations
+    selectedStation: '', // '' means all stations
+    selectedTimePeriod: 'all' // 'all', 'week', 'month', 'ytd'
 };
 
-// Get filtered data based on selected station
-function getWBRFilteredData() {
-    const selectedStation = wbrDashboardState.selectedStation;
+// Get date range based on time period selection
+function getTimePeriodDateRange(period) {
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    let startDate;
 
-    if (!selectedStation) {
-        return {
-            injuries: state.injury.rawData,
-            nearMisses: state.nearMiss.rawData,
-            inspections: state.inspections.rawData
-        };
+    switch (period) {
+        case 'week':
+            // Last 7 days
+            startDate = new Date(today);
+            startDate.setDate(startDate.getDate() - 7);
+            break;
+        case 'month':
+            // Last 30 days
+            startDate = new Date(today);
+            startDate.setDate(startDate.getDate() - 30);
+            break;
+        case 'ytd':
+            // Year to date (from Jan 1 of current year)
+            startDate = new Date(now.getFullYear(), 0, 1);
+            break;
+        default:
+            // All time
+            return null;
     }
 
-    return {
-        injuries: state.injury.rawData.filter(r => r.site === selectedStation),
-        nearMisses: state.nearMiss.rawData.filter(r => r.site === selectedStation),
-        inspections: state.inspections.rawData.filter(r => r.site === selectedStation)
-    };
+    return { startDate, endDate: now };
+}
+
+// Check if a date falls within the selected time period
+function isWithinTimePeriod(dateValue, period) {
+    if (period === 'all' || !period) return true;
+
+    const dateRange = getTimePeriodDateRange(period);
+    if (!dateRange) return true;
+
+    const itemDate = new Date(dateValue);
+    if (isNaN(itemDate.getTime())) return true; // Include items with invalid dates
+
+    return itemDate >= dateRange.startDate && itemDate <= dateRange.endDate;
+}
+
+// Get filtered data based on selected station and time period
+function getWBRFilteredData() {
+    const selectedStation = wbrDashboardState.selectedStation;
+    const selectedTimePeriod = wbrDashboardState.selectedTimePeriod;
+
+    let injuries = state.injury.rawData;
+    let nearMisses = state.nearMiss.rawData;
+    let inspections = state.inspections.rawData;
+
+    // Apply station filter
+    if (selectedStation) {
+        injuries = injuries.filter(r => r.site === selectedStation);
+        nearMisses = nearMisses.filter(r => r.site === selectedStation);
+        inspections = inspections.filter(r => r.site === selectedStation);
+    }
+
+    // Apply time period filter
+    if (selectedTimePeriod && selectedTimePeriod !== 'all') {
+        injuries = injuries.filter(r => isWithinTimePeriod(r.incident_date || r.parsedDate, selectedTimePeriod));
+        nearMisses = nearMisses.filter(r => isWithinTimePeriod(r.incident_date || r.parsedDate || r.date_reported, selectedTimePeriod));
+        inspections = inspections.filter(r => isWithinTimePeriod(r.inspection_date || r.date, selectedTimePeriod));
+    }
+
+    return { injuries, nearMisses, inspections };
 }
 
 // Populate WBR Station Filter dropdown
@@ -16328,16 +16421,40 @@ function applyWBRStationFilter() {
     showStatus(`Filtering WBR data for: ${stationLabel}`, 'info');
 
     // Refresh all WBR components with new filter
+    refreshWBRComponents();
+
+    showStatus(`WBR Dashboard filtered by: ${stationLabel}`, 'success');
+}
+
+// Apply WBR Time Period Filter
+function applyWBRTimePeriodFilter() {
+    const timePeriodSelect = document.getElementById('wbrTimePeriodFilter');
+    wbrDashboardState.selectedTimePeriod = timePeriodSelect ? timePeriodSelect.value : 'all';
+
+    const periodLabels = {
+        'all': 'All Time',
+        'week': 'Last Week',
+        'month': 'Last Month',
+        'ytd': 'Year to Date'
+    };
+    const periodLabel = periodLabels[wbrDashboardState.selectedTimePeriod] || 'All Time';
+    showStatus(`Filtering WBR data for: ${periodLabel}`, 'info');
+
+    // Refresh all WBR components with new filter
+    refreshWBRComponents();
+
+    showStatus(`WBR Dashboard filtered by: ${periodLabel}`, 'success');
+}
+
+// Refresh all WBR components
+function refreshWBRComponents() {
     updateLeadingLaggingGaugeFiltered();
     updateBodyMapFiltered();
     updateStationHeatMap();
-    updateChaserTracker();
     updatePredictiveAnalytics();
     updateWBRQuickStatsFiltered();
     updateDataQualityScorecardFiltered();
     updateNoteworthyNearMisses();
-
-    showStatus(`WBR Dashboard filtered by: ${stationLabel}`, 'success');
 }
 
 // Update Leading Lagging Gauge with station filter
@@ -16588,7 +16705,6 @@ function refreshWBRData() {
     updateStationHeatMap();
     updateAustinIntegration();
     updateInspectionGapAnalysis();
-    updateChaserTracker();
     updatePredictiveAnalytics();
     updateWBRQuickStats();
     updateDataQualityScorecard();
@@ -17096,78 +17212,7 @@ function initAuditDurationChart(data, avgDuration) {
     });
 }
 
-// Update Chaser / Action Accountability Tracker
-function updateChaserTracker() {
-    // Collect all action items from various sources
-    const actions = collectActionItems();
-
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const weekFromNow = new Date(today);
-    weekFromNow.setDate(weekFromNow.getDate() + 7);
-
-    // Categorize actions
-    const overdue = actions.filter(a => a.dueDate < today && a.status !== 'completed');
-    const dueSoon = actions.filter(a => a.dueDate >= today && a.dueDate <= weekFromNow && a.status !== 'completed');
-    const onTrack = actions.filter(a => a.dueDate > weekFromNow && a.status !== 'completed');
-
-    // Update summary cards
-    const overdueCount = document.getElementById('chaserOverdueCount');
-    const dueSoonCount = document.getElementById('chaserDueSoonCount');
-    const onTrackCount = document.getElementById('chaserOnTrackCount');
-
-    if (overdueCount) overdueCount.textContent = overdue.length;
-    if (dueSoonCount) dueSoonCount.textContent = dueSoon.length;
-    if (onTrackCount) onTrackCount.textContent = onTrack.length;
-
-    // Group by owner
-    const ownerActions = {};
-    actions.filter(a => a.status !== 'completed').forEach(action => {
-        const owner = action.owner || 'Unassigned';
-        if (!ownerActions[owner]) {
-            ownerActions[owner] = { total: 0, overdue: 0 };
-        }
-        ownerActions[owner].total++;
-        if (action.dueDate < today) {
-            ownerActions[owner].overdue++;
-        }
-    });
-
-    // Render owner list
-    const ownerList = document.getElementById('chaserOwnerList');
-    if (ownerList) {
-        const sortedOwners = Object.entries(ownerActions)
-            .sort((a, b) => b[1].overdue - a[1].overdue || b[1].total - a[1].total);
-
-        if (sortedOwners.length === 0) {
-            ownerList.innerHTML = '<p class="no-data-msg">No pending action items. Great job!</p>';
-        } else {
-            ownerList.innerHTML = sortedOwners.map(([owner, data]) => {
-                const initials = owner.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
-                return `
-                    <div class="chaser-owner-row">
-                        <div class="owner-info">
-                            <div class="owner-avatar">${initials}</div>
-                            <div class="owner-details">
-                                <span class="owner-name">${owner}</span>
-                                <span class="owner-actions-count">
-                                    ${data.total} actions
-                                    ${data.overdue > 0 ? `(<span class="overdue">${data.overdue} overdue</span>)` : ''}
-                                </span>
-                            </div>
-                        </div>
-                        <div class="chaser-actions-btn">
-                            <button class="btn btn-sm btn-outline" onclick="viewOwnerActions('${owner}')">View</button>
-                            ${data.overdue > 0 ? `<button class="btn btn-sm btn-primary" onclick="sendReminder('${owner}')">Remind</button>` : ''}
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-    }
-}
-
-// Collect all action items from data sources
+// Collect all action items from data sources (kept for future action tracking rework)
 function collectActionItems() {
     const actions = [];
 
@@ -18261,12 +18306,9 @@ window.refreshWBRData = refreshWBRData;
 window.generateOneClickWBRDeck = generateOneClickWBRDeck;
 window.updateStationHeatMap = updateStationHeatMap;
 window.applyWBRStationFilter = applyWBRStationFilter;
+window.applyWBRTimePeriodFilter = applyWBRTimePeriodFilter;
 window.populateWBRStationFilter = populateWBRStationFilter;
 window.updateNoteworthyNearMisses = updateNoteworthyNearMisses;
-window.viewOwnerActions = viewOwnerActions;
-window.sendReminder = sendReminder;
-window.sendReminderEmails = sendReminderEmails;
-window.exportChaserReport = exportChaserReport;
 window.exportInjuryData = exportInjuryData;
 window.exportNearMissData = exportNearMissData;
 window.exportTable = exportTable;
