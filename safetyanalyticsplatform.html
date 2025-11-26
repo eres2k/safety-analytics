@@ -1440,6 +1440,900 @@
             color: #666;
             font-size: 0.9em;
         }
+
+        /* ==================== WBR DASHBOARD STYLES ==================== */
+
+        /* WBR Command Header */
+        .wbr-command-header {
+            background: linear-gradient(135deg, var(--amazon-blue) 0%, var(--amazon-blue-dark) 100%);
+            color: white;
+            border-radius: var(--border-radius);
+            padding: var(--spacing-lg) var(--spacing-xl);
+            margin-bottom: var(--spacing-lg);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: var(--spacing-md);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+
+        .wbr-title-section h2 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        .wbr-icon {
+            font-size: 2rem;
+        }
+
+        .wbr-subtitle {
+            font-size: 0.95rem;
+            opacity: 0.9;
+            margin-top: var(--spacing-xs);
+        }
+
+        .wbr-header-actions {
+            display: flex;
+            gap: var(--spacing-sm);
+        }
+
+        .btn-lg {
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+        }
+
+        .wbr-export-btn {
+            background: linear-gradient(135deg, var(--amazon-orange), var(--amazon-orange-dark));
+            box-shadow: 0 4px 15px rgba(255, 153, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .wbr-export-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 153, 0, 0.4);
+        }
+
+        /* WBR Section Grid */
+        .wbr-section-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: var(--spacing-lg);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        /* WBR Cards */
+        .wbr-card {
+            background: var(--bg-primary);
+            border-radius: 12px;
+            padding: var(--spacing-lg);
+            box-shadow: 0 2px 12px var(--shadow);
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+        }
+
+        .wbr-card:hover {
+            box-shadow: 0 4px 20px var(--shadow-hover);
+            border-color: rgba(255, 153, 0, 0.2);
+        }
+
+        .wbr-card.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .wbr-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-md);
+            padding-bottom: var(--spacing-sm);
+            border-bottom: 2px solid var(--bg-secondary);
+        }
+
+        .wbr-card-header h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            margin: 0;
+        }
+
+        .card-icon {
+            font-size: 1.3rem;
+        }
+
+        .wbr-badge {
+            padding: 0.3rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        .wbr-badge.danger {
+            background: rgba(183, 28, 28, 0.15);
+            color: var(--critical);
+        }
+
+        .wbr-badge.success {
+            background: rgba(76, 175, 80, 0.15);
+            color: var(--success);
+        }
+
+        .wbr-badge.warning {
+            background: rgba(255, 193, 7, 0.15);
+            color: #F57C00;
+        }
+
+        .wbr-subtitle-text {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .wbr-select {
+            padding: 0.4rem 0.8rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            font-size: 0.85rem;
+        }
+
+        .wbr-info-badge {
+            cursor: help;
+            font-size: 1rem;
+            opacity: 0.7;
+        }
+
+        /* Leading/Lagging Gauge */
+        .leading-lagging-gauge-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+
+        .gauge-visual {
+            position: relative;
+            width: 220px;
+            height: 140px;
+        }
+
+        .ratio-gauge {
+            width: 100%;
+            height: auto;
+        }
+
+        .gauge-value-display {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+        }
+
+        .gauge-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            display: block;
+        }
+
+        .gauge-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .gauge-legend {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-xs);
+            font-size: 0.8rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+        }
+
+        .legend-item.danger .legend-color { background: #B71C1C; }
+        .legend-item.warning .legend-color { background: #FFC107; }
+        .legend-item.success .legend-color { background: #4CAF50; }
+
+        .gauge-interpretation {
+            background: var(--bg-secondary);
+            padding: var(--spacing-md);
+            border-radius: 8px;
+            width: 100%;
+        }
+
+        .interpretation-text {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin: 0;
+            text-align: center;
+        }
+
+        /* Quality Scorecard */
+        .quality-scorecard {
+            display: flex;
+            gap: var(--spacing-lg);
+            align-items: flex-start;
+        }
+
+        .quality-ring-container {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            flex-shrink: 0;
+        }
+
+        .quality-ring {
+            width: 100%;
+            height: 100%;
+        }
+
+        .quality-ring-value {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .quality-ring-value span:first-child {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            display: block;
+        }
+
+        .quality-ring-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .quality-breakdown {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-sm);
+        }
+
+        .quality-metric-row {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        .quality-metric-row .metric-name {
+            width: 140px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .metric-bar {
+            flex: 1;
+            height: 8px;
+            background: var(--bg-secondary);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .metric-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--amazon-orange), #4CAF50);
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        .quality-metric-row .metric-value {
+            width: 40px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-align: right;
+        }
+
+        /* Body Map Visualization */
+        .body-map-container {
+            display: flex;
+            gap: var(--spacing-lg);
+            align-items: flex-start;
+        }
+
+        .body-figure {
+            flex-shrink: 0;
+            width: 180px;
+        }
+
+        .body-svg {
+            width: 100%;
+            height: auto;
+        }
+
+        .body-part {
+            fill: #e8e8e8;
+            stroke: #ccc;
+            stroke-width: 1;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .body-part:hover {
+            stroke: var(--amazon-orange);
+            stroke-width: 2;
+        }
+
+        .body-part.heat-1 { fill: #FFEB3B; }
+        .body-part.heat-2 { fill: #FFC107; }
+        .body-part.heat-3 { fill: #FF9800; }
+        .body-part.heat-4 { fill: #FF5722; }
+        .body-part.heat-5 { fill: #B71C1C; }
+
+        .body-map-legend {
+            flex: 1;
+        }
+
+        .body-map-legend h4 {
+            font-size: 0.95rem;
+            margin-bottom: var(--spacing-sm);
+            color: var(--text-primary);
+        }
+
+        .body-legend-items {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-xs);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .body-legend-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--spacing-xs) var(--spacing-sm);
+            background: var(--bg-secondary);
+            border-radius: 4px;
+            font-size: 0.85rem;
+        }
+
+        .body-legend-item .count {
+            font-weight: 700;
+            color: var(--amazon-orange);
+        }
+
+        .body-legend-item .percentage {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-left: var(--spacing-xs);
+        }
+
+        .body-map-scale {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .scale-gradient {
+            flex: 1;
+            height: 8px;
+            background: linear-gradient(90deg, #e8e8e8, #FFEB3B, #FFC107, #FF9800, #FF5722, #B71C1C);
+            border-radius: 4px;
+        }
+
+        /* Station Heat Map */
+        .station-heatmap-container {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-md);
+        }
+
+        .station-layout {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(3, 80px);
+            gap: 8px;
+            padding: var(--spacing-sm);
+            background: var(--bg-secondary);
+            border-radius: 8px;
+        }
+
+        .station-zone {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #e8e8e8;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            border: 2px solid transparent;
+        }
+
+        .station-zone:hover {
+            transform: scale(1.03);
+            border-color: var(--amazon-orange);
+            z-index: 5;
+        }
+
+        .station-zone .zone-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .station-zone .zone-count {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .station-zone.heat-0 { background: #C8E6C9; }
+        .station-zone.heat-1 { background: #FFEB3B; }
+        .station-zone.heat-2 { background: #FFC107; }
+        .station-zone.heat-3 { background: #FF9800; }
+        .station-zone.heat-4 { background: #FF5722; color: white; }
+        .station-zone.heat-5 { background: #B71C1C; color: white; }
+        .station-zone.heat-4 .zone-label,
+        .station-zone.heat-4 .zone-count,
+        .station-zone.heat-5 .zone-label,
+        .station-zone.heat-5 .zone-count { color: white; }
+
+        .heatmap-legend {
+            display: flex;
+            justify-content: center;
+        }
+
+        .heatmap-scale {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .heatmap-gradient {
+            width: 150px;
+            height: 10px;
+            background: linear-gradient(90deg, #C8E6C9, #FFEB3B, #FFC107, #FF9800, #FF5722, #B71C1C);
+            border-radius: 5px;
+        }
+
+        /* Austin Integration */
+        .austin-links-container {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-md);
+        }
+
+        .austin-alert-banner {
+            background: linear-gradient(90deg, rgba(183, 28, 28, 0.1), rgba(255, 87, 34, 0.1));
+            border: 1px solid var(--danger);
+            border-radius: 8px;
+            padding: var(--spacing-md);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        .austin-alert-banner .alert-icon {
+            font-size: 1.5rem;
+        }
+
+        .austin-alert-banner .alert-text {
+            font-size: 0.9rem;
+            color: var(--danger);
+            font-weight: 500;
+        }
+
+        .overdue-inspections-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-sm);
+            max-height: 250px;
+            overflow-y: auto;
+        }
+
+        .overdue-inspection-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--spacing-sm) var(--spacing-md);
+            background: var(--bg-secondary);
+            border-radius: 6px;
+            border-left: 4px solid var(--danger);
+        }
+
+        .overdue-inspection-item .inspection-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .overdue-inspection-item .inspection-type {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .overdue-inspection-item .inspection-detail {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .overdue-inspection-item .days-overdue {
+            font-weight: 700;
+            color: var(--danger);
+            font-size: 0.85rem;
+        }
+
+        .austin-link-btn {
+            background: var(--amazon-yellow);
+            color: var(--amazon-blue);
+            padding: 0.4rem 0.8rem;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            transition: all 0.2s ease;
+        }
+
+        .austin-link-btn:hover {
+            background: #ffc700;
+            transform: translateY(-1px);
+        }
+
+        /* Gap Analysis */
+        .gap-analysis-container {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-md);
+        }
+
+        .gap-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--spacing-md);
+        }
+
+        .gap-stat {
+            text-align: center;
+            padding: var(--spacing-md);
+            background: var(--bg-secondary);
+            border-radius: 8px;
+        }
+
+        .gap-stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            display: block;
+        }
+
+        .gap-stat-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .suspicious-audits-list {
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        .suspicious-audit-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--spacing-sm);
+            background: rgba(255, 193, 7, 0.1);
+            border-left: 3px solid var(--warning);
+            margin-bottom: var(--spacing-xs);
+            border-radius: 0 4px 4px 0;
+            font-size: 0.85rem;
+        }
+
+        .gap-chart-container {
+            height: 150px;
+        }
+
+        /* Chaser / Action Accountability */
+        .chaser-container {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-lg);
+        }
+
+        .chaser-summary-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--spacing-md);
+        }
+
+        .chaser-summary-card {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            padding: var(--spacing-md) var(--spacing-lg);
+            border-radius: 10px;
+            background: var(--bg-secondary);
+        }
+
+        .chaser-summary-card.overdue {
+            background: linear-gradient(135deg, rgba(183, 28, 28, 0.1), rgba(255, 87, 34, 0.05));
+            border: 1px solid rgba(183, 28, 28, 0.2);
+        }
+
+        .chaser-summary-card.due-soon {
+            background: linear-gradient(135deg, rgba(255, 193, 7, 0.15), rgba(255, 152, 0, 0.05));
+            border: 1px solid rgba(255, 152, 0, 0.2);
+        }
+
+        .chaser-summary-card.on-track {
+            background: linear-gradient(135deg, rgba(76, 175, 80, 0.1), rgba(129, 199, 132, 0.05));
+            border: 1px solid rgba(76, 175, 80, 0.2);
+        }
+
+        .summary-icon {
+            font-size: 2rem;
+        }
+
+        .summary-content {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .summary-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .summary-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .chaser-owner-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-sm);
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .chaser-owner-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--spacing-md);
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .chaser-owner-row:hover {
+            background: var(--bg-primary);
+            box-shadow: 0 2px 8px var(--shadow);
+        }
+
+        .owner-info {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+
+        .owner-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--amazon-orange);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        .owner-details {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .owner-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .owner-actions-count {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .owner-actions-count .overdue {
+            color: var(--danger);
+            font-weight: 600;
+        }
+
+        .chaser-actions-btn {
+            display: flex;
+            gap: var(--spacing-sm);
+        }
+
+        /* Predictive Analytics */
+        .predictive-container {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-lg);
+        }
+
+        .prediction-cards {
+            display: flex;
+            gap: var(--spacing-md);
+        }
+
+        .prediction-card {
+            flex: 1;
+            background: linear-gradient(135deg, var(--amazon-blue) 0%, var(--amazon-blue-dark) 100%);
+            color: white;
+            border-radius: 12px;
+            padding: var(--spacing-lg);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .prediction-card::before {
+            content: '🔮';
+            position: absolute;
+            top: -20px;
+            right: -20px;
+            font-size: 6rem;
+            opacity: 0.1;
+        }
+
+        .prediction-header {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .prediction-confidence {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .prediction-content {
+            margin-bottom: var(--spacing-md);
+        }
+
+        .prediction-text {
+            font-size: 1.1rem;
+            line-height: 1.5;
+            margin: 0;
+        }
+
+        .prediction-factors {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--spacing-sm);
+        }
+
+        .prediction-factor {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 0.3rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+
+        .predictive-charts {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--spacing-md);
+        }
+
+        .predictive-chart {
+            height: 200px;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            padding: var(--spacing-sm);
+        }
+
+        /* WBR Quick Stats Footer */
+        .wbr-quick-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--spacing-md);
+            padding: var(--spacing-lg);
+            background: var(--bg-primary);
+            border-radius: 12px;
+            box-shadow: 0 2px 12px var(--shadow);
+        }
+
+        .quick-stat {
+            text-align: center;
+            padding: var(--spacing-md);
+        }
+
+        .quick-stat .stat-icon {
+            font-size: 1.5rem;
+            display: block;
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .quick-stat .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--amazon-orange);
+            display: block;
+        }
+
+        .quick-stat .stat-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        /* No Data Message */
+        .no-data-msg {
+            text-align: center;
+            color: var(--text-secondary);
+            padding: var(--spacing-lg);
+            font-style: italic;
+        }
+
+        /* WBR Responsive */
+        @media (max-width: 1024px) {
+            .wbr-section-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .wbr-command-header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .quality-scorecard {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .body-map-container {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .predictive-charts {
+                grid-template-columns: 1fr;
+            }
+
+            .wbr-quick-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .chaser-summary-cards {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1495,6 +2389,10 @@
             <div class="nav-tab" data-module="inspections" onclick="switchModule('inspections', event)">
                 <span class="nav-tab-icon">📋</span>
                 <span>Inspections</span>
+            </div>
+            <div class="nav-tab" data-module="wbr" onclick="switchModule('wbr', event)">
+                <span class="nav-tab-icon">🎯</span>
+                <span>WBR Dashboard</span>
             </div>
             <div class="nav-tab" data-module="reports" onclick="switchModule('reports', event)">
                 <span class="nav-tab-icon">📄</span>
@@ -2610,6 +3508,380 @@
                     <button class="btn btn-sm" onclick="changePage('inspections', -1)" id="inspectionsPrevBtn">Previous</button>
                     <span class="pagination-info" id="inspectionsPageInfo">Page 1 of 1</span>
                     <button class="btn btn-sm" onclick="changePage('inspections', 1)" id="inspectionsNextBtn">Next</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- WBR Dashboard Module - DSM Command Center -->
+        <div id="wbr" class="tab-content">
+            <!-- WBR Header with One-Click Export -->
+            <div class="wbr-command-header">
+                <div class="wbr-title-section">
+                    <h2><span class="wbr-icon">🎯</span> WBR Command Center</h2>
+                    <p class="wbr-subtitle">Your Weekly Business Review Intelligence Dashboard</p>
+                </div>
+                <div class="wbr-header-actions">
+                    <button class="btn btn-primary btn-lg wbr-export-btn" onclick="generateOneClickWBRDeck()">
+                        <span>📊</span> One-Click WBR Deck
+                    </button>
+                    <button class="btn btn-secondary" onclick="refreshWBRData()">
+                        <span>🔄</span> Refresh Data
+                    </button>
+                </div>
+            </div>
+
+            <!-- Leading vs Lagging Indicator Section -->
+            <div class="wbr-section-grid">
+                <!-- Leading/Lagging Gauge Card -->
+                <div class="wbr-card wbr-gauge-card">
+                    <div class="wbr-card-header">
+                        <h3><span class="card-icon">📈</span> Leading vs Lagging Indicator Ratio</h3>
+                        <span class="wbr-info-badge" title="Leading indicators (Near Misses, Safety Observations) vs Lagging indicators (Recordable Injuries)">ℹ️</span>
+                    </div>
+                    <div class="leading-lagging-gauge-container">
+                        <div class="gauge-visual">
+                            <svg class="ratio-gauge" viewBox="0 0 200 120">
+                                <!-- Background arc -->
+                                <path d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="#e0e0e0" stroke-width="15" stroke-linecap="round"/>
+                                <!-- Danger zone (red) -->
+                                <path d="M 20 100 A 80 80 0 0 1 60 35" fill="none" stroke="#B71C1C" stroke-width="15" stroke-linecap="round"/>
+                                <!-- Warning zone (yellow) -->
+                                <path d="M 60 35 A 80 80 0 0 1 100 20" fill="none" stroke="#FFC107" stroke-width="15" stroke-linecap="round"/>
+                                <!-- Good zone (green) -->
+                                <path d="M 100 20 A 80 80 0 0 1 180 100" fill="none" stroke="#4CAF50" stroke-width="15" stroke-linecap="round"/>
+                                <!-- Needle -->
+                                <line id="ratioNeedle" x1="100" y1="100" x2="100" y2="30" stroke="#232F3E" stroke-width="3" stroke-linecap="round" transform="rotate(-90 100 100)"/>
+                                <circle cx="100" cy="100" r="8" fill="#232F3E"/>
+                            </svg>
+                            <div class="gauge-value-display">
+                                <span class="gauge-value" id="leadLagRatioValue">0:1</span>
+                                <span class="gauge-label">NM:Injury Ratio</span>
+                            </div>
+                        </div>
+                        <div class="gauge-legend">
+                            <div class="legend-item danger"><span class="legend-color"></span> &lt;5:1 (Critical - Team not reporting)</div>
+                            <div class="legend-item warning"><span class="legend-color"></span> 5-10:1 (Needs Attention)</div>
+                            <div class="legend-item success"><span class="legend-color"></span> &gt;10:1 (Proactive Culture)</div>
+                        </div>
+                        <div class="gauge-interpretation" id="gaugeInterpretation">
+                            <p class="interpretation-text">Load data to see your Leading/Lagging ratio analysis</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Data Quality Scorecard -->
+                <div class="wbr-card wbr-quality-card">
+                    <div class="wbr-card-header">
+                        <h3><span class="card-icon">🔬</span> Data Quality Scorecard</h3>
+                        <span class="wbr-badge" id="qualityBadge">--</span>
+                    </div>
+                    <div class="quality-scorecard">
+                        <div class="quality-ring-container">
+                            <svg class="quality-ring" viewBox="0 0 120 120">
+                                <circle cx="60" cy="60" r="50" fill="none" stroke="#e0e0e0" stroke-width="8"/>
+                                <circle id="qualityRingProgress" cx="60" cy="60" r="50" fill="none" stroke="#4CAF50" stroke-width="8"
+                                    stroke-dasharray="0 314" stroke-linecap="round" transform="rotate(-90 60 60)"/>
+                            </svg>
+                            <div class="quality-ring-value">
+                                <span id="qualityScoreValue">0%</span>
+                                <span class="quality-ring-label">Quality</span>
+                            </div>
+                        </div>
+                        <div class="quality-breakdown">
+                            <div class="quality-metric-row">
+                                <span class="metric-name">📝 Description Quality</span>
+                                <div class="metric-bar"><div id="descQualityBar" class="metric-fill" style="width: 0%"></div></div>
+                                <span class="metric-value" id="descQualityValue">0%</span>
+                            </div>
+                            <div class="quality-metric-row">
+                                <span class="metric-name">✅ Field Completeness</span>
+                                <div class="metric-bar"><div id="fieldCompleteBar" class="metric-fill" style="width: 0%"></div></div>
+                                <span class="metric-value" id="fieldCompleteValue">0%</span>
+                            </div>
+                            <div class="quality-metric-row">
+                                <span class="metric-name">🔄 Duplicate-Free</span>
+                                <div class="metric-bar"><div id="duplicateFreeBar" class="metric-fill" style="width: 0%"></div></div>
+                                <span class="metric-value" id="duplicateFreeValue">100%</span>
+                            </div>
+                            <div class="quality-metric-row">
+                                <span class="metric-name">⏰ Timeliness</span>
+                                <div class="metric-bar"><div id="timelinessBar" class="metric-fill" style="width: 0%"></div></div>
+                                <span class="metric-value" id="timelinessValue">0%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Body Part Injury Man & Station Heat Map -->
+            <div class="wbr-section-grid gemba-section">
+                <!-- Body Part Injury Man -->
+                <div class="wbr-card wbr-body-card">
+                    <div class="wbr-card-header">
+                        <h3><span class="card-icon">🦴</span> Injury Body Map</h3>
+                        <span class="wbr-subtitle-text">Focus Areas for Safety Training</span>
+                    </div>
+                    <div class="body-map-container">
+                        <div class="body-figure">
+                            <svg viewBox="0 0 200 400" class="body-svg" id="bodyMapSvg">
+                                <!-- Head -->
+                                <ellipse id="bodyHead" cx="100" cy="35" rx="28" ry="32" class="body-part" data-part="Head"/>
+                                <!-- Neck -->
+                                <rect id="bodyNeck" x="90" y="65" width="20" height="15" rx="3" class="body-part" data-part="Neck"/>
+                                <!-- Shoulders -->
+                                <ellipse id="bodyShoulderL" cx="55" cy="95" rx="18" ry="12" class="body-part" data-part="Shoulder"/>
+                                <ellipse id="bodyShoulderR" cx="145" cy="95" rx="18" ry="12" class="body-part" data-part="Shoulder"/>
+                                <!-- Torso/Back -->
+                                <rect id="bodyTorso" x="60" y="80" width="80" height="90" rx="10" class="body-part" data-part="Back/Torso"/>
+                                <!-- Upper Arms -->
+                                <rect id="bodyArmL" x="30" y="95" width="25" height="55" rx="8" class="body-part" data-part="Arm"/>
+                                <rect id="bodyArmR" x="145" y="95" width="25" height="55" rx="8" class="body-part" data-part="Arm"/>
+                                <!-- Elbows -->
+                                <ellipse id="bodyElbowL" cx="42" cy="155" rx="12" ry="10" class="body-part" data-part="Elbow"/>
+                                <ellipse id="bodyElbowR" cx="158" cy="155" rx="12" ry="10" class="body-part" data-part="Elbow"/>
+                                <!-- Forearms/Wrists -->
+                                <rect id="bodyForearmL" x="32" y="160" width="20" height="45" rx="6" class="body-part" data-part="Wrist/Forearm"/>
+                                <rect id="bodyForearmR" x="148" y="160" width="20" height="45" rx="6" class="body-part" data-part="Wrist/Forearm"/>
+                                <!-- Hands/Fingers -->
+                                <ellipse id="bodyHandL" cx="42" cy="215" rx="15" ry="12" class="body-part" data-part="Hand/Finger"/>
+                                <ellipse id="bodyHandR" cx="158" cy="215" rx="15" ry="12" class="body-part" data-part="Hand/Finger"/>
+                                <!-- Hips -->
+                                <ellipse id="bodyHips" cx="100" cy="180" rx="45" ry="18" class="body-part" data-part="Hip"/>
+                                <!-- Upper Legs/Thighs -->
+                                <rect id="bodyThighL" x="58" y="190" width="30" height="70" rx="10" class="body-part" data-part="Leg/Thigh"/>
+                                <rect id="bodyThighR" x="112" y="190" width="30" height="70" rx="10" class="body-part" data-part="Leg/Thigh"/>
+                                <!-- Knees -->
+                                <ellipse id="bodyKneeL" cx="73" cy="268" rx="16" ry="14" class="body-part" data-part="Knee"/>
+                                <ellipse id="bodyKneeR" cx="127" cy="268" rx="16" ry="14" class="body-part" data-part="Knee"/>
+                                <!-- Lower Legs -->
+                                <rect id="bodyLowerLegL" x="60" y="280" width="26" height="65" rx="8" class="body-part" data-part="Lower Leg"/>
+                                <rect id="bodyLowerLegR" x="114" y="280" width="26" height="65" rx="8" class="body-part" data-part="Lower Leg"/>
+                                <!-- Ankles -->
+                                <ellipse id="bodyAnkleL" cx="73" cy="350" rx="14" ry="10" class="body-part" data-part="Ankle"/>
+                                <ellipse id="bodyAnkleR" cx="127" cy="350" rx="14" ry="10" class="body-part" data-part="Ankle"/>
+                                <!-- Feet -->
+                                <ellipse id="bodyFootL" cx="73" cy="375" rx="20" ry="12" class="body-part" data-part="Foot"/>
+                                <ellipse id="bodyFootR" cx="127" cy="375" rx="20" ry="12" class="body-part" data-part="Foot"/>
+                            </svg>
+                        </div>
+                        <div class="body-map-legend">
+                            <h4>Top Affected Areas</h4>
+                            <div id="bodyPartLegend" class="body-legend-items">
+                                <p class="no-data-msg">Load injury data to see body part analysis</p>
+                            </div>
+                            <div class="body-map-scale">
+                                <span class="scale-label">Low</span>
+                                <div class="scale-gradient"></div>
+                                <span class="scale-label">High</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Station Floor Risk Heat Map -->
+                <div class="wbr-card wbr-heatmap-card">
+                    <div class="wbr-card-header">
+                        <h3><span class="card-icon">🏭</span> Station Risk Heat Map</h3>
+                        <select id="heatmapSiteSelect" class="wbr-select" onchange="updateStationHeatMap()">
+                            <option value="">All Sites</option>
+                        </select>
+                    </div>
+                    <div class="station-heatmap-container">
+                        <div class="station-layout" id="stationLayout">
+                            <!-- Station zones will be populated dynamically -->
+                            <div class="station-zone zone-inbound" data-zone="Inbound/Receive">
+                                <span class="zone-label">Inbound</span>
+                                <span class="zone-count">0</span>
+                            </div>
+                            <div class="station-zone zone-stow" data-zone="Stow">
+                                <span class="zone-label">Stow</span>
+                                <span class="zone-count">0</span>
+                            </div>
+                            <div class="station-zone zone-pick" data-zone="Pick">
+                                <span class="zone-label">Pick</span>
+                                <span class="zone-count">0</span>
+                            </div>
+                            <div class="station-zone zone-pack" data-zone="Pack">
+                                <span class="zone-label">Pack</span>
+                                <span class="zone-count">0</span>
+                            </div>
+                            <div class="station-zone zone-ship" data-zone="Ship/Dock">
+                                <span class="zone-label">Ship Dock</span>
+                                <span class="zone-count">0</span>
+                            </div>
+                            <div class="station-zone zone-sort" data-zone="Sort">
+                                <span class="zone-label">Sort</span>
+                                <span class="zone-count">0</span>
+                            </div>
+                            <div class="station-zone zone-problem" data-zone="Problem Solve">
+                                <span class="zone-label">PS</span>
+                                <span class="zone-count">0</span>
+                            </div>
+                            <div class="station-zone zone-parking" data-zone="Parking/OTR">
+                                <span class="zone-label">OTR</span>
+                                <span class="zone-count">0</span>
+                            </div>
+                            <div class="station-zone zone-office" data-zone="Office/Common">
+                                <span class="zone-label">Common</span>
+                                <span class="zone-count">0</span>
+                            </div>
+                        </div>
+                        <div class="heatmap-legend">
+                            <div class="heatmap-scale">
+                                <span>Safe</span>
+                                <div class="heatmap-gradient"></div>
+                                <span>High Risk</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Austin Integration & Inspection Gap Analysis -->
+            <div class="wbr-section-grid austin-section">
+                <!-- Austin Deep Links & Overdue Inspections -->
+                <div class="wbr-card wbr-austin-card">
+                    <div class="wbr-card-header">
+                        <h3><span class="card-icon">🔗</span> Austin Integration</h3>
+                        <span class="wbr-badge danger" id="overdueAuditBadge">0 Overdue</span>
+                    </div>
+                    <div class="austin-links-container">
+                        <div class="austin-alert-banner" id="austinAlertBanner" style="display: none;">
+                            <span class="alert-icon">⚠️</span>
+                            <span class="alert-text">You have overdue inspections requiring immediate attention</span>
+                        </div>
+                        <div class="overdue-inspections-list" id="overdueInspectionsList">
+                            <p class="no-data-msg">Load inspection data to see overdue audits with direct Austin links</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Inspection Gap Analysis (Pencil-Whipping Detector) -->
+                <div class="wbr-card wbr-gap-card">
+                    <div class="wbr-card-header">
+                        <h3><span class="card-icon">⏱️</span> Inspection Gap Analysis</h3>
+                        <span class="wbr-subtitle-text">Audit Duration Anomaly Detection</span>
+                    </div>
+                    <div class="gap-analysis-container">
+                        <div class="gap-stats-grid">
+                            <div class="gap-stat">
+                                <span class="gap-stat-value" id="avgAuditDuration">--</span>
+                                <span class="gap-stat-label">Avg Duration</span>
+                            </div>
+                            <div class="gap-stat">
+                                <span class="gap-stat-value" id="suspiciousAudits">0</span>
+                                <span class="gap-stat-label">Suspicious</span>
+                            </div>
+                            <div class="gap-stat">
+                                <span class="gap-stat-value" id="thoroughAudits">0</span>
+                                <span class="gap-stat-label">Thorough</span>
+                            </div>
+                        </div>
+                        <div class="suspicious-audits-list" id="suspiciousAuditsList">
+                            <p class="no-data-msg">Load inspection data to analyze audit quality</p>
+                        </div>
+                        <div class="gap-chart-container">
+                            <canvas id="auditDurationChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Item Accountability - "The Chaser" -->
+            <div class="wbr-card wbr-chaser-card full-width">
+                <div class="wbr-card-header">
+                    <h3><span class="card-icon">👊</span> Action Accountability Tracker - "Who Owes Me?"</h3>
+                    <div class="chaser-actions">
+                        <button class="btn btn-sm btn-outline" onclick="sendReminderEmails()">
+                            <span>📧</span> Send Reminders
+                        </button>
+                        <button class="btn btn-sm btn-primary" onclick="exportChaserReport()">
+                            <span>📋</span> Export List
+                        </button>
+                    </div>
+                </div>
+                <div class="chaser-container">
+                    <div class="chaser-summary-cards">
+                        <div class="chaser-summary-card overdue">
+                            <span class="summary-icon">🚨</span>
+                            <div class="summary-content">
+                                <span class="summary-value" id="chaserOverdueCount">0</span>
+                                <span class="summary-label">Overdue Actions</span>
+                            </div>
+                        </div>
+                        <div class="chaser-summary-card due-soon">
+                            <span class="summary-icon">⏰</span>
+                            <div class="summary-content">
+                                <span class="summary-value" id="chaserDueSoonCount">0</span>
+                                <span class="summary-label">Due This Week</span>
+                            </div>
+                        </div>
+                        <div class="chaser-summary-card on-track">
+                            <span class="summary-icon">✅</span>
+                            <div class="summary-content">
+                                <span class="summary-value" id="chaserOnTrackCount">0</span>
+                                <span class="summary-label">On Track</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chaser-owner-list" id="chaserOwnerList">
+                        <p class="no-data-msg">Load action data to see owner accountability breakdown</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Predictive Analytics - "Crystal Ball" -->
+            <div class="wbr-card wbr-predictive-card full-width">
+                <div class="wbr-card-header">
+                    <h3><span class="card-icon">🔮</span> Predictive Risk Analysis - "Crystal Ball"</h3>
+                    <span class="wbr-subtitle-text">AI-Powered Incident Forecasting</span>
+                </div>
+                <div class="predictive-container">
+                    <div class="prediction-cards">
+                        <div class="prediction-card" id="predictionHighRisk">
+                            <div class="prediction-header">
+                                <span class="prediction-confidence" id="predictionConfidence">--% confidence</span>
+                            </div>
+                            <div class="prediction-content">
+                                <p class="prediction-text" id="predictionText">Load data to generate predictive insights</p>
+                            </div>
+                            <div class="prediction-factors" id="predictionFactors">
+                                <!-- Risk factors will be populated dynamically -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="predictive-charts">
+                        <div class="chart-container predictive-chart">
+                            <canvas id="predictiveTrendChart"></canvas>
+                        </div>
+                        <div class="chart-container predictive-chart">
+                            <canvas id="riskFactorChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- WBR Quick Stats Footer -->
+            <div class="wbr-quick-stats">
+                <div class="quick-stat">
+                    <span class="stat-icon">📊</span>
+                    <span class="stat-value" id="wbrTotalIncidents">0</span>
+                    <span class="stat-label">Total Incidents</span>
+                </div>
+                <div class="quick-stat">
+                    <span class="stat-icon">📝</span>
+                    <span class="stat-value" id="wbrRecordableRate">0%</span>
+                    <span class="stat-label">Recordable Rate</span>
+                </div>
+                <div class="quick-stat">
+                    <span class="stat-icon">📅</span>
+                    <span class="stat-value" id="wbrDaysSinceLast">0</span>
+                    <span class="stat-label">Days Since Last Recordable</span>
+                </div>
+                <div class="quick-stat">
+                    <span class="stat-icon">🎯</span>
+                    <span class="stat-value" id="wbrSafetyIndex">--</span>
+                    <span class="stat-label">Safety Index</span>
                 </div>
             </div>
         </div>
@@ -5222,6 +6494,8 @@ function switchModule(module, evt) {
         checkOverdueInspections();
     } else if (module === 'actions') {
         updateActionItems();
+    } else if (module === 'wbr') {
+        refreshWBRData();
     }
 }
 
@@ -14783,6 +16057,1516 @@ window.SafetyAnalytics = {
 // referenced directly in HTML markup are exposed below.
 window.switchModule = switchModule;
 window.toggleTheme = toggleTheme;
+// ==================== WBR DASHBOARD FUNCTIONS ====================
+
+// Initialize WBR Dashboard state
+const wbrDashboardState = {
+    charts: {},
+    actionItems: [],
+    predictions: []
+};
+
+// Refresh all WBR Dashboard data
+function refreshWBRData() {
+    showStatus('Refreshing WBR Dashboard data...', 'info');
+
+    // Update all WBR components
+    updateLeadingLaggingGauge();
+    updateBodyMap();
+    updateStationHeatMap();
+    updateAustinIntegration();
+    updateInspectionGapAnalysis();
+    updateChaserTracker();
+    updatePredictiveAnalytics();
+    updateWBRQuickStats();
+    updateDataQualityScorecard();
+
+    showStatus('WBR Dashboard refreshed successfully', 'success');
+}
+
+// Update Leading vs Lagging Indicator Gauge
+function updateLeadingLaggingGauge() {
+    const nearMissCount = state.nearMiss.rawData.length;
+    const injuryCount = state.injury.rawData.length;
+    const recordableCount = state.injury.rawData.filter(r =>
+        r.recordable === 'Yes' || r.recordable === true || r.recordable === 'Y'
+    ).length;
+
+    // Calculate ratio
+    const ratio = recordableCount > 0 ? nearMissCount / recordableCount : nearMissCount;
+    const displayRatio = recordableCount > 0 ? `${ratio.toFixed(1)}:1` : (nearMissCount > 0 ? `${nearMissCount}:0` : '0:0');
+
+    // Update gauge value
+    const gaugeValue = document.getElementById('leadLagRatioValue');
+    if (gaugeValue) {
+        gaugeValue.textContent = displayRatio;
+    }
+
+    // Calculate needle angle (-90 = left, 0 = middle, 90 = right)
+    // Map ratio: 0-5 = danger (-90 to -30), 5-10 = warning (-30 to 30), 10+ = good (30 to 90)
+    let angle;
+    if (ratio < 5) {
+        angle = -90 + (ratio / 5) * 60; // -90 to -30
+    } else if (ratio < 10) {
+        angle = -30 + ((ratio - 5) / 5) * 60; // -30 to 30
+    } else {
+        angle = Math.min(90, 30 + ((ratio - 10) / 20) * 60); // 30 to 90
+    }
+
+    // Update needle
+    const needle = document.getElementById('ratioNeedle');
+    if (needle) {
+        needle.setAttribute('transform', `rotate(${angle} 100 100)`);
+    }
+
+    // Update interpretation
+    const interpretation = document.getElementById('gaugeInterpretation');
+    if (interpretation) {
+        let message, className;
+        if (!nearMissCount && !injuryCount) {
+            message = 'Load injury and near miss data to see your Leading/Lagging ratio analysis';
+            className = '';
+        } else if (ratio < 5) {
+            message = `<strong>Critical:</strong> Your ${displayRatio} ratio indicates under-reporting. Associates may fear reporting or don't understand near miss value. Focus on reporting culture training.`;
+            className = 'danger';
+        } else if (ratio < 10) {
+            message = `<strong>Needs Attention:</strong> Your ${displayRatio} ratio is below target. Review Gemba processes and encourage more proactive hazard identification.`;
+            className = 'warning';
+        } else {
+            message = `<strong>Proactive Culture:</strong> Your ${displayRatio} ratio demonstrates strong safety awareness. Continue to recognize associates for near miss reporting.`;
+            className = 'success';
+        }
+        interpretation.innerHTML = `<p class="interpretation-text ${className}">${message}</p>`;
+    }
+}
+
+// Update Body Map Visualization
+function updateBodyMap() {
+    const data = state.injury.rawData;
+    if (!data.length) return;
+
+    // Count body parts
+    const bodyPartCounts = {};
+    data.forEach(row => {
+        const part = normalizeBodyPart(row.bodyPart || row.initial_info_principal_body_part || 'Unknown');
+        if (part !== 'Unknown') {
+            bodyPartCounts[part] = (bodyPartCounts[part] || 0) + 1;
+        }
+    });
+
+    // Get sorted body parts
+    const sortedParts = Object.entries(bodyPartCounts)
+        .sort((a, b) => b[1] - a[1]);
+
+    const maxCount = sortedParts.length > 0 ? sortedParts[0][1] : 1;
+    const total = data.length;
+
+    // Clear all body parts
+    document.querySelectorAll('.body-part').forEach(el => {
+        el.classList.remove('heat-1', 'heat-2', 'heat-3', 'heat-4', 'heat-5');
+    });
+
+    // Body part to SVG element mapping
+    const bodyPartMapping = {
+        'Head': ['bodyHead'],
+        'Neck': ['bodyNeck'],
+        'Shoulder': ['bodyShoulderL', 'bodyShoulderR'],
+        'Back': ['bodyTorso'],
+        'Torso': ['bodyTorso'],
+        'Back/Torso': ['bodyTorso'],
+        'Arm': ['bodyArmL', 'bodyArmR'],
+        'Upper Arm': ['bodyArmL', 'bodyArmR'],
+        'Elbow': ['bodyElbowL', 'bodyElbowR'],
+        'Wrist': ['bodyForearmL', 'bodyForearmR'],
+        'Forearm': ['bodyForearmL', 'bodyForearmR'],
+        'Wrist/Forearm': ['bodyForearmL', 'bodyForearmR'],
+        'Hand': ['bodyHandL', 'bodyHandR'],
+        'Finger': ['bodyHandL', 'bodyHandR'],
+        'Hand/Finger': ['bodyHandL', 'bodyHandR'],
+        'Hip': ['bodyHips'],
+        'Leg': ['bodyThighL', 'bodyThighR'],
+        'Thigh': ['bodyThighL', 'bodyThighR'],
+        'Leg/Thigh': ['bodyThighL', 'bodyThighR'],
+        'Knee': ['bodyKneeL', 'bodyKneeR'],
+        'Lower Leg': ['bodyLowerLegL', 'bodyLowerLegR'],
+        'Ankle': ['bodyAnkleL', 'bodyAnkleR'],
+        'Foot': ['bodyFootL', 'bodyFootR']
+    };
+
+    // Apply heat colors to body parts
+    sortedParts.forEach(([part, count]) => {
+        const heatLevel = Math.ceil((count / maxCount) * 5);
+        const elements = bodyPartMapping[part] || [];
+        elements.forEach(elId => {
+            const el = document.getElementById(elId);
+            if (el) {
+                el.classList.add(`heat-${heatLevel}`);
+            }
+        });
+    });
+
+    // Update legend
+    const legend = document.getElementById('bodyPartLegend');
+    if (legend) {
+        const top5 = sortedParts.slice(0, 5);
+        legend.innerHTML = top5.map(([part, count]) => {
+            const percentage = ((count / total) * 100).toFixed(1);
+            return `
+                <div class="body-legend-item">
+                    <span class="part-name">${part}</span>
+                    <span><span class="count">${count}</span><span class="percentage">(${percentage}%)</span></span>
+                </div>
+            `;
+        }).join('');
+
+        if (top5.length === 0) {
+            legend.innerHTML = '<p class="no-data-msg">No body part data available</p>';
+        }
+    }
+}
+
+// Normalize body part names
+function normalizeBodyPart(part) {
+    if (!part) return 'Unknown';
+    const lower = part.toLowerCase().trim();
+
+    // Mapping of common variations
+    const mappings = {
+        'back': 'Back',
+        'lower back': 'Back',
+        'upper back': 'Back',
+        'lumbar': 'Back',
+        'shoulder': 'Shoulder',
+        'shoulders': 'Shoulder',
+        'hand': 'Hand/Finger',
+        'hands': 'Hand/Finger',
+        'finger': 'Hand/Finger',
+        'fingers': 'Hand/Finger',
+        'thumb': 'Hand/Finger',
+        'wrist': 'Wrist/Forearm',
+        'wrists': 'Wrist/Forearm',
+        'forearm': 'Wrist/Forearm',
+        'arm': 'Arm',
+        'upper arm': 'Arm',
+        'knee': 'Knee',
+        'knees': 'Knee',
+        'ankle': 'Ankle',
+        'ankles': 'Ankle',
+        'foot': 'Foot',
+        'feet': 'Foot',
+        'toe': 'Foot',
+        'toes': 'Foot',
+        'leg': 'Leg/Thigh',
+        'legs': 'Leg/Thigh',
+        'thigh': 'Leg/Thigh',
+        'hip': 'Hip',
+        'hips': 'Hip',
+        'head': 'Head',
+        'face': 'Head',
+        'eye': 'Head',
+        'eyes': 'Head',
+        'neck': 'Neck',
+        'elbow': 'Elbow',
+        'elbows': 'Elbow',
+        'torso': 'Back/Torso',
+        'chest': 'Back/Torso',
+        'abdomen': 'Back/Torso'
+    };
+
+    return mappings[lower] || part;
+}
+
+// Update Station Heat Map
+function updateStationHeatMap() {
+    const selectedSite = document.getElementById('heatmapSiteSelect')?.value || '';
+
+    // Combine injury and near miss data
+    const allData = [
+        ...state.injury.rawData.map(r => ({ ...r, type: 'injury' })),
+        ...state.nearMiss.rawData.map(r => ({ ...r, type: 'nearmiss' }))
+    ].filter(r => !selectedSite || r.site === selectedSite);
+
+    // Map process paths to station zones
+    const zoneCounts = {
+        'Inbound/Receive': 0,
+        'Stow': 0,
+        'Pick': 0,
+        'Pack': 0,
+        'Ship/Dock': 0,
+        'Sort': 0,
+        'Problem Solve': 0,
+        'Parking/OTR': 0,
+        'Office/Common': 0
+    };
+
+    // Keywords for zone mapping
+    const zoneKeywords = {
+        'Inbound/Receive': ['inbound', 'receive', 'receiving', 'unload', 'dock door', 'trailer'],
+        'Stow': ['stow', 'storage', 'put away', 'bin'],
+        'Pick': ['pick', 'picking', 'afe', 'pod', 'aisle'],
+        'Pack': ['pack', 'packing', 'rebin', 'slam'],
+        'Ship/Dock': ['ship', 'shipping', 'outbound', 'dock', 'sortation'],
+        'Sort': ['sort', 'sorting', 'scan', 'divert'],
+        'Problem Solve': ['problem solve', 'ps', 'damage', 'exception'],
+        'Parking/OTR': ['parking', 'otr', 'yard', 'external', 'driveway', 'vehicle'],
+        'Office/Common': ['office', 'restroom', 'break room', 'cafeteria', 'stairs', 'hallway', 'entrance']
+    };
+
+    allData.forEach(row => {
+        const location = (row.location || row.processPath || row.investigation_evidence_near_incident_location || '').toLowerCase();
+
+        let matched = false;
+        for (const [zone, keywords] of Object.entries(zoneKeywords)) {
+            if (keywords.some(kw => location.includes(kw))) {
+                zoneCounts[zone]++;
+                matched = true;
+                break;
+            }
+        }
+
+        // If no match, try to categorize by process path
+        if (!matched && row.processPath) {
+            const pp = row.processPath.toLowerCase();
+            if (pp.includes('pick')) zoneCounts['Pick']++;
+            else if (pp.includes('pack')) zoneCounts['Pack']++;
+            else if (pp.includes('stow')) zoneCounts['Stow']++;
+            else if (pp.includes('ship') || pp.includes('out')) zoneCounts['Ship/Dock']++;
+            else if (pp.includes('receive') || pp.includes('in')) zoneCounts['Inbound/Receive']++;
+        }
+    });
+
+    // Calculate max for heat scaling
+    const maxCount = Math.max(...Object.values(zoneCounts), 1);
+
+    // Update zone elements
+    document.querySelectorAll('.station-zone').forEach(zone => {
+        const zoneName = zone.dataset.zone;
+        const count = zoneCounts[zoneName] || 0;
+        const heatLevel = count === 0 ? 0 : Math.ceil((count / maxCount) * 5);
+
+        // Clear previous heat classes
+        zone.classList.remove('heat-0', 'heat-1', 'heat-2', 'heat-3', 'heat-4', 'heat-5');
+        zone.classList.add(`heat-${heatLevel}`);
+
+        // Update count display
+        const countEl = zone.querySelector('.zone-count');
+        if (countEl) {
+            countEl.textContent = count;
+        }
+    });
+
+    // Populate site selector
+    const siteSelect = document.getElementById('heatmapSiteSelect');
+    if (siteSelect) {
+        const sites = new Set([
+            ...state.injury.rawData.map(r => r.site),
+            ...state.nearMiss.rawData.map(r => r.site)
+        ]);
+
+        const currentValue = siteSelect.value;
+        siteSelect.innerHTML = '<option value="">All Sites</option>';
+        [...sites].filter(Boolean).sort().forEach(site => {
+            siteSelect.innerHTML += `<option value="${site}" ${site === currentValue ? 'selected' : ''}>${site}</option>`;
+        });
+    }
+}
+
+// Update Austin Integration with overdue inspections
+function updateAustinIntegration() {
+    const inspections = state.inspections.rawData;
+    const overdueList = document.getElementById('overdueInspectionsList');
+    const alertBanner = document.getElementById('austinAlertBanner');
+    const badge = document.getElementById('overdueAuditBadge');
+
+    if (!inspections.length) {
+        if (overdueList) {
+            overdueList.innerHTML = '<p class="no-data-msg">Load inspection data to see overdue audits with direct Austin links</p>';
+        }
+        if (alertBanner) alertBanner.style.display = 'none';
+        if (badge) badge.textContent = '0 Overdue';
+        return;
+    }
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    // Find overdue inspections
+    const overdue = inspections.filter(insp => {
+        const dueDate = new Date(insp.due_date || insp.dueDate);
+        const status = (insp.status || '').toLowerCase();
+        return !isNaN(dueDate) && dueDate < today && status !== 'completed' && status !== 'complete';
+    }).sort((a, b) => {
+        const dateA = new Date(a.due_date || a.dueDate);
+        const dateB = new Date(b.due_date || b.dueDate);
+        return dateA - dateB; // Most overdue first
+    });
+
+    // Update badge and alert
+    if (badge) {
+        badge.textContent = `${overdue.length} Overdue`;
+        badge.classList.toggle('danger', overdue.length > 0);
+    }
+
+    if (alertBanner) {
+        alertBanner.style.display = overdue.length > 0 ? 'flex' : 'none';
+    }
+
+    // Render overdue list
+    if (overdueList) {
+        if (overdue.length === 0) {
+            overdueList.innerHTML = '<p class="no-data-msg" style="color: var(--success);">All inspections are up to date!</p>';
+        } else {
+            overdueList.innerHTML = overdue.slice(0, 10).map(insp => {
+                const dueDate = new Date(insp.due_date || insp.dueDate);
+                const daysOverdue = Math.floor((today - dueDate) / (1000 * 60 * 60 * 24));
+                const austinUrl = insp.austin_url || '#';
+
+                return `
+                    <div class="overdue-inspection-item">
+                        <div class="inspection-info">
+                            <span class="inspection-type">${insp.inspection_type || insp.type || 'Inspection'}</span>
+                            <span class="inspection-detail">${insp.site || ''} - Due: ${dueDate.toLocaleDateString()}</span>
+                        </div>
+                        <span class="days-overdue">${daysOverdue} days overdue</span>
+                        ${austinUrl !== '#' ? `<a href="${austinUrl}" target="_blank" class="austin-link-btn">Open in Austin</a>` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+    }
+}
+
+// Update Inspection Gap Analysis (Pencil-Whipping Detection)
+function updateInspectionGapAnalysis() {
+    const inspections = state.inspections.rawData;
+    const avgEl = document.getElementById('avgAuditDuration');
+    const suspiciousEl = document.getElementById('suspiciousAudits');
+    const thoroughEl = document.getElementById('thoroughAudits');
+    const listEl = document.getElementById('suspiciousAuditsList');
+
+    if (!inspections.length) {
+        if (avgEl) avgEl.textContent = '--';
+        if (suspiciousEl) suspiciousEl.textContent = '0';
+        if (thoroughEl) thoroughEl.textContent = '0';
+        if (listEl) listEl.innerHTML = '<p class="no-data-msg">Load inspection data to analyze audit quality</p>';
+        return;
+    }
+
+    // Calculate audit durations (using start_time and end_time if available)
+    const auditsWithDuration = inspections.filter(insp => {
+        return insp.duration || (insp.start_time && insp.end_time);
+    }).map(insp => {
+        let duration = insp.duration;
+        if (!duration && insp.start_time && insp.end_time) {
+            const start = new Date(insp.start_time);
+            const end = new Date(insp.end_time);
+            duration = (end - start) / (1000 * 60); // minutes
+        }
+        return { ...insp, calculatedDuration: duration };
+    }).filter(insp => insp.calculatedDuration > 0);
+
+    if (auditsWithDuration.length === 0) {
+        // Simulate with expected durations based on inspection type
+        const expectedDurations = {
+            'SHE Inspection': 15,
+            'PIT Inspection': 10,
+            'Fire Safety': 20,
+            'Ergonomic Assessment': 25,
+            'Default': 15
+        };
+
+        // Generate analysis based on completion patterns
+        if (avgEl) avgEl.textContent = '~15 min';
+        if (suspiciousEl) suspiciousEl.textContent = '0';
+        if (thoroughEl) thoroughEl.textContent = inspections.filter(i => i.status === 'completed' || i.status === 'complete').length.toString();
+        if (listEl) listEl.innerHTML = '<p class="no-data-msg">Duration data not available. Add start_time and end_time to inspection data for gap analysis.</p>';
+        return;
+    }
+
+    // Calculate averages and identify anomalies
+    const avgDuration = auditsWithDuration.reduce((sum, a) => sum + a.calculatedDuration, 0) / auditsWithDuration.length;
+    const threshold = avgDuration * 0.2; // 20% of average is suspicious
+
+    const suspicious = auditsWithDuration.filter(a => a.calculatedDuration < threshold);
+    const thorough = auditsWithDuration.filter(a => a.calculatedDuration >= avgDuration);
+
+    // Update stats
+    if (avgEl) avgEl.textContent = `${Math.round(avgDuration)} min`;
+    if (suspiciousEl) suspiciousEl.textContent = suspicious.length.toString();
+    if (thoroughEl) thoroughEl.textContent = thorough.length.toString();
+
+    // Render suspicious audits
+    if (listEl) {
+        if (suspicious.length === 0) {
+            listEl.innerHTML = '<p class="no-data-msg" style="color: var(--success);">No suspicious audits detected!</p>';
+        } else {
+            listEl.innerHTML = suspicious.slice(0, 5).map(audit => `
+                <div class="suspicious-audit-item">
+                    <span>${audit.inspection_type || audit.type || 'Audit'} - ${audit.site || 'Unknown'}</span>
+                    <span style="color: var(--warning); font-weight: 600;">${Math.round(audit.calculatedDuration)} min (Expected: ~${Math.round(avgDuration)} min)</span>
+                </div>
+            `).join('');
+        }
+    }
+
+    // Initialize chart
+    initAuditDurationChart(auditsWithDuration, avgDuration);
+}
+
+// Initialize Audit Duration Chart
+function initAuditDurationChart(data, avgDuration) {
+    const ctx = document.getElementById('auditDurationChart');
+    if (!ctx) return;
+
+    // Destroy existing chart
+    if (wbrDashboardState.charts.auditDuration) {
+        wbrDashboardState.charts.auditDuration.destroy();
+    }
+
+    // Prepare histogram data
+    const buckets = { '0-5': 0, '5-10': 0, '10-15': 0, '15-20': 0, '20-30': 0, '30+': 0 };
+    data.forEach(d => {
+        const dur = d.calculatedDuration;
+        if (dur < 5) buckets['0-5']++;
+        else if (dur < 10) buckets['5-10']++;
+        else if (dur < 15) buckets['10-15']++;
+        else if (dur < 20) buckets['15-20']++;
+        else if (dur < 30) buckets['20-30']++;
+        else buckets['30+']++;
+    });
+
+    wbrDashboardState.charts.auditDuration = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: Object.keys(buckets),
+            datasets: [{
+                label: 'Audit Count',
+                data: Object.values(buckets),
+                backgroundColor: [
+                    '#B71C1C', // 0-5 suspicious
+                    '#FF9800', // 5-10 warning
+                    '#FFC107', // 10-15 okay
+                    '#4CAF50', // 15-20 good
+                    '#4CAF50', // 20-30 good
+                    '#4CAF50'  // 30+ thorough
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Audit Duration Distribution (minutes)'
+                },
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Count'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Duration (minutes)'
+                    }
+                }
+            }
+        }
+    });
+}
+
+// Update Chaser / Action Accountability Tracker
+function updateChaserTracker() {
+    // Collect all action items from various sources
+    const actions = collectActionItems();
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const weekFromNow = new Date(today);
+    weekFromNow.setDate(weekFromNow.getDate() + 7);
+
+    // Categorize actions
+    const overdue = actions.filter(a => a.dueDate < today && a.status !== 'completed');
+    const dueSoon = actions.filter(a => a.dueDate >= today && a.dueDate <= weekFromNow && a.status !== 'completed');
+    const onTrack = actions.filter(a => a.dueDate > weekFromNow && a.status !== 'completed');
+
+    // Update summary cards
+    const overdueCount = document.getElementById('chaserOverdueCount');
+    const dueSoonCount = document.getElementById('chaserDueSoonCount');
+    const onTrackCount = document.getElementById('chaserOnTrackCount');
+
+    if (overdueCount) overdueCount.textContent = overdue.length;
+    if (dueSoonCount) dueSoonCount.textContent = dueSoon.length;
+    if (onTrackCount) onTrackCount.textContent = onTrack.length;
+
+    // Group by owner
+    const ownerActions = {};
+    actions.filter(a => a.status !== 'completed').forEach(action => {
+        const owner = action.owner || 'Unassigned';
+        if (!ownerActions[owner]) {
+            ownerActions[owner] = { total: 0, overdue: 0 };
+        }
+        ownerActions[owner].total++;
+        if (action.dueDate < today) {
+            ownerActions[owner].overdue++;
+        }
+    });
+
+    // Render owner list
+    const ownerList = document.getElementById('chaserOwnerList');
+    if (ownerList) {
+        const sortedOwners = Object.entries(ownerActions)
+            .sort((a, b) => b[1].overdue - a[1].overdue || b[1].total - a[1].total);
+
+        if (sortedOwners.length === 0) {
+            ownerList.innerHTML = '<p class="no-data-msg">No pending action items. Great job!</p>';
+        } else {
+            ownerList.innerHTML = sortedOwners.map(([owner, data]) => {
+                const initials = owner.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
+                return `
+                    <div class="chaser-owner-row">
+                        <div class="owner-info">
+                            <div class="owner-avatar">${initials}</div>
+                            <div class="owner-details">
+                                <span class="owner-name">${owner}</span>
+                                <span class="owner-actions-count">
+                                    ${data.total} actions
+                                    ${data.overdue > 0 ? `(<span class="overdue">${data.overdue} overdue</span>)` : ''}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="chaser-actions-btn">
+                            <button class="btn btn-sm btn-outline" onclick="viewOwnerActions('${owner}')">View</button>
+                            ${data.overdue > 0 ? `<button class="btn btn-sm btn-primary" onclick="sendReminder('${owner}')">Remind</button>` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+    }
+}
+
+// Collect all action items from data sources
+function collectActionItems() {
+    const actions = [];
+
+    // From near misses with corrective actions
+    state.nearMiss.rawData.forEach(nm => {
+        if (nm.corrective_action || nm.rca_immediate_actions) {
+            actions.push({
+                id: nm.case_number || nm.id,
+                description: nm.corrective_action || nm.rca_immediate_actions,
+                owner: nm.assigned_to || nm.owner || nm.rca_responsible_person || 'Unassigned',
+                dueDate: new Date(nm.due_date || nm.target_date || Date.now() + 7 * 24 * 60 * 60 * 1000),
+                status: nm.action_status || 'pending',
+                source: 'Near Miss',
+                priority: nm.severity === 'A' ? 'Critical' : nm.severity === 'B' ? 'High' : 'Medium'
+            });
+        }
+    });
+
+    // From injuries with corrective actions
+    state.injury.rawData.forEach(inj => {
+        if (inj.corrective_action || inj.rca_corrective_actions) {
+            actions.push({
+                id: inj.case_number || inj.id,
+                description: inj.corrective_action || inj.rca_corrective_actions,
+                owner: inj.assigned_to || inj.owner || inj.rca_responsible_person || 'Unassigned',
+                dueDate: new Date(inj.due_date || inj.target_date || Date.now() + 7 * 24 * 60 * 60 * 1000),
+                status: inj.action_status || 'pending',
+                source: 'Injury',
+                priority: inj.recordable === 'Yes' ? 'Critical' : inj.severity === 'A' ? 'High' : 'Medium'
+            });
+        }
+    });
+
+    // From inspections with findings
+    state.inspections.rawData.forEach(insp => {
+        if (insp.finding || insp.findings || insp.action_required) {
+            actions.push({
+                id: insp.inspection_id || insp.id,
+                description: insp.finding || insp.findings || insp.action_required,
+                owner: insp.assigned_to || insp.owner || 'Unassigned',
+                dueDate: new Date(insp.action_due_date || insp.due_date || Date.now() + 14 * 24 * 60 * 60 * 1000),
+                status: insp.action_status || 'pending',
+                source: 'Inspection',
+                priority: insp.priority || 'Medium'
+            });
+        }
+    });
+
+    return actions;
+}
+
+// Update Predictive Analytics
+function updatePredictiveAnalytics() {
+    const injuries = state.injury.rawData;
+    const nearMisses = state.nearMiss.rawData;
+
+    if (!injuries.length && !nearMisses.length) {
+        const predictionText = document.getElementById('predictionText');
+        if (predictionText) {
+            predictionText.textContent = 'Load injury and near miss data to generate predictive insights';
+        }
+        return;
+    }
+
+    // Analyze patterns
+    const analysis = analyzePredictiveFactors(injuries, nearMisses);
+
+    // Update prediction card
+    const confidenceEl = document.getElementById('predictionConfidence');
+    const predictionText = document.getElementById('predictionText');
+    const factorsEl = document.getElementById('predictionFactors');
+
+    if (confidenceEl) confidenceEl.textContent = `${analysis.confidence}% confidence`;
+    if (predictionText) predictionText.textContent = analysis.prediction;
+    if (factorsEl) {
+        factorsEl.innerHTML = analysis.factors.map(f =>
+            `<span class="prediction-factor">${f}</span>`
+        ).join('');
+    }
+
+    // Initialize predictive charts
+    initPredictiveCharts(injuries, nearMisses);
+}
+
+// Analyze predictive factors
+function analyzePredictiveFactors(injuries, nearMisses) {
+    const factors = [];
+    let riskScore = 0;
+    const today = new Date();
+    const dayOfWeek = today.getDay();
+
+    // Day of week analysis
+    const injuriesByDay = [0, 0, 0, 0, 0, 0, 0];
+    injuries.forEach(inj => {
+        const date = new Date(inj.incident_date || inj.parsedDate);
+        if (!isNaN(date)) {
+            injuriesByDay[date.getDay()]++;
+        }
+    });
+    const maxDayCount = Math.max(...injuriesByDay);
+    const peakDays = injuriesByDay.map((count, day) => ({ day, count }))
+        .filter(d => d.count === maxDayCount)
+        .map(d => ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][d.day]);
+
+    if (peakDays.length > 0) {
+        factors.push(`Peak day: ${peakDays[0]}`);
+        if (injuriesByDay[dayOfWeek] === maxDayCount) {
+            riskScore += 20;
+        }
+    }
+
+    // Body part trend
+    const bodyPartCounts = {};
+    injuries.forEach(inj => {
+        const part = normalizeBodyPart(inj.bodyPart || inj.initial_info_principal_body_part);
+        if (part !== 'Unknown') {
+            bodyPartCounts[part] = (bodyPartCounts[part] || 0) + 1;
+        }
+    });
+    const topBodyPart = Object.entries(bodyPartCounts).sort((a, b) => b[1] - a[1])[0];
+    if (topBodyPart) {
+        factors.push(`Top injury: ${topBodyPart[0]}`);
+        riskScore += Math.min(topBodyPart[1] * 2, 15);
+    }
+
+    // Near miss trend (increasing = higher risk)
+    const recentNearMisses = nearMisses.filter(nm => {
+        const date = new Date(nm.nearmiss_date || nm.parsedDate);
+        return !isNaN(date) && (today - date) < 30 * 24 * 60 * 60 * 1000;
+    }).length;
+    const olderNearMisses = nearMisses.filter(nm => {
+        const date = new Date(nm.nearmiss_date || nm.parsedDate);
+        return !isNaN(date) && (today - date) >= 30 * 24 * 60 * 60 * 1000 && (today - date) < 60 * 24 * 60 * 60 * 1000;
+    }).length;
+
+    if (recentNearMisses > olderNearMisses) {
+        factors.push('NM trend: Increasing');
+        riskScore += 15;
+    } else if (nearMisses.length > 0) {
+        factors.push('NM trend: Stable');
+    }
+
+    // Location hotspot
+    const locationCounts = {};
+    [...injuries, ...nearMisses].forEach(item => {
+        const loc = item.location || item.processPath || item.investigation_evidence_near_incident_location;
+        if (loc) {
+            const normalizedLoc = loc.toLowerCase().split(' ')[0];
+            locationCounts[normalizedLoc] = (locationCounts[normalizedLoc] || 0) + 1;
+        }
+    });
+    const hotspot = Object.entries(locationCounts).sort((a, b) => b[1] - a[1])[0];
+    if (hotspot && hotspot[1] >= 3) {
+        factors.push(`Hotspot: ${hotspot[0].charAt(0).toUpperCase() + hotspot[0].slice(1)}`);
+        riskScore += 10;
+    }
+
+    // Calculate confidence based on data quality
+    const confidence = Math.min(95, 40 + (injuries.length + nearMisses.length) * 2);
+    riskScore = Math.min(95, Math.max(5, riskScore + 40));
+
+    // Generate prediction text
+    let prediction;
+    if (riskScore >= 70) {
+        prediction = `Based on current trends, there is a ${riskScore}% likelihood of a ${topBodyPart ? topBodyPart[0].toLowerCase() : 'soft-tissue'} injury in ${hotspot ? hotspot[0] : 'high-traffic areas'} this week. Consider targeted safety interventions.`;
+    } else if (riskScore >= 50) {
+        prediction = `Moderate risk detected (${riskScore}%). Continue monitoring ${topBodyPart ? topBodyPart[0].toLowerCase() : 'common injury'} incidents and reinforce safety protocols in ${hotspot ? hotspot[0] : 'identified hotspots'}.`;
+    } else {
+        prediction = `Risk levels are relatively stable (${riskScore}%). Maintain current safety practices and continue proactive near miss reporting to identify emerging hazards.`;
+    }
+
+    return {
+        confidence,
+        prediction,
+        factors,
+        riskScore
+    };
+}
+
+// Initialize Predictive Charts
+function initPredictiveCharts(injuries, nearMisses) {
+    // Trend forecast chart
+    const trendCtx = document.getElementById('predictiveTrendChart');
+    if (trendCtx) {
+        if (wbrDashboardState.charts.predictiveTrend) {
+            wbrDashboardState.charts.predictiveTrend.destroy();
+        }
+
+        // Get weekly data for last 12 weeks
+        const weeklyData = getWeeklyTrendData(injuries, nearMisses, 12);
+
+        wbrDashboardState.charts.predictiveTrend = new Chart(trendCtx, {
+            type: 'line',
+            data: {
+                labels: weeklyData.labels,
+                datasets: [
+                    {
+                        label: 'Injuries',
+                        data: weeklyData.injuries,
+                        borderColor: '#B71C1C',
+                        backgroundColor: 'rgba(183, 28, 28, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    },
+                    {
+                        label: 'Near Misses',
+                        data: weeklyData.nearMisses,
+                        borderColor: '#FF9900',
+                        backgroundColor: 'rgba(255, 153, 0, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    },
+                    {
+                        label: 'Forecast',
+                        data: weeklyData.forecast,
+                        borderColor: '#2196F3',
+                        borderDash: [5, 5],
+                        fill: false,
+                        tension: 0.4
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Incident Trend & Forecast'
+                    }
+                },
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+    }
+
+    // Risk factor chart
+    const riskCtx = document.getElementById('riskFactorChart');
+    if (riskCtx) {
+        if (wbrDashboardState.charts.riskFactor) {
+            wbrDashboardState.charts.riskFactor.destroy();
+        }
+
+        const riskFactors = calculateRiskFactors(injuries, nearMisses);
+
+        wbrDashboardState.charts.riskFactor = new Chart(riskCtx, {
+            type: 'radar',
+            data: {
+                labels: riskFactors.labels,
+                datasets: [{
+                    label: 'Risk Level',
+                    data: riskFactors.values,
+                    backgroundColor: 'rgba(255, 153, 0, 0.2)',
+                    borderColor: '#FF9900',
+                    pointBackgroundColor: '#FF9900'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Risk Factor Analysis'
+                    }
+                },
+                scales: {
+                    r: {
+                        beginAtZero: true,
+                        max: 100
+                    }
+                }
+            }
+        });
+    }
+}
+
+// Get weekly trend data
+function getWeeklyTrendData(injuries, nearMisses, weeks) {
+    const labels = [];
+    const injuryData = [];
+    const nearMissData = [];
+    const forecast = [];
+
+    const today = new Date();
+
+    for (let i = weeks - 1; i >= 0; i--) {
+        const weekStart = new Date(today);
+        weekStart.setDate(today.getDate() - (i * 7) - today.getDay());
+        weekStart.setHours(0, 0, 0, 0);
+
+        const weekEnd = new Date(weekStart);
+        weekEnd.setDate(weekStart.getDate() + 6);
+
+        labels.push(`W${weeks - i}`);
+
+        const weekInjuries = injuries.filter(inj => {
+            const date = new Date(inj.incident_date || inj.parsedDate);
+            return !isNaN(date) && date >= weekStart && date <= weekEnd;
+        }).length;
+
+        const weekNearMisses = nearMisses.filter(nm => {
+            const date = new Date(nm.nearmiss_date || nm.parsedDate);
+            return !isNaN(date) && date >= weekStart && date <= weekEnd;
+        }).length;
+
+        injuryData.push(weekInjuries);
+        nearMissData.push(weekNearMisses);
+
+        // Forecast (simple moving average + trend)
+        if (i < 4) {
+            forecast.push(null);
+        } else {
+            forecast.push(null);
+        }
+    }
+
+    // Add forecast weeks
+    const avgInjuries = injuryData.reduce((a, b) => a + b, 0) / injuryData.length;
+    const trend = (injuryData[injuryData.length - 1] - injuryData[0]) / weeks;
+
+    for (let i = 1; i <= 4; i++) {
+        labels.push(`W${weeks + i}*`);
+        injuryData.push(null);
+        nearMissData.push(null);
+        forecast.push(Math.max(0, Math.round(avgInjuries + trend * i)));
+    }
+
+    return { labels, injuries: injuryData, nearMisses: nearMissData, forecast };
+}
+
+// Calculate risk factors for radar chart
+function calculateRiskFactors(injuries, nearMisses) {
+    const factors = {
+        'Ergonomic': 0,
+        'Slip/Trip/Fall': 0,
+        'Equipment': 0,
+        'Vehicle': 0,
+        'Struck By': 0,
+        'Repetitive': 0
+    };
+
+    const keywords = {
+        'Ergonomic': ['lift', 'bend', 'strain', 'back', 'ergonomic', 'posture', 'shoulder'],
+        'Slip/Trip/Fall': ['slip', 'trip', 'fall', 'wet', 'stairs', 'ladder'],
+        'Equipment': ['equipment', 'machine', 'tool', 'scanner', 'conveyor'],
+        'Vehicle': ['pit', 'forklift', 'truck', 'vehicle', 'otr', 'van'],
+        'Struck By': ['struck', 'hit', 'impact', 'falling object', 'box'],
+        'Repetitive': ['repetitive', 'overuse', 'cumulative', 'carpal', 'tendon']
+    };
+
+    [...injuries, ...nearMisses].forEach(item => {
+        const desc = (item.description || item.initial_info_incident_description || item.initial_info_nearmiss_type || '').toLowerCase();
+        const type = (item.type || item.injury_type || item.initial_info_nearmiss_type || '').toLowerCase();
+        const text = desc + ' ' + type;
+
+        for (const [factor, kws] of Object.entries(keywords)) {
+            if (kws.some(kw => text.includes(kw))) {
+                factors[factor]++;
+            }
+        }
+    });
+
+    // Normalize to 0-100
+    const maxCount = Math.max(...Object.values(factors), 1);
+    const normalized = {};
+    for (const [factor, count] of Object.entries(factors)) {
+        normalized[factor] = Math.round((count / maxCount) * 100);
+    }
+
+    return {
+        labels: Object.keys(normalized),
+        values: Object.values(normalized)
+    };
+}
+
+// Update WBR Quick Stats
+function updateWBRQuickStats() {
+    const injuries = state.injury.rawData;
+    const nearMisses = state.nearMiss.rawData;
+
+    // Total incidents
+    const totalEl = document.getElementById('wbrTotalIncidents');
+    if (totalEl) totalEl.textContent = injuries.length + nearMisses.length;
+
+    // Recordable rate
+    const recordables = injuries.filter(i => i.recordable === 'Yes' || i.recordable === true || i.recordable === 'Y');
+    const rateEl = document.getElementById('wbrRecordableRate');
+    if (rateEl) {
+        const rate = injuries.length > 0 ? ((recordables.length / injuries.length) * 100).toFixed(1) : 0;
+        rateEl.textContent = `${rate}%`;
+    }
+
+    // Days since last recordable
+    const daysEl = document.getElementById('wbrDaysSinceLast');
+    if (daysEl) {
+        const lastRecordable = recordables
+            .map(r => new Date(r.incident_date || r.parsedDate))
+            .filter(d => !isNaN(d))
+            .sort((a, b) => b - a)[0];
+
+        if (lastRecordable) {
+            const days = Math.floor((new Date() - lastRecordable) / (1000 * 60 * 60 * 24));
+            daysEl.textContent = days;
+        } else {
+            daysEl.textContent = 'N/A';
+        }
+    }
+
+    // Safety Index
+    const indexEl = document.getElementById('wbrSafetyIndex');
+    if (indexEl) {
+        // Calculate composite safety index
+        const nmRatio = recordables.length > 0 ? nearMisses.length / recordables.length : nearMisses.length;
+        const qualityScore = state.nearMiss.qualityMetrics?.qualityScore || 50;
+        const safetyIndex = Math.round((Math.min(nmRatio, 20) * 3 + qualityScore) / 2);
+        indexEl.textContent = Math.min(100, safetyIndex);
+    }
+}
+
+// Update Data Quality Scorecard
+function updateDataQualityScorecard() {
+    const injuryMetrics = state.injury.qualityMetrics || {};
+    const nearMissMetrics = state.nearMiss.qualityMetrics || {};
+
+    // Calculate combined quality score
+    const injuryScore = injuryMetrics.qualityScore || 0;
+    const nearMissScore = nearMissMetrics.qualityScore || 0;
+    const combinedScore = Math.round((injuryScore + nearMissScore) / 2);
+
+    // Update ring progress
+    const ringEl = document.getElementById('qualityRingProgress');
+    if (ringEl) {
+        const circumference = 314; // 2 * PI * 50
+        const progress = (combinedScore / 100) * circumference;
+        ringEl.setAttribute('stroke-dasharray', `${progress} ${circumference}`);
+
+        // Update color based on score
+        const color = combinedScore >= 80 ? '#4CAF50' : combinedScore >= 60 ? '#FFC107' : '#B71C1C';
+        ringEl.setAttribute('stroke', color);
+    }
+
+    // Update score value
+    const scoreEl = document.getElementById('qualityScoreValue');
+    if (scoreEl) scoreEl.textContent = `${combinedScore}%`;
+
+    // Update badge
+    const badgeEl = document.getElementById('qualityBadge');
+    if (badgeEl) {
+        if (combinedScore >= 80) {
+            badgeEl.textContent = 'Excellent';
+            badgeEl.className = 'wbr-badge success';
+        } else if (combinedScore >= 60) {
+            badgeEl.textContent = 'Good';
+            badgeEl.className = 'wbr-badge warning';
+        } else {
+            badgeEl.textContent = 'Needs Work';
+            badgeEl.className = 'wbr-badge danger';
+        }
+    }
+
+    // Update individual metrics
+    const descQuality = nearMissMetrics.wordAnalysis ?
+        Math.min(100, Math.round((nearMissMetrics.wordAnalysis.averageWords / 15) * 100)) : 0;
+    updateQualityBar('descQualityBar', 'descQualityValue', descQuality);
+
+    const fieldComplete = Math.round(((injuryMetrics.dataCompleteness || 0) + (nearMissMetrics.dataCompleteness || 0)) / 2);
+    updateQualityBar('fieldCompleteBar', 'fieldCompleteValue', fieldComplete);
+
+    const totalRecords = (injuryMetrics.totalRecords || 0) + (nearMissMetrics.totalRecords || 0);
+    const totalDuplicates = nearMissMetrics.duplicates || 0;
+    const duplicateFree = totalRecords > 0 ? Math.round(((totalRecords - totalDuplicates) / totalRecords) * 100) : 100;
+    updateQualityBar('duplicateFreeBar', 'duplicateFreeValue', duplicateFree);
+
+    // Timeliness (how recent is the data)
+    const allDates = [
+        ...state.injury.rawData.map(r => new Date(r.incident_date || r.parsedDate)),
+        ...state.nearMiss.rawData.map(r => new Date(r.nearmiss_date || r.parsedDate))
+    ].filter(d => !isNaN(d));
+
+    const mostRecent = allDates.length > 0 ? Math.max(...allDates) : null;
+    const daysSinceLatest = mostRecent ? Math.floor((new Date() - mostRecent) / (1000 * 60 * 60 * 24)) : 999;
+    const timeliness = Math.max(0, 100 - (daysSinceLatest * 3)); // Lose 3% per day old
+    updateQualityBar('timelinessBar', 'timelinessValue', timeliness);
+}
+
+// Helper to update quality bars
+function updateQualityBar(barId, valueId, percentage) {
+    const bar = document.getElementById(barId);
+    const value = document.getElementById(valueId);
+    if (bar) bar.style.width = `${percentage}%`;
+    if (value) value.textContent = `${percentage}%`;
+}
+
+// Generate One-Click WBR Deck
+function generateOneClickWBRDeck() {
+    showStatus('Generating One-Click WBR Deck...', 'info');
+
+    // Check for data
+    if (!state.injury.rawData.length && !state.nearMiss.rawData.length) {
+        showStatus('Please load injury or near miss data before generating WBR Deck', 'warning');
+        return;
+    }
+
+    // Use existing WBR report generation with enhanced DSM format
+    generateEnhancedWBRDeck();
+}
+
+// Generate Enhanced WBR Deck with DSM-focused content
+function generateEnhancedWBRDeck() {
+    const today = new Date();
+    const weekNumber = getWeekNumber(today);
+    const year = today.getFullYear();
+
+    // Gather all WBR data
+    const wbrData = {
+        weekNumber,
+        year,
+        dateGenerated: today.toLocaleDateString(),
+
+        // Leading/Lagging Metrics
+        nearMissCount: state.nearMiss.rawData.length,
+        injuryCount: state.injury.rawData.length,
+        recordableCount: state.injury.rawData.filter(r =>
+            r.recordable === 'Yes' || r.recordable === true
+        ).length,
+        leadLagRatio: calculateLeadLagRatio(),
+
+        // Top incidents
+        recentIncidents: getRecentIncidents(7),
+        topRootCauses: getTopRootCauses(),
+        topBodyParts: getTopBodyParts(),
+        topLocations: getTopLocations(),
+
+        // Predictive insights
+        predictiveInsights: analyzePredictiveFactors(state.injury.rawData, state.nearMiss.rawData),
+
+        // Quality metrics
+        qualityScore: Math.round((
+            (state.injury.qualityMetrics?.qualityScore || 0) +
+            (state.nearMiss.qualityMetrics?.qualityScore || 0)
+        ) / 2),
+
+        // Action items
+        overdueActions: collectActionItems().filter(a => a.dueDate < today && a.status !== 'completed').length,
+
+        // Days since last recordable
+        daysSinceRecordable: calculateDaysSinceRecordable()
+    };
+
+    // Generate HTML report
+    generateWBRDeckHTML(wbrData);
+}
+
+// Calculate Lead/Lag ratio
+function calculateLeadLagRatio() {
+    const nearMisses = state.nearMiss.rawData.length;
+    const recordables = state.injury.rawData.filter(r =>
+        r.recordable === 'Yes' || r.recordable === true
+    ).length;
+
+    if (recordables === 0) return nearMisses > 0 ? `${nearMisses}:0` : '0:0';
+    return `${(nearMisses / recordables).toFixed(1)}:1`;
+}
+
+// Get recent incidents
+function getRecentIncidents(days) {
+    const cutoff = new Date();
+    cutoff.setDate(cutoff.getDate() - days);
+
+    return [
+        ...state.injury.rawData.filter(i => {
+            const date = new Date(i.incident_date || i.parsedDate);
+            return !isNaN(date) && date >= cutoff;
+        }).map(i => ({ ...i, type: 'Injury' })),
+        ...state.nearMiss.rawData.filter(nm => {
+            const date = new Date(nm.nearmiss_date || nm.parsedDate);
+            return !isNaN(date) && date >= cutoff;
+        }).map(nm => ({ ...nm, type: 'Near Miss' }))
+    ].sort((a, b) => {
+        const dateA = new Date(a.incident_date || a.nearmiss_date || a.parsedDate);
+        const dateB = new Date(b.incident_date || b.nearmiss_date || b.parsedDate);
+        return dateB - dateA;
+    });
+}
+
+// Get top root causes
+function getTopRootCauses() {
+    const causes = {};
+    [...state.injury.rawData, ...state.nearMiss.rawData].forEach(item => {
+        const cause = item.rootCause || item.rca_root_cause || item.root_cause;
+        if (cause) {
+            causes[cause] = (causes[cause] || 0) + 1;
+        }
+    });
+    return Object.entries(causes).sort((a, b) => b[1] - a[1]).slice(0, 5);
+}
+
+// Get top body parts
+function getTopBodyParts() {
+    const parts = {};
+    state.injury.rawData.forEach(item => {
+        const part = normalizeBodyPart(item.bodyPart || item.initial_info_principal_body_part);
+        if (part !== 'Unknown') {
+            parts[part] = (parts[part] || 0) + 1;
+        }
+    });
+    return Object.entries(parts).sort((a, b) => b[1] - a[1]).slice(0, 5);
+}
+
+// Get top locations
+function getTopLocations() {
+    const locations = {};
+    [...state.injury.rawData, ...state.nearMiss.rawData].forEach(item => {
+        const loc = item.location || item.processPath || item.investigation_evidence_near_incident_location;
+        if (loc) {
+            locations[loc] = (locations[loc] || 0) + 1;
+        }
+    });
+    return Object.entries(locations).sort((a, b) => b[1] - a[1]).slice(0, 5);
+}
+
+// Calculate days since last recordable
+function calculateDaysSinceRecordable() {
+    const recordables = state.injury.rawData.filter(i =>
+        i.recordable === 'Yes' || i.recordable === true
+    );
+
+    if (!recordables.length) return 'N/A';
+
+    const lastDate = recordables
+        .map(r => new Date(r.incident_date || r.parsedDate))
+        .filter(d => !isNaN(d))
+        .sort((a, b) => b - a)[0];
+
+    if (!lastDate) return 'N/A';
+    return Math.floor((new Date() - lastDate) / (1000 * 60 * 60 * 24));
+}
+
+// Get week number
+function getWeekNumber(date) {
+    const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+    const dayNum = d.getUTCDay() || 7;
+    d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+    const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+    return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+}
+
+// Generate WBR Deck HTML
+function generateWBRDeckHTML(data) {
+    const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Safety WBR Deck - CW${data.weekNumber} ${data.year}</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Amazon Ember', Arial, sans-serif; background: #f5f5f5; color: #232F3E; }
+        .page { width: 100%; max-width: 1200px; margin: 0 auto; background: white; padding: 40px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); page-break-after: always; }
+        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 4px solid #FF9900; padding-bottom: 20px; margin-bottom: 30px; }
+        .header h1 { font-size: 2rem; color: #232F3E; }
+        .header .meta { text-align: right; color: #666; }
+        .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 30px; }
+        .kpi-card { background: linear-gradient(135deg, #232F3E, #37475A); color: white; padding: 20px; border-radius: 8px; text-align: center; }
+        .kpi-card.orange { background: linear-gradient(135deg, #FF9900, #ec7211); }
+        .kpi-card.green { background: linear-gradient(135deg, #4CAF50, #45a049); }
+        .kpi-card.red { background: linear-gradient(135deg, #B71C1C, #c62828); }
+        .kpi-value { font-size: 2.5rem; font-weight: bold; }
+        .kpi-label { font-size: 0.9rem; opacity: 0.9; margin-top: 5px; }
+        .section { margin-bottom: 30px; }
+        .section h2 { font-size: 1.3rem; color: #232F3E; border-left: 4px solid #FF9900; padding-left: 15px; margin-bottom: 15px; }
+        .table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        .table th, .table td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+        .table th { background: #f8f8f8; font-weight: 600; }
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 4px; font-size: 0.8rem; font-weight: 600; }
+        .badge.critical { background: #ffebee; color: #B71C1C; }
+        .badge.warning { background: #fff3e0; color: #e65100; }
+        .badge.good { background: #e8f5e9; color: #2e7d32; }
+        .insights-box { background: #e3f2fd; border-left: 4px solid #1976d2; padding: 20px; border-radius: 0 8px 8px 0; }
+        .insights-box h3 { color: #1565c0; margin-bottom: 10px; }
+        .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+        .action-item { display: flex; align-items: center; gap: 10px; padding: 10px; background: #fff3e0; border-radius: 4px; margin-bottom: 8px; }
+        .action-item.overdue { background: #ffebee; }
+        .footer { text-align: center; color: #666; font-size: 0.8rem; border-top: 1px solid #ddd; padding-top: 20px; margin-top: 30px; }
+        @media print { .page { box-shadow: none; margin: 0; padding: 20px; } }
+    </style>
+</head>
+<body>
+    <!-- Page 1: Executive Summary -->
+    <div class="page">
+        <div class="header">
+            <div>
+                <h1>Safety WBR Deck</h1>
+                <p style="color: #FF9900; font-weight: 600;">Weekly Business Review - CW${data.weekNumber} ${data.year}</p>
+            </div>
+            <div class="meta">
+                <p>Generated: ${data.dateGenerated}</p>
+                <p>Delivery Station Safety Report</p>
+            </div>
+        </div>
+
+        <div class="kpi-grid">
+            <div class="kpi-card ${data.daysSinceRecordable !== 'N/A' && data.daysSinceRecordable < 7 ? 'red' : 'green'}">
+                <div class="kpi-value">${data.daysSinceRecordable}</div>
+                <div class="kpi-label">Days Since Last Recordable</div>
+            </div>
+            <div class="kpi-card ${parseFloat(data.leadLagRatio) < 5 ? 'red' : parseFloat(data.leadLagRatio) < 10 ? 'orange' : 'green'}">
+                <div class="kpi-value">${data.leadLagRatio}</div>
+                <div class="kpi-label">Near Miss : Injury Ratio</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-value">${data.nearMissCount}</div>
+                <div class="kpi-label">Near Misses (Total)</div>
+            </div>
+            <div class="kpi-card ${data.recordableCount > 0 ? 'red' : 'green'}">
+                <div class="kpi-value">${data.recordableCount}</div>
+                <div class="kpi-label">Recordable Injuries</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Predictive Insights</h2>
+            <div class="insights-box">
+                <h3>${data.predictiveInsights.confidence}% Confidence</h3>
+                <p>${data.predictiveInsights.prediction}</p>
+                <p style="margin-top: 10px;"><strong>Key Factors:</strong> ${data.predictiveInsights.factors.join(' | ')}</p>
+            </div>
+        </div>
+
+        <div class="two-col">
+            <div class="section">
+                <h2>Top Root Causes</h2>
+                <table class="table">
+                    <tr><th>Root Cause</th><th>Count</th></tr>
+                    ${data.topRootCauses.map(([cause, count]) => `<tr><td>${cause}</td><td>${count}</td></tr>`).join('')}
+                    ${data.topRootCauses.length === 0 ? '<tr><td colspan="2" style="text-align:center;color:#666;">No root cause data available</td></tr>' : ''}
+                </table>
+            </div>
+            <div class="section">
+                <h2>Top Body Parts Affected</h2>
+                <table class="table">
+                    <tr><th>Body Part</th><th>Count</th></tr>
+                    ${data.topBodyParts.map(([part, count]) => `<tr><td>${part}</td><td>${count}</td></tr>`).join('')}
+                    ${data.topBodyParts.length === 0 ? '<tr><td colspan="2" style="text-align:center;color:#666;">No body part data available</td></tr>' : ''}
+                </table>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>Safety Analytics Platform | Amazon WBR Format | Data Quality Score: ${data.qualityScore}%</p>
+            <p>Overdue Actions: ${data.overdueActions} | This report was auto-generated for your Weekly Business Review</p>
+        </div>
+    </div>
+
+    <!-- Page 2: Recent Incidents -->
+    <div class="page">
+        <div class="header">
+            <div>
+                <h1>Recent Incidents (Last 7 Days)</h1>
+            </div>
+            <div class="meta">
+                <p>CW${data.weekNumber} ${data.year}</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <table class="table">
+                <tr>
+                    <th>Date</th>
+                    <th>Type</th>
+                    <th>Site</th>
+                    <th>Description</th>
+                    <th>Severity</th>
+                </tr>
+                ${data.recentIncidents.slice(0, 15).map(inc => `
+                    <tr>
+                        <td>${new Date(inc.incident_date || inc.nearmiss_date || inc.parsedDate).toLocaleDateString()}</td>
+                        <td><span class="badge ${inc.type === 'Injury' ? 'critical' : 'warning'}">${inc.type}</span></td>
+                        <td>${inc.site || 'N/A'}</td>
+                        <td>${(inc.description || inc.initial_info_incident_description || inc.initial_info_nearmiss_type || 'No description').substring(0, 100)}...</td>
+                        <td>${inc.severity || 'N/A'}</td>
+                    </tr>
+                `).join('')}
+                ${data.recentIncidents.length === 0 ? '<tr><td colspan="5" style="text-align:center;color:#666;">No incidents in the last 7 days</td></tr>' : ''}
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>Location Hotspots</h2>
+            <table class="table">
+                <tr><th>Location/Process Path</th><th>Incident Count</th><th>Risk Level</th></tr>
+                ${data.topLocations.map(([loc, count], i) => `
+                    <tr>
+                        <td>${loc}</td>
+                        <td>${count}</td>
+                        <td><span class="badge ${i === 0 ? 'critical' : i < 3 ? 'warning' : 'good'}">${i === 0 ? 'High' : i < 3 ? 'Medium' : 'Low'}</span></td>
+                    </tr>
+                `).join('')}
+                ${data.topLocations.length === 0 ? '<tr><td colspan="3" style="text-align:center;color:#666;">No location data available</td></tr>' : ''}
+            </table>
+        </div>
+
+        <div class="footer">
+            <p>Safety Analytics Platform | Incident Detail Report</p>
+        </div>
+    </div>
+</body>
+</html>`;
+
+    // Create and download the file
+    const blob = new Blob([html], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Safety_WBR_Deck_CW${data.weekNumber}_${data.year}.html`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    showStatus('WBR Deck generated successfully! Open the HTML file and print to PDF for your slide deck.', 'success');
+}
+
+// Helper functions for Chaser
+function viewOwnerActions(owner) {
+    const actions = collectActionItems().filter(a => a.owner === owner && a.status !== 'completed');
+
+    const modal = document.getElementById('detailModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalBody = document.getElementById('modalBody');
+
+    if (modal && modalTitle && modalBody) {
+        modalTitle.textContent = `Action Items - ${owner}`;
+        modalBody.innerHTML = `
+            <div style="max-height: 400px; overflow-y: auto;">
+                ${actions.map(a => `
+                    <div style="padding: 15px; border-bottom: 1px solid #ddd; ${a.dueDate < new Date() ? 'background: #ffebee;' : ''}">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                            <span style="font-weight: 600;">${a.source} - ${a.id || 'Action'}</span>
+                            <span style="color: ${a.dueDate < new Date() ? '#B71C1C' : '#666'}; font-size: 0.85rem;">
+                                Due: ${a.dueDate.toLocaleDateString()}
+                            </span>
+                        </div>
+                        <p style="color: #666; font-size: 0.9rem;">${a.description || 'No description'}</p>
+                    </div>
+                `).join('')}
+                ${actions.length === 0 ? '<p style="text-align: center; color: #666; padding: 20px;">No pending actions for this owner</p>' : ''}
+            </div>
+        `;
+        modal.style.display = 'flex';
+    }
+}
+
+function sendReminder(owner) {
+    const actions = collectActionItems().filter(a => a.owner === owner && a.dueDate < new Date() && a.status !== 'completed');
+
+    // Generate mailto link
+    const subject = encodeURIComponent(`Action Item Reminder - ${actions.length} Overdue Safety Actions`);
+    const body = encodeURIComponent(`Hi ${owner},\n\nThis is a reminder that you have ${actions.length} overdue safety action item(s):\n\n${actions.map(a => `- ${a.source}: ${a.description?.substring(0, 100) || 'Review required'} (Due: ${a.dueDate.toLocaleDateString()})`).join('\n')}\n\nPlease complete these items as soon as possible.\n\nThank you,\nSafety Team`);
+
+    window.open(`mailto:?subject=${subject}&body=${body}`, '_blank');
+    showStatus(`Reminder email prepared for ${owner}`, 'success');
+}
+
+function sendReminderEmails() {
+    const actions = collectActionItems().filter(a => a.dueDate < new Date() && a.status !== 'completed');
+    const owners = [...new Set(actions.map(a => a.owner))];
+
+    if (owners.length === 0) {
+        showStatus('No overdue actions to send reminders for', 'info');
+        return;
+    }
+
+    showStatus(`Preparing reminders for ${owners.length} owner(s) with overdue actions...`, 'info');
+
+    // Open mailto for first owner
+    if (owners[0] && owners[0] !== 'Unassigned') {
+        sendReminder(owners[0]);
+    }
+}
+
+function exportChaserReport() {
+    const actions = collectActionItems();
+    const today = new Date();
+
+    let csv = 'Owner,Description,Source,Due Date,Status,Days Overdue\n';
+    actions.filter(a => a.status !== 'completed').forEach(a => {
+        const daysOverdue = a.dueDate < today ? Math.floor((today - a.dueDate) / (1000 * 60 * 60 * 24)) : 0;
+        csv += `"${a.owner}","${(a.description || '').replace(/"/g, '""')}","${a.source}","${a.dueDate.toLocaleDateString()}","${a.status}","${daysOverdue}"\n`;
+    });
+
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Action_Items_${today.toISOString().split('T')[0]}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    showStatus('Action items exported to CSV', 'success');
+}
+
+// Hook into module switching to refresh WBR data
+const originalSwitchModule = typeof switchModule === 'function' ? switchModule : null;
+
+// Will be hooked after page load
+
 window.loadSampleData = loadSampleData;
 window.exportToExcel = exportToExcel;
 window.generatePDFReport = generatePDFReport;
@@ -14796,6 +17580,14 @@ window.changePage = changePage;
 window.changeTimelinePage = changeTimelinePage;
 window.closeModal = closeModal;
 window.exportDashboard = exportDashboard;
+// WBR Dashboard exports
+window.refreshWBRData = refreshWBRData;
+window.generateOneClickWBRDeck = generateOneClickWBRDeck;
+window.updateStationHeatMap = updateStationHeatMap;
+window.viewOwnerActions = viewOwnerActions;
+window.sendReminder = sendReminder;
+window.sendReminderEmails = sendReminderEmails;
+window.exportChaserReport = exportChaserReport;
 window.exportInjuryData = exportInjuryData;
 window.exportNearMissData = exportNearMissData;
 window.exportTable = exportTable;
