@@ -720,6 +720,44 @@
             flex-wrap: wrap;
         }
 
+        /* Quick Date Presets */
+        .date-presets-group {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-xs);
+        }
+
+        .date-presets {
+            display: flex;
+            gap: 0.375rem;
+            flex-wrap: wrap;
+        }
+
+        .date-preset-btn {
+            padding: 0.375rem 0.625rem;
+            font-size: 0.7rem;
+            font-weight: 600;
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-sm);
+            background: var(--bg-elevated);
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: var(--transition);
+            white-space: nowrap;
+        }
+
+        .date-preset-btn:hover {
+            border-color: var(--amazon-orange);
+            background: rgba(255, 153, 0, 0.1);
+            color: var(--amazon-orange);
+        }
+
+        .date-preset-btn.active {
+            background: var(--amazon-orange);
+            border-color: var(--amazon-orange);
+            color: white;
+        }
+
         /* Modern Charts Container */
         .charts-grid {
             display: grid;
@@ -2271,13 +2309,23 @@
                         <option value="D">D - Low</option>
                     </select>
                 </div>
+                <div class="date-presets-group">
+                    <label class="filter-label">Date Range</label>
+                    <div class="date-presets">
+                        <button class="date-preset-btn" onclick="applyDatePreset('overview', 'week')">Last Week</button>
+                        <button class="date-preset-btn" onclick="applyDatePreset('overview', 'month')">Last Month</button>
+                        <button class="date-preset-btn" onclick="applyDatePreset('overview', 'quarter')">Last Quarter</button>
+                        <button class="date-preset-btn" onclick="applyDatePreset('overview', 'year')">Last Year</button>
+                        <button class="date-preset-btn" onclick="applyDatePreset('overview', 'all')">All Time</button>
+                    </div>
+                </div>
                 <div class="filter-group">
                     <label class="filter-label">Date From</label>
-                    <input type="date" class="filter-input" id="overviewDateFrom" onchange="applyOverviewFilters()">
+                    <input type="date" class="filter-input" id="overviewDateFrom" onchange="clearDatePresetButtons('overview'); applyOverviewFilters()">
                 </div>
                 <div class="filter-group">
                     <label class="filter-label">Date To</label>
-                    <input type="date" class="filter-input" id="overviewDateTo" onchange="applyOverviewFilters()">
+                    <input type="date" class="filter-input" id="overviewDateTo" onchange="clearDatePresetButtons('overview'); applyOverviewFilters()">
                 </div>
                 <!-- Additional unified filters to mirror both modules -->
                 <div class="filter-group">
@@ -2461,13 +2509,23 @@
                                 <option value="">All Causes</option>
                             </select>
                         </div>
+                        <div class="date-presets-group">
+                            <label class="filter-label">Date Range</label>
+                            <div class="date-presets">
+                                <button class="date-preset-btn" onclick="applyDatePreset('injury', 'week')">Last Week</button>
+                                <button class="date-preset-btn" onclick="applyDatePreset('injury', 'month')">Last Month</button>
+                                <button class="date-preset-btn" onclick="applyDatePreset('injury', 'quarter')">Last Quarter</button>
+                                <button class="date-preset-btn" onclick="applyDatePreset('injury', 'year')">Last Year</button>
+                                <button class="date-preset-btn" onclick="applyDatePreset('injury', 'all')">All Time</button>
+                            </div>
+                        </div>
                         <div class="filter-group">
                             <label class="filter-label">Date From</label>
-                            <input type="date" class="filter-input" id="injuryDateFrom" onchange="applyFilters('injury')">
+                            <input type="date" class="filter-input" id="injuryDateFrom" onchange="clearDatePresetButtons('injury'); applyFilters('injury')">
                         </div>
                         <div class="filter-group">
                             <label class="filter-label">Date To</label>
-                            <input type="date" class="filter-input" id="injuryDateTo" onchange="applyFilters('injury')">
+                            <input type="date" class="filter-input" id="injuryDateTo" onchange="clearDatePresetButtons('injury'); applyFilters('injury')">
                         </div>
                     </div>
                 </div>
@@ -2813,13 +2871,23 @@
                                 <option value="Almost Certain">Almost Certain</option>
                             </select>
                         </div>
+                        <div class="date-presets-group">
+                            <label class="filter-label">Date Range</label>
+                            <div class="date-presets">
+                                <button class="date-preset-btn" onclick="applyDatePreset('nearmiss', 'week')">Last Week</button>
+                                <button class="date-preset-btn" onclick="applyDatePreset('nearmiss', 'month')">Last Month</button>
+                                <button class="date-preset-btn" onclick="applyDatePreset('nearmiss', 'quarter')">Last Quarter</button>
+                                <button class="date-preset-btn" onclick="applyDatePreset('nearmiss', 'year')">Last Year</button>
+                                <button class="date-preset-btn" onclick="applyDatePreset('nearmiss', 'all')">All Time</button>
+                            </div>
+                        </div>
                         <div class="filter-group">
                             <label class="filter-label">Date From</label>
-                            <input type="date" class="filter-input" id="nearMissDateFrom" onchange="applyFilters('nearmiss')">
+                            <input type="date" class="filter-input" id="nearMissDateFrom" onchange="clearDatePresetButtons('nearmiss'); applyFilters('nearmiss')">
                         </div>
                         <div class="filter-group">
                             <label class="filter-label">Date To</label>
-                            <input type="date" class="filter-input" id="nearMissDateTo" onchange="applyFilters('nearmiss')">
+                            <input type="date" class="filter-input" id="nearMissDateTo" onchange="clearDatePresetButtons('nearmiss'); applyFilters('nearmiss')">
                         </div>
                     </div>
                 </div>
@@ -3119,13 +3187,23 @@
                             <option value="D">D - Low</option>
                         </select>
                     </div>
+                    <div class="date-presets-group">
+                        <label class="filter-label">Date Range</label>
+                        <div class="date-presets">
+                            <button class="date-preset-btn" onclick="applyDatePreset('combined', 'week')">Last Week</button>
+                            <button class="date-preset-btn" onclick="applyDatePreset('combined', 'month')">Last Month</button>
+                            <button class="date-preset-btn" onclick="applyDatePreset('combined', 'quarter')">Last Quarter</button>
+                            <button class="date-preset-btn" onclick="applyDatePreset('combined', 'year')">Last Year</button>
+                            <button class="date-preset-btn" onclick="applyDatePreset('combined', 'all')">All Time</button>
+                        </div>
+                    </div>
                     <div class="filter-group">
                         <label class="filter-label">Date From</label>
-                        <input type="date" class="filter-input" id="combinedDateFrom" onchange="applyCombinedFilters()">
+                        <input type="date" class="filter-input" id="combinedDateFrom" onchange="clearDatePresetButtons('combined'); applyCombinedFilters()">
                     </div>
                     <div class="filter-group">
                         <label class="filter-label">Date To</label>
-                        <input type="date" class="filter-input" id="combinedDateTo" onchange="applyCombinedFilters()">
+                        <input type="date" class="filter-input" id="combinedDateTo" onchange="clearDatePresetButtons('combined'); applyCombinedFilters()">
                     </div>
                     <div class="filter-group">
                         <label class="filter-label">Body Part</label>
@@ -7348,7 +7426,18 @@ function calculateQualityMetrics(type) {
             minWords: Infinity,
             maxWords: 0,
             distribution: {}
-        }
+        },
+        // Enhanced metrics for near miss quality
+        creatorQuality: [],
+        severityBreakdown: {},
+        weeklyTrend: [],
+        commonKeywords: [],
+        closureAnalysis: {
+            closed: 0,
+            open: 0,
+            avgDaysToClose: 0
+        },
+        riskDistribution: {}
     };
 
     // Check for duplicates
@@ -7446,12 +7535,166 @@ function calculateQualityMetrics(type) {
             metrics.wordAnalysis.distribution[range] = (metrics.wordAnalysis.distribution[range] || 0) + 1;
         });
 
-        metrics.wordAnalysis.averageWords = data.length > 0 ? 
+        metrics.wordAnalysis.averageWords = data.length > 0 ?
             Math.round(metrics.wordAnalysis.totalWords / data.length) : 0;
 
         if (metrics.wordAnalysis.minWords === Infinity) {
             metrics.wordAnalysis.minWords = 0;
         }
+
+        // Enhanced: Creator quality analysis
+        const creatorStats = {};
+        data.forEach(row => {
+            const creator = row.created_by || row.creator || row.reportedBy || row.initial_info_reporter || 'Unknown';
+            if (!creatorStats[creator]) {
+                creatorStats[creator] = { count: 0, totalWords: 0, highSeverity: 0 };
+            }
+            creatorStats[creator].count++;
+
+            // Count words for this creator
+            const textFields = [row.initial_info_incident_description, row.initial_info_nearmiss_type, row.rca_comments];
+            let wordCount = 0;
+            textFields.forEach(field => {
+                if (field && typeof field === 'string') {
+                    wordCount += field.trim().split(/\s+/).filter(w => w.length > 0).length;
+                }
+            });
+            creatorStats[creator].totalWords += wordCount;
+
+            // Track high severity reports (A or B)
+            if (row.severity === 'A' || row.severity === 'B') {
+                creatorStats[creator].highSeverity++;
+            }
+        });
+
+        metrics.creatorQuality = Object.entries(creatorStats)
+            .map(([creator, stats]) => ({
+                creator,
+                count: stats.count,
+                avgWords: Math.round(stats.totalWords / stats.count),
+                highSeverityRate: Math.round((stats.highSeverity / stats.count) * 100)
+            }))
+            .filter(c => c.count >= 3) // Only include creators with 3+ reports
+            .sort((a, b) => b.avgWords - a.avgWords)
+            .slice(0, 5);
+
+        // Enhanced: Severity breakdown with quality metrics
+        const severityStats = { 'A': { count: 0, avgWords: 0, totalWords: 0 }, 'B': { count: 0, avgWords: 0, totalWords: 0 },
+                               'C': { count: 0, avgWords: 0, totalWords: 0 }, 'D': { count: 0, avgWords: 0, totalWords: 0 } };
+        data.forEach(row => {
+            const sev = row.severity || 'D';
+            if (severityStats[sev]) {
+                severityStats[sev].count++;
+                const textFields = [row.initial_info_incident_description, row.initial_info_nearmiss_type];
+                let wordCount = 0;
+                textFields.forEach(field => {
+                    if (field && typeof field === 'string') {
+                        wordCount += field.trim().split(/\s+/).filter(w => w.length > 0).length;
+                    }
+                });
+                severityStats[sev].totalWords += wordCount;
+            }
+        });
+        Object.keys(severityStats).forEach(sev => {
+            if (severityStats[sev].count > 0) {
+                severityStats[sev].avgWords = Math.round(severityStats[sev].totalWords / severityStats[sev].count);
+            }
+        });
+        metrics.severityBreakdown = severityStats;
+
+        // Enhanced: Weekly quality trend (last 8 weeks)
+        const weeklyData = {};
+        const now = new Date();
+        data.forEach(row => {
+            const date = new Date(row.nearmiss_date);
+            if (isNaN(date.getTime())) return;
+
+            const weekStart = new Date(date);
+            weekStart.setDate(date.getDate() - date.getDay());
+            const weekKey = weekStart.toISOString().split('T')[0];
+
+            if (!weeklyData[weekKey]) {
+                weeklyData[weekKey] = { count: 0, totalWords: 0 };
+            }
+            weeklyData[weekKey].count++;
+
+            const desc = row.initial_info_incident_description || '';
+            weeklyData[weekKey].totalWords += desc.trim().split(/\s+/).filter(w => w.length > 0).length;
+        });
+
+        metrics.weeklyTrend = Object.entries(weeklyData)
+            .sort((a, b) => new Date(b[0]) - new Date(a[0]))
+            .slice(0, 8)
+            .map(([week, stats]) => ({
+                week,
+                count: stats.count,
+                avgWords: stats.count > 0 ? Math.round(stats.totalWords / stats.count) : 0
+            }))
+            .reverse();
+
+        // Enhanced: Extract common keywords (excluding stop words)
+        const stopWords = new Set(['the', 'a', 'an', 'is', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had',
+                                   'do', 'does', 'did', 'will', 'would', 'could', 'should', 'may', 'might', 'must',
+                                   'and', 'but', 'or', 'if', 'then', 'else', 'when', 'where', 'why', 'how', 'all',
+                                   'each', 'every', 'both', 'few', 'more', 'most', 'other', 'some', 'such', 'no',
+                                   'not', 'only', 'same', 'so', 'than', 'too', 'very', 'just', 'can', 'also', 'now',
+                                   'of', 'to', 'in', 'on', 'at', 'by', 'for', 'with', 'about', 'against', 'between',
+                                   'into', 'through', 'during', 'before', 'after', 'above', 'below', 'from', 'up',
+                                   'down', 'out', 'off', 'over', 'under', 'again', 'further', 'once', 'here', 'there',
+                                   'that', 'this', 'these', 'those', 'am', 'are', 'it', 'its', 'he', 'she', 'they',
+                                   'them', 'his', 'her', 'their', 'my', 'your', 'our', 'we', 'you', 'me', 'him', 'who',
+                                   'which', 'what', 'while', 'as', 'until', 'because', 'although', 'though', 'since']);
+        const wordFreq = {};
+        data.forEach(row => {
+            const desc = (row.initial_info_incident_description || '').toLowerCase();
+            const words = desc.split(/\s+/).filter(w => w.length > 3 && !stopWords.has(w));
+            words.forEach(word => {
+                const cleanWord = word.replace(/[^a-z]/g, '');
+                if (cleanWord.length > 3) {
+                    wordFreq[cleanWord] = (wordFreq[cleanWord] || 0) + 1;
+                }
+            });
+        });
+        metrics.commonKeywords = Object.entries(wordFreq)
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 15)
+            .map(([word, count]) => ({ word, count }));
+
+        // Enhanced: Closure analysis
+        let totalDaysToClose = 0;
+        let closedCount = 0;
+        data.forEach(row => {
+            const status = (row.status || row.investigation_status || '').toLowerCase();
+            if (status.includes('closed') || status.includes('complete')) {
+                metrics.closureAnalysis.closed++;
+                // Try to calculate days to close if we have dates
+                const openDate = new Date(row.nearmiss_date);
+                const closeDate = row.closed_date ? new Date(row.closed_date) : null;
+                if (closeDate && !isNaN(closeDate.getTime()) && !isNaN(openDate.getTime())) {
+                    totalDaysToClose += Math.max(0, (closeDate - openDate) / (1000 * 60 * 60 * 24));
+                    closedCount++;
+                }
+            } else {
+                metrics.closureAnalysis.open++;
+            }
+        });
+        metrics.closureAnalysis.avgDaysToClose = closedCount > 0 ? Math.round(totalDaysToClose / closedCount) : 0;
+
+        // Enhanced: Risk distribution
+        const riskCounts = { 'High': 0, 'Medium': 0, 'Low': 0, 'Unknown': 0 };
+        data.forEach(row => {
+            const risk = row.risk || row.riskLevel || 'Unknown';
+            if (risk.toLowerCase().includes('high') || risk >= 15) {
+                riskCounts['High']++;
+            } else if (risk.toLowerCase().includes('medium') || (risk >= 8 && risk < 15)) {
+                riskCounts['Medium']++;
+            } else if (risk.toLowerCase().includes('low') || (risk > 0 && risk < 8)) {
+                riskCounts['Low']++;
+            } else {
+                riskCounts['Unknown']++;
+            }
+        });
+        metrics.riskDistribution = riskCounts;
     }
 
     // Check critical fields
@@ -7734,10 +7977,117 @@ function updateQualityDisplay(type, metrics) {
                 </div>
             </div>
             
-            <!-- Word Heat Map -->
+            <!-- Enhanced: Creator Quality Leaderboard -->
+            ${metrics.creatorQuality && metrics.creatorQuality.length > 0 ? `
             <div class="quality-section">
-                <h4><span class="section-icon">🔥</span> Most Common Words</h4>
-                <div id="nearMissWordHeatMap" class="word-heatmap-enhanced"></div>
+                <h4><span class="section-icon">🏆</span> Reporter Quality Leaderboard</h4>
+                <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1rem;">Top reporters by average description length (min 3 reports)</p>
+                <div class="creator-leaderboard">
+                    ${metrics.creatorQuality.map((creator, index) => `
+                        <div class="leaderboard-item ${index === 0 ? 'top-performer' : ''}">
+                            <div class="leaderboard-rank">${index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : index + 1}</div>
+                            <div class="leaderboard-name">${creator.creator}</div>
+                            <div class="leaderboard-stats">
+                                <span class="stat-badge">${creator.avgWords} avg words</span>
+                                <span class="stat-badge secondary">${creator.count} reports</span>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+            ` : ''}
+
+            <!-- Enhanced: Severity vs Quality Analysis -->
+            <div class="quality-section">
+                <h4><span class="section-icon">📈</span> Quality by Severity</h4>
+                <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1rem;">Average description length per severity level</p>
+                <div class="severity-quality-grid">
+                    ${Object.entries(metrics.severityBreakdown).map(([sev, stats]) => {
+                        const qualityLevel = stats.avgWords >= 15 ? 'excellent' : stats.avgWords >= 10 ? 'good' : stats.avgWords >= 5 ? 'warning' : 'poor';
+                        const sevLabel = sev === 'A' ? 'Critical' : sev === 'B' ? 'High' : sev === 'C' ? 'Medium' : 'Low';
+                        return stats.count > 0 ? `
+                            <div class="severity-quality-card sev-${sev.toLowerCase()}">
+                                <div class="sev-header">
+                                    <span class="sev-badge">${sev}</span>
+                                    <span class="sev-label">${sevLabel}</span>
+                                </div>
+                                <div class="sev-stats">
+                                    <div class="sev-count">${stats.count} reports</div>
+                                    <div class="sev-words ${qualityLevel}">${stats.avgWords} avg words</div>
+                                </div>
+                            </div>
+                        ` : '';
+                    }).join('')}
+                </div>
+            </div>
+
+            <!-- Enhanced: Weekly Quality Trend -->
+            ${metrics.weeklyTrend && metrics.weeklyTrend.length > 0 ? `
+            <div class="quality-section">
+                <h4><span class="section-icon">📅</span> Weekly Quality Trend</h4>
+                <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1rem;">Report count and average quality over recent weeks</p>
+                <div class="weekly-trend-container">
+                    ${metrics.weeklyTrend.map((week, index) => {
+                        const maxCount = Math.max(...metrics.weeklyTrend.map(w => w.count));
+                        const barHeight = maxCount > 0 ? Math.max(10, (week.count / maxCount) * 100) : 10;
+                        const qualityColor = week.avgWords >= 15 ? '#4CAF50' : week.avgWords >= 10 ? '#FFC107' : week.avgWords >= 5 ? '#FF9800' : '#FF5722';
+                        const weekDate = new Date(week.week);
+                        const weekLabel = weekDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                        return `
+                            <div class="trend-bar-container">
+                                <div class="trend-bar" style="height: ${barHeight}%; background: ${qualityColor};" title="${week.count} reports, ${week.avgWords} avg words">
+                                    <span class="trend-count">${week.count}</span>
+                                </div>
+                                <div class="trend-label">${weekLabel}</div>
+                                <div class="trend-quality" style="color: ${qualityColor}">${week.avgWords}w</div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            </div>
+            ` : ''}
+
+            <!-- Enhanced: Closure Status -->
+            <div class="quality-section">
+                <h4><span class="section-icon">✅</span> Closure Status</h4>
+                <div class="closure-stats-grid">
+                    <div class="closure-stat">
+                        <div class="closure-value success">${metrics.closureAnalysis.closed}</div>
+                        <div class="closure-label">Closed</div>
+                    </div>
+                    <div class="closure-stat">
+                        <div class="closure-value warning">${metrics.closureAnalysis.open}</div>
+                        <div class="closure-label">Open</div>
+                    </div>
+                    <div class="closure-stat">
+                        <div class="closure-value">${metrics.totalRecords > 0 ? Math.round((metrics.closureAnalysis.closed / metrics.totalRecords) * 100) : 0}%</div>
+                        <div class="closure-label">Closure Rate</div>
+                    </div>
+                    ${metrics.closureAnalysis.avgDaysToClose > 0 ? `
+                    <div class="closure-stat">
+                        <div class="closure-value info">${metrics.closureAnalysis.avgDaysToClose}</div>
+                        <div class="closure-label">Avg Days to Close</div>
+                    </div>
+                    ` : ''}
+                </div>
+            </div>
+
+            <!-- Word Heat Map with enhanced keywords -->
+            <div class="quality-section">
+                <h4><span class="section-icon">🔥</span> Common Keywords</h4>
+                <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1rem;">Most frequently used terms in near miss descriptions</p>
+                <div class="word-heatmap-enhanced">
+                    ${metrics.commonKeywords && metrics.commonKeywords.length > 0 ?
+                        metrics.commonKeywords.map((kw, index) => {
+                            const maxCount = metrics.commonKeywords[0].count;
+                            const intensity = Math.max(0.3, kw.count / maxCount);
+                            const fontSize = 0.75 + (intensity * 0.5);
+                            const hue = 35; // Orange hue
+                            return `<span class="heatmap-item" style="background: hsla(${hue}, 100%, 50%, ${intensity}); font-size: ${fontSize}rem;" title="${kw.count} occurrences">${kw.word}</span>`;
+                        }).join('') :
+                        '<p style="color: var(--text-secondary);">No keywords extracted yet.</p>'
+                    }
+                </div>
             </div>
             ` : `
             <!-- Missing Fields Chart -->
@@ -8177,6 +8527,227 @@ function updateQualityDisplay(type, metrics) {
                 font-weight: 600;
                 text-transform: uppercase;
             }
+
+            /* Enhanced Quality Sections - Creator Leaderboard */
+            .creator-leaderboard {
+                display: grid;
+                gap: 0.5rem;
+            }
+
+            .leaderboard-item {
+                display: flex;
+                align-items: center;
+                gap: 1rem;
+                padding: 0.75rem 1rem;
+                background: var(--bg-secondary);
+                border-radius: 8px;
+                transition: all 0.2s ease;
+            }
+
+            .leaderboard-item:hover {
+                background: var(--bg-elevated);
+            }
+
+            .leaderboard-item.top-performer {
+                background: linear-gradient(135deg, rgba(255, 193, 7, 0.15) 0%, rgba(255, 153, 0, 0.1) 100%);
+                border: 1px solid rgba(255, 193, 7, 0.3);
+            }
+
+            .leaderboard-rank {
+                font-size: 1.25rem;
+                min-width: 2rem;
+                text-align: center;
+            }
+
+            .leaderboard-name {
+                flex: 1;
+                font-weight: 500;
+                color: var(--text-primary);
+            }
+
+            .leaderboard-stats {
+                display: flex;
+                gap: 0.5rem;
+            }
+
+            .stat-badge {
+                padding: 0.25rem 0.75rem;
+                background: var(--amazon-orange);
+                color: white;
+                border-radius: 20px;
+                font-size: 0.75rem;
+                font-weight: 600;
+            }
+
+            .stat-badge.secondary {
+                background: var(--bg-tertiary);
+                color: var(--text-secondary);
+            }
+
+            /* Severity Quality Grid */
+            .severity-quality-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+                gap: 1rem;
+            }
+
+            .severity-quality-card {
+                padding: 1rem;
+                background: var(--bg-secondary);
+                border-radius: 12px;
+                text-align: center;
+                border-left: 4px solid transparent;
+            }
+
+            .severity-quality-card.sev-a { border-left-color: #B71C1C; }
+            .severity-quality-card.sev-b { border-left-color: #E65100; }
+            .severity-quality-card.sev-c { border-left-color: #F9A825; }
+            .severity-quality-card.sev-d { border-left-color: #2E7D32; }
+
+            .sev-header {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 0.5rem;
+                margin-bottom: 0.75rem;
+            }
+
+            .sev-badge {
+                width: 28px;
+                height: 28px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: 700;
+                font-size: 0.9rem;
+                color: white;
+            }
+
+            .sev-a .sev-badge { background: #B71C1C; }
+            .sev-b .sev-badge { background: #E65100; }
+            .sev-c .sev-badge { background: #F9A825; color: #333; }
+            .sev-d .sev-badge { background: #2E7D32; }
+
+            .sev-label {
+                font-size: 0.85rem;
+                color: var(--text-secondary);
+            }
+
+            .sev-count {
+                font-size: 0.8rem;
+                color: var(--text-secondary);
+                margin-bottom: 0.25rem;
+            }
+
+            .sev-words {
+                font-size: 1.1rem;
+                font-weight: 700;
+            }
+
+            .sev-words.excellent { color: #4CAF50; }
+            .sev-words.good { color: #FFC107; }
+            .sev-words.warning { color: #FF9800; }
+            .sev-words.poor { color: #FF5722; }
+
+            /* Weekly Trend */
+            .weekly-trend-container {
+                display: flex;
+                align-items: flex-end;
+                justify-content: space-between;
+                height: 150px;
+                padding: 1rem 0;
+                gap: 0.5rem;
+            }
+
+            .trend-bar-container {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                height: 100%;
+                max-width: 80px;
+            }
+
+            .trend-bar {
+                width: 100%;
+                max-width: 40px;
+                border-radius: 4px 4px 0 0;
+                display: flex;
+                align-items: flex-start;
+                justify-content: center;
+                min-height: 10px;
+                transition: height 0.5s ease;
+                flex-shrink: 0;
+                margin-top: auto;
+            }
+
+            .trend-count {
+                color: white;
+                font-size: 0.7rem;
+                font-weight: 700;
+                padding-top: 4px;
+            }
+
+            .trend-label {
+                font-size: 0.7rem;
+                color: var(--text-secondary);
+                margin-top: 0.5rem;
+                text-align: center;
+            }
+
+            .trend-quality {
+                font-size: 0.7rem;
+                font-weight: 600;
+            }
+
+            /* Closure Stats */
+            .closure-stats-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+                gap: 1rem;
+            }
+
+            .closure-stat {
+                text-align: center;
+                padding: 1rem;
+                background: var(--bg-secondary);
+                border-radius: 12px;
+            }
+
+            .closure-value {
+                font-size: 1.75rem;
+                font-weight: 700;
+                color: var(--text-primary);
+            }
+
+            .closure-value.success { color: #4CAF50; }
+            .closure-value.warning { color: #FF9800; }
+            .closure-value.info { color: #2196F3; }
+
+            .closure-label {
+                font-size: 0.8rem;
+                color: var(--text-secondary);
+                margin-top: 0.25rem;
+            }
+
+            /* Quality Section base */
+            .quality-section {
+                background: var(--bg-primary);
+                border-radius: 12px;
+                padding: 1.5rem;
+                margin-bottom: 1.5rem;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+                border: 1px solid var(--border-light);
+            }
+
+            .quality-section h4 {
+                margin: 0 0 0.5rem 0;
+                color: var(--text-primary);
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
         `;
         document.head.appendChild(style);
     }
@@ -8440,6 +9011,144 @@ function populateNearMissFilters() {
             option.textContent = process;
             processFilter.appendChild(option);
         });
+    }
+}
+
+// Date Preset Functions
+function applyDatePreset(section, preset) {
+    const today = new Date();
+    let dateFrom, dateTo;
+
+    // Set dateTo to today's end
+    dateTo = new Date(today);
+    dateTo.setHours(23, 59, 59, 999);
+
+    switch(preset) {
+        case 'week':
+            dateFrom = new Date(today);
+            dateFrom.setDate(today.getDate() - 7);
+            break;
+        case 'month':
+            dateFrom = new Date(today);
+            dateFrom.setMonth(today.getMonth() - 1);
+            break;
+        case 'quarter':
+            dateFrom = new Date(today);
+            dateFrom.setMonth(today.getMonth() - 3);
+            break;
+        case 'year':
+            dateFrom = new Date(today);
+            dateFrom.setFullYear(today.getFullYear() - 1);
+            break;
+        case 'all':
+            dateFrom = null;
+            dateTo = null;
+            break;
+    }
+
+    // Format dates for input fields
+    const formatDate = (date) => {
+        if (!date) return '';
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    };
+
+    // Get the date input element IDs based on section
+    let dateFromId, dateToId;
+    switch(section) {
+        case 'overview':
+            dateFromId = 'overviewDateFrom';
+            dateToId = 'overviewDateTo';
+            break;
+        case 'injury':
+            dateFromId = 'injuryDateFrom';
+            dateToId = 'injuryDateTo';
+            break;
+        case 'nearmiss':
+            dateFromId = 'nearMissDateFrom';
+            dateToId = 'nearMissDateTo';
+            break;
+        case 'combined':
+            dateFromId = 'combinedDateFrom';
+            dateToId = 'combinedDateTo';
+            break;
+    }
+
+    // Set the date values
+    const fromInput = document.getElementById(dateFromId);
+    const toInput = document.getElementById(dateToId);
+    if (fromInput) fromInput.value = formatDate(dateFrom);
+    if (toInput) toInput.value = formatDate(dateTo);
+
+    // Update active button state
+    updateDatePresetButtons(section, preset);
+
+    // Trigger the appropriate filter function
+    switch(section) {
+        case 'overview':
+            applyOverviewFilters();
+            break;
+        case 'injury':
+            applyFilters('injury');
+            break;
+        case 'nearmiss':
+            applyFilters('nearmiss');
+            break;
+        case 'combined':
+            applyCombinedFilters();
+            break;
+    }
+}
+
+function updateDatePresetButtons(section, activePreset) {
+    // Find the date presets container for this section
+    let container;
+    switch(section) {
+        case 'overview':
+            container = document.querySelector('#overview .date-presets');
+            break;
+        case 'injury':
+            container = document.querySelector('#injury .date-presets');
+            break;
+        case 'nearmiss':
+            container = document.querySelector('#nearmiss .date-presets');
+            break;
+        case 'combined':
+            container = document.querySelector('#combined .date-presets');
+            break;
+    }
+
+    if (container) {
+        const buttons = container.querySelectorAll('.date-preset-btn');
+        buttons.forEach(btn => {
+            const btnPreset = btn.getAttribute('onclick').match(/'(\w+)'\)$/)?.[1];
+            btn.classList.toggle('active', btnPreset === activePreset);
+        });
+    }
+}
+
+function clearDatePresetButtons(section) {
+    let container;
+    switch(section) {
+        case 'overview':
+            container = document.querySelector('#overview .date-presets');
+            break;
+        case 'injury':
+            container = document.querySelector('#injury .date-presets');
+            break;
+        case 'nearmiss':
+            container = document.querySelector('#nearmiss .date-presets');
+            break;
+        case 'combined':
+            container = document.querySelector('#combined .date-presets');
+            break;
+    }
+
+    if (container) {
+        const buttons = container.querySelectorAll('.date-preset-btn');
+        buttons.forEach(btn => btn.classList.remove('active'));
     }
 }
 
