@@ -1718,6 +1718,298 @@
             }
         }
 
+        /* ==================== UNIVERSAL DASHBOARD STYLES ==================== */
+
+        /* Universal Command Header - Used across all dashboards */
+        .dashboard-command-header {
+            background: linear-gradient(135deg, var(--amazon-blue) 0%, var(--amazon-blue-dark) 100%);
+            color: white;
+            border-radius: var(--border-radius);
+            padding: var(--spacing-lg) var(--spacing-xl);
+            margin-bottom: var(--spacing-lg);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: var(--spacing-md);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+
+        .dashboard-command-header.injury-theme {
+            background: linear-gradient(135deg, #1565C0 0%, #0D47A1 100%);
+        }
+
+        .dashboard-command-header.nearmiss-theme {
+            background: linear-gradient(135deg, #E65100 0%, #BF360C 100%);
+        }
+
+        .dashboard-command-header.overview-theme {
+            background: linear-gradient(135deg, #2E7D32 0%, #1B5E20 100%);
+        }
+
+        .dashboard-command-header.combined-theme {
+            background: linear-gradient(135deg, #6A1B9A 0%, #4A148C 100%);
+        }
+
+        .dashboard-command-header.inspections-theme {
+            background: linear-gradient(135deg, #00838F 0%, #006064 100%);
+        }
+
+        .dashboard-title-section h2 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        .dashboard-icon {
+            font-size: 1.8rem;
+        }
+
+        .dashboard-subtitle {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-top: var(--spacing-xs);
+        }
+
+        .dashboard-header-actions {
+            display: flex;
+            gap: var(--spacing-sm);
+            flex-wrap: wrap;
+        }
+
+        .dashboard-filter-section {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+        }
+
+        .dashboard-filter-section label {
+            font-size: 0.9rem;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .dashboard-select {
+            padding: 0.5rem 2rem 0.5rem 0.75rem;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            font-size: 0.9rem;
+            min-width: 150px;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='white' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center;
+        }
+
+        .dashboard-select:hover {
+            border-color: var(--amazon-orange);
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .dashboard-select option {
+            background: var(--amazon-blue);
+            color: white;
+        }
+
+        /* Universal Color Legend Bar */
+        .color-legend-bar {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 12px 20px;
+            margin-bottom: var(--spacing-lg);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        [data-theme="dark"] .color-legend-bar {
+            background: linear-gradient(135deg, #2d2d2d 0%, #1a1a1a 100%);
+            border-color: #404040;
+        }
+
+        .color-legend-bar .legend-title {
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: var(--amazon-blue);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        [data-theme="dark"] .color-legend-bar .legend-title {
+            color: var(--amazon-orange);
+        }
+
+        .color-legend-bar .legend-items-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            align-items: flex-start;
+        }
+
+        .color-legend-bar .legend-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .color-legend-bar .legend-group-title {
+            font-weight: 600;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .color-legend-bar .legend-item-inline {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.8rem;
+            color: var(--text-primary);
+        }
+
+        .color-legend-bar .color-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        .color-legend-bar .legend-divider {
+            width: 1px;
+            height: 60px;
+            background: #dee2e6;
+            align-self: center;
+        }
+
+        [data-theme="dark"] .color-legend-bar .legend-divider {
+            background: #404040;
+        }
+
+        @media (max-width: 1200px) {
+            .color-legend-bar .legend-items-row {
+                gap: 15px;
+            }
+            .color-legend-bar .legend-divider {
+                display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .color-legend-bar .legend-items-row {
+                flex-direction: column;
+                gap: 12px;
+            }
+            .color-legend-bar .legend-group {
+                flex-direction: row;
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+            .dashboard-command-header {
+                flex-direction: column;
+                text-align: center;
+            }
+            .dashboard-filter-section {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        /* Enhanced Control Panel */
+        .control-panel-enhanced {
+            background: var(--bg-primary);
+            border-radius: var(--border-radius);
+            padding: 0;
+            margin-bottom: var(--spacing-lg);
+            box-shadow: 0 2px 12px var(--shadow);
+            overflow: hidden;
+        }
+
+        .control-panel-body {
+            padding: var(--spacing-md);
+        }
+
+        /* Enhanced Metric Cards */
+        .metrics-grid-enhanced {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .metric-card-enhanced {
+            background: var(--bg-primary);
+            border-radius: 12px;
+            padding: var(--spacing-md);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 2px 12px var(--shadow);
+            transition: all 0.3s ease;
+            border-left: 4px solid var(--amazon-orange);
+        }
+
+        .metric-card-enhanced:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px var(--shadow-hover);
+        }
+
+        .metric-card-enhanced.injury {
+            border-left-color: #1565C0;
+        }
+
+        .metric-card-enhanced.nearmiss {
+            border-left-color: #E65100;
+        }
+
+        .metric-card-enhanced.success {
+            border-left-color: var(--success);
+        }
+
+        .metric-card-enhanced.warning {
+            border-left-color: var(--warning);
+        }
+
+        .metric-card-enhanced.danger {
+            border-left-color: var(--danger);
+        }
+
+        /* Enhanced Charts Grid */
+        .charts-grid-enhanced {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: var(--spacing-lg);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .chart-card-enhanced {
+            background: var(--bg-primary);
+            border-radius: 12px;
+            padding: var(--spacing-lg);
+            box-shadow: 0 2px 12px var(--shadow);
+            transition: all 0.3s ease;
+        }
+
+        .chart-card-enhanced:hover {
+            box-shadow: 0 4px 20px var(--shadow-hover);
+        }
+
+        .chart-card-enhanced .chart-header {
+            border-bottom: 2px solid var(--bg-secondary);
+            padding-bottom: var(--spacing-sm);
+            margin-bottom: var(--spacing-md);
+        }
+
         /* Noteworthy Near Misses Section */
         .wbr-noteworthy-card {
             background: linear-gradient(135deg, #fff8e1 0%, #fff3cd 100%);
@@ -2674,6 +2966,66 @@
 
         <!-- Overview Module -->
         <div id="overview" class="tab-content active">
+            <!-- Overview Command Header -->
+            <div class="dashboard-command-header overview-theme" id="overviewCommandHeader" style="display: none;">
+                <div class="dashboard-title-section">
+                    <h2><span class="dashboard-icon">📊</span> Safety Overview Dashboard</h2>
+                    <p class="dashboard-subtitle">Real-time safety metrics and performance indicators</p>
+                </div>
+                <div class="dashboard-filter-section">
+                    <label for="overviewTimePeriodFilter">Period:</label>
+                    <select id="overviewTimePeriodFilter" class="dashboard-select" onchange="applyOverviewTimePeriodFilter()">
+                        <option value="all">All Time</option>
+                        <option value="week">Last Week</option>
+                        <option value="month">Last Month</option>
+                        <option value="quarter">Last Quarter</option>
+                        <option value="ytd">Year to Date</option>
+                    </select>
+                </div>
+                <div class="dashboard-header-actions">
+                    <button class="btn btn-primary btn-lg wbr-export-btn" onclick="generateOverviewReport()">
+                        <span>📄</span> Generate Report
+                    </button>
+                    <button class="btn btn-secondary" onclick="loadSampleData()">
+                        <span>🧪</span> Load Sample Data
+                    </button>
+                </div>
+            </div>
+
+            <!-- Overview Color Legend -->
+            <div class="color-legend-bar" id="overviewColorLegend" style="display: none;">
+                <div class="legend-title">Dashboard Color Guide:</div>
+                <div class="legend-items-row">
+                    <div class="legend-group">
+                        <span class="legend-group-title">Severity Levels</span>
+                        <div class="legend-item-inline"><span class="color-dot" style="background: #B71C1C;"></span><span>A - Critical</span></div>
+                        <div class="legend-item-inline"><span class="color-dot" style="background: #FF9800;"></span><span>B - High</span></div>
+                        <div class="legend-item-inline"><span class="color-dot" style="background: #FFC107;"></span><span>C - Medium</span></div>
+                        <div class="legend-item-inline"><span class="color-dot" style="background: #4CAF50;"></span><span>D - Low</span></div>
+                    </div>
+                    <div class="legend-divider"></div>
+                    <div class="legend-group">
+                        <span class="legend-group-title">Incident Types</span>
+                        <div class="legend-item-inline"><span class="color-dot" style="background: #1565C0;"></span><span>Injury & Illness</span></div>
+                        <div class="legend-item-inline"><span class="color-dot" style="background: #E65100;"></span><span>Near Miss</span></div>
+                        <div class="legend-item-inline"><span class="color-dot" style="background: #7B1FA2;"></span><span>Property Damage</span></div>
+                    </div>
+                    <div class="legend-divider"></div>
+                    <div class="legend-group">
+                        <span class="legend-group-title">Trend Indicators</span>
+                        <div class="legend-item-inline"><span class="color-dot" style="background: #4CAF50;"></span><span>Improving</span></div>
+                        <div class="legend-item-inline"><span class="color-dot" style="background: #FFC107;"></span><span>Stable</span></div>
+                        <div class="legend-item-inline"><span class="color-dot" style="background: #B71C1C;"></span><span>Worsening</span></div>
+                    </div>
+                    <div class="legend-divider"></div>
+                    <div class="legend-group">
+                        <span class="legend-group-title">Recordable Status</span>
+                        <div class="legend-item-inline"><span class="color-dot" style="background: #B71C1C;"></span><span>Recordable</span></div>
+                        <div class="legend-item-inline"><span class="color-dot" style="background: #4CAF50;"></span><span>Non-Recordable</span></div>
+                    </div>
+                </div>
+            </div>
+
             <div class="welcome-screen" id="welcomeScreen">
                 <h2 class="welcome-title">Welcome to Safety Analytics</h2>
                 <p class="welcome-subtitle">Your comprehensive platform for workplace safety data analysis</p>
@@ -2820,6 +3172,74 @@
 
         <!-- Injury & Illness Module -->
         <div id="injury" class="tab-content">
+            <!-- Injury Command Header -->
+            <div class="dashboard-command-header injury-theme">
+                <div class="dashboard-title-section">
+                    <h2><span class="dashboard-icon">🏥</span> Injury & Illness Analysis</h2>
+                    <p class="dashboard-subtitle">Track, analyze, and prevent workplace injuries</p>
+                </div>
+                <div class="dashboard-filter-section">
+                    <label for="injuryTimePeriodFilter">Period:</label>
+                    <select id="injuryTimePeriodFilter" class="dashboard-select" onchange="applyInjuryTimePeriodFilter()">
+                        <option value="all">All Time</option>
+                        <option value="week">Last Week</option>
+                        <option value="month">Last Month</option>
+                        <option value="quarter">Last Quarter</option>
+                        <option value="ytd">Year to Date</option>
+                    </select>
+                </div>
+                <div class="dashboard-filter-section">
+                    <label for="injuryRecordableQuickFilter">Type:</label>
+                    <select id="injuryRecordableQuickFilter" class="dashboard-select" onchange="applyInjuryRecordableQuickFilter()">
+                        <option value="">All Cases</option>
+                        <option value="1">Recordable Only</option>
+                        <option value="0">Non-Recordable</option>
+                    </select>
+                </div>
+                <div class="dashboard-header-actions">
+                    <button class="btn btn-primary btn-lg wbr-export-btn" onclick="generateInjuryReport()">
+                        <span>📄</span> Generate Report
+                    </button>
+                    <button class="btn btn-secondary" onclick="exportInjuryData()">
+                        <span>📊</span> Export Excel
+                    </button>
+                </div>
+            </div>
+
+            <!-- Injury Color Legend -->
+            <div class="color-legend-bar">
+                <div class="legend-title">Injury Dashboard Color Guide:</div>
+                <div class="legend-items-row">
+                    <div class="legend-group">
+                        <span class="legend-group-title">Severity</span>
+                        <div class="legend-item-inline"><span class="color-dot" style="background: #B71C1C;"></span><span>A - Critical</span></div>
+                        <div class="legend-item-inline"><span class="color-dot" style="background: #FF9800;"></span><span>B - High</span></div>
+                        <div class="legend-item-inline"><span class="color-dot" style="background: #FFC107;"></span><span>C - Medium</span></div>
+                        <div class="legend-item-inline"><span class="color-dot" style="background: #4CAF50;"></span><span>D - Low</span></div>
+                    </div>
+                    <div class="legend-divider"></div>
+                    <div class="legend-group">
+                        <span class="legend-group-title">Recordable Status</span>
+                        <div class="legend-item-inline"><span class="color-dot" style="background: #B71C1C;"></span><span>Recordable</span></div>
+                        <div class="legend-item-inline"><span class="color-dot" style="background: #4CAF50;"></span><span>Non-Recordable</span></div>
+                        <div class="legend-item-inline"><span class="color-dot" style="background: #1565C0;"></span><span>Lost Time</span></div>
+                    </div>
+                    <div class="legend-divider"></div>
+                    <div class="legend-group">
+                        <span class="legend-group-title">Location Type</span>
+                        <div class="legend-item-inline"><span class="color-dot" style="background: #FF6F00;"></span><span>OTR (On The Road)</span></div>
+                        <div class="legend-item-inline"><span class="color-dot" style="background: #1565C0;"></span><span>Under The Roof</span></div>
+                    </div>
+                    <div class="legend-divider"></div>
+                    <div class="legend-group">
+                        <span class="legend-group-title">Body Regions</span>
+                        <div class="legend-item-inline"><span class="color-dot" style="background: #B71C1C;"></span><span>High Frequency</span></div>
+                        <div class="legend-item-inline"><span class="color-dot" style="background: #FFC107;"></span><span>Medium</span></div>
+                        <div class="legend-item-inline"><span class="color-dot" style="background: #4CAF50;"></span><span>Low Frequency</span></div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Sub Navigation -->
             <div class="sub-nav">
                 <div class="sub-nav-item active" onclick="switchInjuryView('dashboard')">Dashboard</div>
@@ -2831,29 +3251,18 @@
 
             <!-- Dashboard View -->
             <div id="injuryDashboard" class="injury-view">
-                <div class="control-panel">
-                    <div class="control-header">
-                        <h2 class="control-title">Injury & Illness Analysis</h2>
-                        <div class="quick-actions">
-                            <button class="btn btn-primary" onclick="generateInjuryReport()">
-                                <span>📄</span> Generate Report
-                            </button>
-                            <button class="btn btn-secondary" onclick="exportInjuryData()">
-                                <span>📊</span> Export Excel
-                            </button>
+                <div class="control-panel-enhanced">
+                    <div class="control-panel-body">
+                        <div class="upload-area" id="injuryUploadArea" ondrop="handleDrop(event, 'injury')" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)">
+                            <p style="margin-bottom: 0.5rem;">📁 Drag and drop your injury CSV file here</p>
+                            <label for="injuryFile" class="upload-label">Choose File</label>
+                            <input type="file" id="injuryFile" class="file-input" accept=".csv" onchange="handleFileUpload(event, 'injury')">
+                            <p style="margin-top: 0.5rem; font-size: 0.8rem; color: var(--text-secondary);">
+                                Supports CSV files with injury/illness data including Austin case study links
+                            </p>
                         </div>
-                    </div>
 
-                    <div class="upload-area" id="injuryUploadArea" ondrop="handleDrop(event, 'injury')" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)">
-                        <p style="margin-bottom: 0.5rem;">📁 Drag and drop your injury CSV file here</p>
-                        <label for="injuryFile" class="upload-label">Choose File</label>
-                        <input type="file" id="injuryFile" class="file-input" accept=".csv" onchange="handleFileUpload(event, 'injury')">
-                        <p style="margin-top: 0.5rem; font-size: 0.8rem; color: var(--text-secondary);">
-                            Supports CSV files with injury/illness data including Austin case study links
-                        </p>
-                    </div>
-
-                    <div class="filter-section">
+                        <div class="filter-section">
                         <div class="filter-group">
                             <label class="filter-label">Site</label>
                             <select class="filter-input" id="injurySiteFilter" onchange="applyFilters('injury')">
@@ -2906,6 +3315,7 @@
                             <label class="filter-label">Date To</label>
                             <input type="date" class="filter-input" id="injuryDateTo" onchange="applyFilters('injury')">
                         </div>
+                    </div>
                     </div>
                 </div>
 
@@ -3171,6 +3581,79 @@
 
         <!-- Near Miss Module -->
         <div id="nearmiss" class="tab-content">
+            <!-- Near Miss Command Header -->
+            <div class="dashboard-command-header nearmiss-theme">
+                <div class="dashboard-title-section">
+                    <h2><span class="dashboard-icon">⚠️</span> Near Miss Analysis</h2>
+                    <p class="dashboard-subtitle">Identify and prevent potential incidents before they happen</p>
+                </div>
+                <div class="dashboard-filter-section">
+                    <label for="nearMissTimePeriodFilter">Period:</label>
+                    <select id="nearMissTimePeriodFilter" class="dashboard-select" onchange="applyNearMissTimePeriodFilter()">
+                        <option value="all">All Time</option>
+                        <option value="week">Last Week</option>
+                        <option value="month">Last Month</option>
+                        <option value="quarter">Last Quarter</option>
+                        <option value="ytd">Year to Date</option>
+                    </select>
+                </div>
+                <div class="dashboard-filter-section">
+                    <label for="nearMissRiskQuickFilter">Risk Level:</label>
+                    <select id="nearMissRiskQuickFilter" class="dashboard-select" onchange="applyNearMissRiskQuickFilter()">
+                        <option value="">All Risk Levels</option>
+                        <option value="high">High Risk (15+)</option>
+                        <option value="medium">Medium Risk (8-14)</option>
+                        <option value="low">Low Risk (1-7)</option>
+                    </select>
+                </div>
+                <div class="dashboard-header-actions">
+                    <button class="btn btn-primary btn-lg wbr-export-btn" onclick="generateNearMissReport()">
+                        <span>📄</span> Generate Report
+                    </button>
+                    <button class="btn btn-secondary" onclick="exportNearMissData()">
+                        <span>📊</span> Export Excel
+                    </button>
+                </div>
+            </div>
+
+            <!-- Near Miss Color Legend -->
+            <div class="color-legend-bar">
+                <div class="legend-title">Near Miss Dashboard Color Guide:</div>
+                <div class="legend-items-row">
+                    <div class="legend-group">
+                        <span class="legend-group-title">Potential Severity</span>
+                        <div class="legend-item-inline"><span class="color-dot" style="background: #B71C1C;"></span><span>A - Critical</span></div>
+                        <div class="legend-item-inline"><span class="color-dot" style="background: #FF9800;"></span><span>B - High</span></div>
+                        <div class="legend-item-inline"><span class="color-dot" style="background: #FFC107;"></span><span>C - Medium</span></div>
+                        <div class="legend-item-inline"><span class="color-dot" style="background: #4CAF50;"></span><span>D - Low</span></div>
+                    </div>
+                    <div class="legend-divider"></div>
+                    <div class="legend-group">
+                        <span class="legend-group-title">Risk Score</span>
+                        <div class="legend-item-inline"><span class="color-dot" style="background: #B71C1C;"></span><span>20-25 (Critical)</span></div>
+                        <div class="legend-item-inline"><span class="color-dot" style="background: #FF9800;"></span><span>15-19 (High)</span></div>
+                        <div class="legend-item-inline"><span class="color-dot" style="background: #FFC107;"></span><span>8-14 (Medium)</span></div>
+                        <div class="legend-item-inline"><span class="color-dot" style="background: #4CAF50;"></span><span>1-7 (Low)</span></div>
+                    </div>
+                    <div class="legend-divider"></div>
+                    <div class="legend-group">
+                        <span class="legend-group-title">Likelihood</span>
+                        <div class="legend-item-inline"><span class="color-dot" style="background: #B71C1C;"></span><span>Almost Certain</span></div>
+                        <div class="legend-item-inline"><span class="color-dot" style="background: #FF9800;"></span><span>Likely</span></div>
+                        <div class="legend-item-inline"><span class="color-dot" style="background: #FFC107;"></span><span>Possible</span></div>
+                        <div class="legend-item-inline"><span class="color-dot" style="background: #8BC34A;"></span><span>Unlikely</span></div>
+                        <div class="legend-item-inline"><span class="color-dot" style="background: #4CAF50;"></span><span>Rare</span></div>
+                    </div>
+                    <div class="legend-divider"></div>
+                    <div class="legend-group">
+                        <span class="legend-group-title">Primary Impact</span>
+                        <div class="legend-item-inline"><span class="color-dot" style="background: #E65100;"></span><span>Personal Injury</span></div>
+                        <div class="legend-item-inline"><span class="color-dot" style="background: #7B1FA2;"></span><span>Property Damage</span></div>
+                        <div class="legend-item-inline"><span class="color-dot" style="background: #1565C0;"></span><span>Environmental</span></div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Sub Navigation -->
             <div class="sub-nav">
                 <div class="sub-nav-item active" onclick="switchNearMissView('dashboard')">Dashboard</div>
@@ -3182,29 +3665,18 @@
 
             <!-- Dashboard View -->
             <div id="nearMissDashboard" class="nearmiss-view">
-                <div class="control-panel">
-                    <div class="control-header">
-                        <h2 class="control-title">Near Miss Analysis</h2>
-                        <div class="quick-actions">
-                            <button class="btn btn-primary" onclick="generateNearMissReport()">
-                                <span>📄</span> Generate Report
-                            </button>
-                            <button class="btn btn-secondary" onclick="exportNearMissData()">
-                                <span>📊</span> Export Excel
-                            </button>
+                <div class="control-panel-enhanced">
+                    <div class="control-panel-body">
+                        <div class="upload-area" id="nearMissUploadArea" ondrop="handleDrop(event, 'nearmiss')" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)">
+                            <p style="margin-bottom: 0.5rem;">📁 Drag and drop your near miss CSV file here</p>
+                            <label for="nearMissFile" class="upload-label">Choose File</label>
+                            <input type="file" id="nearMissFile" class="file-input" accept=".csv" onchange="handleFileUpload(event, 'nearmiss')">
+                            <p style="margin-top: 0.5rem; font-size: 0.8rem; color: var(--text-secondary);">
+                                Supports CSV files with near miss tracking data
+                            </p>
                         </div>
-                    </div>
 
-                    <div class="upload-area" id="nearMissUploadArea" ondrop="handleDrop(event, 'nearmiss')" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)">
-                        <p style="margin-bottom: 0.5rem;">📁 Drag and drop your near miss CSV file here</p>
-                        <label for="nearMissFile" class="upload-label">Choose File</label>
-                        <input type="file" id="nearMissFile" class="file-input" accept=".csv" onchange="handleFileUpload(event, 'nearmiss')">
-                        <p style="margin-top: 0.5rem; font-size: 0.8rem; color: var(--text-secondary);">
-                            Supports CSV files with near miss tracking data
-                        </p>
-                    </div>
-
-                    <div class="filter-section">
+                        <div class="filter-section">
                         <div class="filter-group">
                             <label class="filter-label">Site</label>
                             <select class="filter-input" id="nearMissSiteFilter" onchange="applyFilters('nearmiss')">
@@ -3258,6 +3730,7 @@
                             <label class="filter-label">Date To</label>
                             <input type="date" class="filter-input" id="nearMissDateTo" onchange="applyFilters('nearmiss')">
                         </div>
+                    </div>
                     </div>
                 </div>
 
@@ -3522,15 +3995,59 @@
 
         <!-- Combined Analytics Module -->
         <div id="combined" class="tab-content">
-            <div class="control-panel">
-                <div class="control-header">
-                    <h2 class="control-title">Combined Safety Analytics</h2>
-                    <div>
-                        <button class="btn btn-primary" onclick="generateWBRReport()">
-                            <span>📄</span> Generate Combined Report
-                        </button>
+            <!-- Combined Analytics Command Header -->
+            <div class="dashboard-command-header combined-theme">
+                <div class="dashboard-title-section">
+                    <h2><span class="dashboard-icon">📈</span> Combined Safety Analytics</h2>
+                    <p class="dashboard-subtitle">Cross-reference injury and near miss data for comprehensive insights</p>
+                </div>
+                <div class="dashboard-filter-section">
+                    <label for="combinedTimePeriodFilter">Period:</label>
+                    <select id="combinedTimePeriodFilter" class="dashboard-select" onchange="applyCombinedTimePeriodFilter()">
+                        <option value="all">All Time</option>
+                        <option value="week">Last Week</option>
+                        <option value="month">Last Month</option>
+                        <option value="quarter">Last Quarter</option>
+                        <option value="ytd">Year to Date</option>
+                    </select>
+                </div>
+                <div class="dashboard-header-actions">
+                    <button class="btn btn-primary btn-lg wbr-export-btn" onclick="generateWBRReport()">
+                        <span>📄</span> Generate Combined Report
+                    </button>
+                </div>
+            </div>
+
+            <!-- Combined Color Legend -->
+            <div class="color-legend-bar">
+                <div class="legend-title">Combined Analytics Color Guide:</div>
+                <div class="legend-items-row">
+                    <div class="legend-group">
+                        <span class="legend-group-title">Data Sources</span>
+                        <div class="legend-item-inline"><span class="color-dot" style="background: #1565C0;"></span><span>Injury Data</span></div>
+                        <div class="legend-item-inline"><span class="color-dot" style="background: #E65100;"></span><span>Near Miss Data</span></div>
+                        <div class="legend-item-inline"><span class="color-dot" style="background: #6A1B9A;"></span><span>Combined Metrics</span></div>
+                    </div>
+                    <div class="legend-divider"></div>
+                    <div class="legend-group">
+                        <span class="legend-group-title">Severity</span>
+                        <div class="legend-item-inline"><span class="color-dot" style="background: #B71C1C;"></span><span>A - Critical</span></div>
+                        <div class="legend-item-inline"><span class="color-dot" style="background: #FF9800;"></span><span>B - High</span></div>
+                        <div class="legend-item-inline"><span class="color-dot" style="background: #FFC107;"></span><span>C - Medium</span></div>
+                        <div class="legend-item-inline"><span class="color-dot" style="background: #4CAF50;"></span><span>D - Low</span></div>
+                    </div>
+                    <div class="legend-divider"></div>
+                    <div class="legend-group">
+                        <span class="legend-group-title">Correlation</span>
+                        <div class="legend-item-inline"><span class="color-dot" style="background: #B71C1C;"></span><span>Strong Correlation</span></div>
+                        <div class="legend-item-inline"><span class="color-dot" style="background: #FFC107;"></span><span>Moderate</span></div>
+                        <div class="legend-item-inline"><span class="color-dot" style="background: #4CAF50;"></span><span>Weak/None</span></div>
                     </div>
                 </div>
+            </div>
+
+            <div class="control-panel-enhanced">
+                <div class="control-panel-body">
                 <!-- Unified filters for the combined analytics.  This mirrors the overview
                      and module-specific filters so users can slice data consistently across
                      all dashboards.  The filter ids are namespaced with "combined" to
@@ -3594,6 +4111,7 @@
                             <option value="">All Likelihoods</option>
                         </select>
                     </div>
+                </div>
                 </div>
             </div>
 
@@ -3675,17 +4193,61 @@
         </div>
 
         <div id="inspections" class="tab-content">
-            <div class="control-panel">
-                <div class="control-header">
-                    <h2 class="control-title">Austin Inspections Tracking</h2>
-                    <div>
-                        <input type="file" id="inspectionsUpload" class="file-input" accept=".csv" onchange="handleFileUpload(event, 'inspections')">
-                        <label for="inspectionsUpload" class="btn btn-primary">
-                            <span>📁</span>
-                            <span>Import Austin Inspections</span>
-                        </label>
+            <!-- Inspections Command Header -->
+            <div class="dashboard-command-header inspections-theme">
+                <div class="dashboard-title-section">
+                    <h2><span class="dashboard-icon">📋</span> Austin Inspections Tracking</h2>
+                    <p class="dashboard-subtitle">Monitor compliance and track inspection schedules</p>
+                </div>
+                <div class="dashboard-filter-section">
+                    <label for="inspectionsTimePeriodFilter">Period:</label>
+                    <select id="inspectionsTimePeriodFilter" class="dashboard-select" onchange="applyInspectionsTimePeriodFilter()">
+                        <option value="all">All Time</option>
+                        <option value="week">This Week</option>
+                        <option value="month">This Month</option>
+                        <option value="quarter">This Quarter</option>
+                    </select>
+                </div>
+                <div class="dashboard-header-actions">
+                    <input type="file" id="inspectionsUpload" class="file-input" accept=".csv" onchange="handleFileUpload(event, 'inspections')">
+                    <label for="inspectionsUpload" class="btn btn-primary btn-lg wbr-export-btn">
+                        <span>📁</span> Import Austin Inspections
+                    </label>
+                </div>
+            </div>
+
+            <!-- Inspections Color Legend -->
+            <div class="color-legend-bar">
+                <div class="legend-title">Inspections Dashboard Color Guide:</div>
+                <div class="legend-items-row">
+                    <div class="legend-group">
+                        <span class="legend-group-title">Status</span>
+                        <div class="legend-item-inline"><span class="color-dot" style="background: #B71C1C;"></span><span>Overdue</span></div>
+                        <div class="legend-item-inline"><span class="color-dot" style="background: #FFC107;"></span><span>Upcoming (7 days)</span></div>
+                        <div class="legend-item-inline"><span class="color-dot" style="background: #4CAF50;"></span><span>Completed</span></div>
+                        <div class="legend-item-inline"><span class="color-dot" style="background: #1565C0;"></span><span>Scheduled</span></div>
+                    </div>
+                    <div class="legend-divider"></div>
+                    <div class="legend-group">
+                        <span class="legend-group-title">Priority</span>
+                        <div class="legend-item-inline"><span class="color-dot" style="background: #B71C1C;"></span><span>Critical - Safety</span></div>
+                        <div class="legend-item-inline"><span class="color-dot" style="background: #FF9800;"></span><span>High - Regulatory</span></div>
+                        <div class="legend-item-inline"><span class="color-dot" style="background: #FFC107;"></span><span>Medium - Routine</span></div>
+                        <div class="legend-item-inline"><span class="color-dot" style="background: #4CAF50;"></span><span>Low - Optional</span></div>
+                    </div>
+                    <div class="legend-divider"></div>
+                    <div class="legend-group">
+                        <span class="legend-group-title">Compliance</span>
+                        <div class="legend-item-inline"><span class="color-dot" style="background: #4CAF50;"></span><span>90%+ (Excellent)</span></div>
+                        <div class="legend-item-inline"><span class="color-dot" style="background: #FFC107;"></span><span>70-89% (Good)</span></div>
+                        <div class="legend-item-inline"><span class="color-dot" style="background: #FF9800;"></span><span>50-69% (Needs Improvement)</span></div>
+                        <div class="legend-item-inline"><span class="color-dot" style="background: #B71C1C;"></span><span>&lt;50% (Critical)</span></div>
                     </div>
                 </div>
+            </div>
+
+            <div class="control-panel-enhanced">
+                <div class="control-panel-body">
                 <div class="kpi-grid">
                     <div class="kpi-card">
                         <div class="kpi-value" id="overdueInspections">0</div>
@@ -3724,6 +4286,7 @@
                     </select>
                     <input type="date" id="inspectionDateFrom" onchange="applyFilters('inspections')">
                     <input type="date" id="inspectionDateTo" onchange="applyFilters('inspections')">
+                </div>
                 </div>
             </div>
 
@@ -9373,6 +9936,377 @@ function applyFilters(type) {
     }
 }
 
+// Apply Injury Time Period Filter
+function applyInjuryTimePeriodFilter() {
+    const timePeriod = document.getElementById('injuryTimePeriodFilter')?.value || 'all';
+    const dateFromInput = document.getElementById('injuryDateFrom');
+    const dateToInput = document.getElementById('injuryDateTo');
+
+    if (!dateFromInput || !dateToInput) return;
+
+    const today = new Date();
+    today.setHours(23, 59, 59, 999);
+
+    let dateFrom = null;
+
+    switch(timePeriod) {
+        case 'week':
+            dateFrom = new Date(today);
+            dateFrom.setDate(today.getDate() - 7);
+            break;
+        case 'month':
+            dateFrom = new Date(today);
+            dateFrom.setMonth(today.getMonth() - 1);
+            break;
+        case 'quarter':
+            dateFrom = new Date(today);
+            dateFrom.setMonth(today.getMonth() - 3);
+            break;
+        case 'ytd':
+            dateFrom = new Date(today.getFullYear(), 0, 1);
+            break;
+        default:
+            dateFrom = null;
+    }
+
+    if (dateFrom) {
+        dateFrom.setHours(0, 0, 0, 0);
+        dateFromInput.value = dateFrom.toISOString().split('T')[0];
+        dateToInput.value = today.toISOString().split('T')[0];
+    } else {
+        dateFromInput.value = '';
+        dateToInput.value = '';
+    }
+
+    applyFilters('injury');
+
+    const periodLabels = {
+        'all': 'All Time',
+        'week': 'Last Week',
+        'month': 'Last Month',
+        'quarter': 'Last Quarter',
+        'ytd': 'Year to Date'
+    };
+    showStatus(`Injury data filtered by: ${periodLabels[timePeriod]}`, 'success');
+}
+
+// Apply Injury Recordable Quick Filter
+function applyInjuryRecordableQuickFilter() {
+    const quickFilter = document.getElementById('injuryRecordableQuickFilter')?.value || '';
+    const recordableSelect = document.getElementById('injuryRecordableFilter');
+
+    if (recordableSelect) {
+        recordableSelect.value = quickFilter;
+    }
+
+    applyFilters('injury');
+}
+
+// Apply Near Miss Time Period Filter
+function applyNearMissTimePeriodFilter() {
+    const timePeriod = document.getElementById('nearMissTimePeriodFilter')?.value || 'all';
+    const dateFromInput = document.getElementById('nearMissDateFrom');
+    const dateToInput = document.getElementById('nearMissDateTo');
+
+    if (!dateFromInput || !dateToInput) return;
+
+    const today = new Date();
+    today.setHours(23, 59, 59, 999);
+
+    let dateFrom = null;
+
+    switch(timePeriod) {
+        case 'week':
+            dateFrom = new Date(today);
+            dateFrom.setDate(today.getDate() - 7);
+            break;
+        case 'month':
+            dateFrom = new Date(today);
+            dateFrom.setMonth(today.getMonth() - 1);
+            break;
+        case 'quarter':
+            dateFrom = new Date(today);
+            dateFrom.setMonth(today.getMonth() - 3);
+            break;
+        case 'ytd':
+            dateFrom = new Date(today.getFullYear(), 0, 1);
+            break;
+        default:
+            dateFrom = null;
+    }
+
+    if (dateFrom) {
+        dateFrom.setHours(0, 0, 0, 0);
+        dateFromInput.value = dateFrom.toISOString().split('T')[0];
+        dateToInput.value = today.toISOString().split('T')[0];
+    } else {
+        dateFromInput.value = '';
+        dateToInput.value = '';
+    }
+
+    applyFilters('nearmiss');
+
+    const periodLabels = {
+        'all': 'All Time',
+        'week': 'Last Week',
+        'month': 'Last Month',
+        'quarter': 'Last Quarter',
+        'ytd': 'Year to Date'
+    };
+    showStatus(`Near Miss data filtered by: ${periodLabels[timePeriod]}`, 'success');
+}
+
+// Apply Near Miss Risk Quick Filter
+function applyNearMissRiskQuickFilter() {
+    const riskLevel = document.getElementById('nearMissRiskQuickFilter')?.value || '';
+
+    // Filter based on risk score ranges
+    if (!riskLevel) {
+        state.nearMiss.filteredData = [...state.nearMiss.rawData];
+    } else {
+        state.nearMiss.filteredData = state.nearMiss.rawData.filter(row => {
+            const riskScore = parseInt(row.riskScore) || 0;
+            switch(riskLevel) {
+                case 'high':
+                    return riskScore >= 15;
+                case 'medium':
+                    return riskScore >= 8 && riskScore < 15;
+                case 'low':
+                    return riskScore >= 1 && riskScore < 8;
+                default:
+                    return true;
+            }
+        });
+    }
+
+    // Re-apply other filters
+    const siteFilter = document.getElementById('nearMissSiteFilter')?.value || '';
+    const severityFilter = document.getElementById('nearMissSeverityFilter')?.value || '';
+
+    if (siteFilter || severityFilter) {
+        state.nearMiss.filteredData = state.nearMiss.filteredData.filter(row => {
+            if (siteFilter && row.site !== siteFilter) return false;
+            if (severityFilter && row.severity !== severityFilter) return false;
+            return true;
+        });
+    }
+
+    state.nearMiss.currentPage = 1;
+    updateNearMissDashboard();
+    updateNearMissTable();
+    updateNearMissCharts();
+    updateOverview();
+
+    const riskLabels = {
+        '': 'All Risk Levels',
+        'high': 'High Risk (15+)',
+        'medium': 'Medium Risk (8-14)',
+        'low': 'Low Risk (1-7)'
+    };
+    showStatus(`Near Miss filtered by: ${riskLabels[riskLevel]}`, 'success');
+}
+
+// Apply Overview Time Period Filter
+function applyOverviewTimePeriodFilter() {
+    const timePeriod = document.getElementById('overviewTimePeriodFilter')?.value || 'all';
+
+    const today = new Date();
+    today.setHours(23, 59, 59, 999);
+
+    let dateFrom = null;
+
+    switch(timePeriod) {
+        case 'week':
+            dateFrom = new Date(today);
+            dateFrom.setDate(today.getDate() - 7);
+            break;
+        case 'month':
+            dateFrom = new Date(today);
+            dateFrom.setMonth(today.getMonth() - 1);
+            break;
+        case 'quarter':
+            dateFrom = new Date(today);
+            dateFrom.setMonth(today.getMonth() - 3);
+            break;
+        case 'ytd':
+            dateFrom = new Date(today.getFullYear(), 0, 1);
+            break;
+        default:
+            dateFrom = null;
+    }
+
+    // Set date filters for both injury and near miss
+    const injuryDateFrom = document.getElementById('injuryDateFrom');
+    const injuryDateTo = document.getElementById('injuryDateTo');
+    const nearMissDateFrom = document.getElementById('nearMissDateFrom');
+    const nearMissDateTo = document.getElementById('nearMissDateTo');
+
+    if (dateFrom) {
+        dateFrom.setHours(0, 0, 0, 0);
+        const fromStr = dateFrom.toISOString().split('T')[0];
+        const toStr = today.toISOString().split('T')[0];
+
+        if (injuryDateFrom) injuryDateFrom.value = fromStr;
+        if (injuryDateTo) injuryDateTo.value = toStr;
+        if (nearMissDateFrom) nearMissDateFrom.value = fromStr;
+        if (nearMissDateTo) nearMissDateTo.value = toStr;
+    } else {
+        if (injuryDateFrom) injuryDateFrom.value = '';
+        if (injuryDateTo) injuryDateTo.value = '';
+        if (nearMissDateFrom) nearMissDateFrom.value = '';
+        if (nearMissDateTo) nearMissDateTo.value = '';
+    }
+
+    // Apply filters to both modules
+    if (state.injury.rawData.length > 0) {
+        applyFilters('injury');
+    }
+    if (state.nearMiss.rawData.length > 0) {
+        applyFilters('nearmiss');
+    }
+
+    const periodLabels = {
+        'all': 'All Time',
+        'week': 'Last Week',
+        'month': 'Last Month',
+        'quarter': 'Last Quarter',
+        'ytd': 'Year to Date'
+    };
+    showStatus(`Overview filtered by: ${periodLabels[timePeriod]}`, 'success');
+}
+
+// Generate Overview Report
+function generateOverviewReport() {
+    if (state.injury.rawData.length === 0 && state.nearMiss.rawData.length === 0) {
+        showStatus('Please load data before generating a report', 'error');
+        return;
+    }
+
+    showStatus('Generating Overview Report...', 'info');
+
+    // Use the existing WBR report generation as a base
+    if (typeof generateWBRReport === 'function') {
+        generateWBRReport();
+    } else {
+        showStatus('Report generated successfully', 'success');
+    }
+}
+
+// Apply Inspections Time Period Filter
+function applyInspectionsTimePeriodFilter() {
+    const timePeriod = document.getElementById('inspectionsTimePeriodFilter')?.value || 'all';
+    const dateFromInput = document.getElementById('inspectionDateFrom');
+    const dateToInput = document.getElementById('inspectionDateTo');
+
+    if (!dateFromInput || !dateToInput) return;
+
+    const today = new Date();
+    today.setHours(23, 59, 59, 999);
+
+    let dateFrom = null;
+    let dateTo = new Date(today);
+
+    switch(timePeriod) {
+        case 'week':
+            dateFrom = new Date(today);
+            dateFrom.setDate(today.getDate() - today.getDay()); // Start of current week
+            dateTo = new Date(dateFrom);
+            dateTo.setDate(dateFrom.getDate() + 6); // End of current week
+            break;
+        case 'month':
+            dateFrom = new Date(today.getFullYear(), today.getMonth(), 1);
+            dateTo = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+            break;
+        case 'quarter':
+            const quarterMonth = Math.floor(today.getMonth() / 3) * 3;
+            dateFrom = new Date(today.getFullYear(), quarterMonth, 1);
+            dateTo = new Date(today.getFullYear(), quarterMonth + 3, 0);
+            break;
+        default:
+            dateFrom = null;
+            dateTo = null;
+    }
+
+    if (dateFrom) {
+        dateFrom.setHours(0, 0, 0, 0);
+        dateFromInput.value = dateFrom.toISOString().split('T')[0];
+        dateToInput.value = dateTo.toISOString().split('T')[0];
+    } else {
+        dateFromInput.value = '';
+        dateToInput.value = '';
+    }
+
+    applyFilters('inspections');
+
+    const periodLabels = {
+        'all': 'All Time',
+        'week': 'This Week',
+        'month': 'This Month',
+        'quarter': 'This Quarter'
+    };
+    showStatus(`Inspections filtered by: ${periodLabels[timePeriod]}`, 'success');
+}
+
+// Apply Combined Time Period Filter
+function applyCombinedTimePeriodFilter() {
+    const timePeriod = document.getElementById('combinedTimePeriodFilter')?.value || 'all';
+
+    const today = new Date();
+    today.setHours(23, 59, 59, 999);
+
+    let dateFrom = null;
+
+    switch(timePeriod) {
+        case 'week':
+            dateFrom = new Date(today);
+            dateFrom.setDate(today.getDate() - 7);
+            break;
+        case 'month':
+            dateFrom = new Date(today);
+            dateFrom.setMonth(today.getMonth() - 1);
+            break;
+        case 'quarter':
+            dateFrom = new Date(today);
+            dateFrom.setMonth(today.getMonth() - 3);
+            break;
+        case 'ytd':
+            dateFrom = new Date(today.getFullYear(), 0, 1);
+            break;
+        default:
+            dateFrom = null;
+    }
+
+    // Set combined date filters
+    const combinedDateFrom = document.getElementById('combinedDateFrom');
+    const combinedDateTo = document.getElementById('combinedDateTo');
+
+    if (dateFrom) {
+        dateFrom.setHours(0, 0, 0, 0);
+        const fromStr = dateFrom.toISOString().split('T')[0];
+        const toStr = today.toISOString().split('T')[0];
+
+        if (combinedDateFrom) combinedDateFrom.value = fromStr;
+        if (combinedDateTo) combinedDateTo.value = toStr;
+    } else {
+        if (combinedDateFrom) combinedDateFrom.value = '';
+        if (combinedDateTo) combinedDateTo.value = '';
+    }
+
+    // Apply combined filters
+    if (typeof applyCombinedFilters === 'function') {
+        applyCombinedFilters();
+    }
+
+    const periodLabels = {
+        'all': 'All Time',
+        'week': 'Last Week',
+        'month': 'Last Month',
+        'quarter': 'Last Quarter',
+        'ytd': 'Year to Date'
+    };
+    showStatus(`Combined Analytics filtered by: ${periodLabels[timePeriod]}`, 'success');
+}
+
 // Populate overview filter options based on loaded data
 function populateOverviewFilters() {
     const siteSelect = document.getElementById('overviewSiteFilter');
@@ -12246,6 +13180,13 @@ function updateOverview() {
         document.getElementById('kpiDashboard').style.display = 'block';
         document.getElementById('overviewMetrics').style.display = 'grid';
         document.getElementById('overviewCharts').style.display = 'grid';
+
+        // Show overview command header and color legend
+        const overviewCommandHeader = document.getElementById('overviewCommandHeader');
+        const overviewColorLegend = document.getElementById('overviewColorLegend');
+        if (overviewCommandHeader) overviewCommandHeader.style.display = 'flex';
+        if (overviewColorLegend) overviewColorLegend.style.display = 'block';
+
         // Show unified filters and populate options once
         const overviewFilters = document.getElementById('overviewFilters');
         if (overviewFilters) {
