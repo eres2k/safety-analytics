@@ -15,36 +15,67 @@
         :root {
             --amazon-orange: #FF9900;
             --amazon-orange-dark: #e88600;
-            --amazon-dark: #232F3E;
+            --amazon-orange-light: #FFB84D;
+            --amazon-dark: #131921;
             --amazon-blue: #232F3E;
             --amazon-blue-dark: #37475A;
+            --amazon-blue-light: #485769;
             --amazon-yellow: #FFD814;
-            --success: #4CAF50;
-            --warning: #FFC107;
-            --danger: #FF5722;
+            --amazon-teal: #007185;
+            --success: #067D62;
+            --success-light: #E7F4E4;
+            --warning: #F0AD4E;
+            --warning-light: #FFF4E5;
+            --danger: #D13212;
+            --danger-light: #FFF0EE;
             --critical: #B71C1C;
+            --info: #0066C0;
             --bg-primary: #ffffff;
-            --bg-secondary: #f5f5f5;
-            --text-primary: #212121;
-            --text-secondary: #757575;
-            --shadow: rgba(0,0,0,0.08);
-            --shadow-hover: rgba(0,0,0,0.12);
+            --bg-secondary: #F7F8F8;
+            --bg-tertiary: #EAEDED;
+            --text-primary: #0F1111;
+            --text-secondary: #565959;
+            --text-muted: #888C8C;
+            --border-color: #D5D9D9;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+            --shadow: 0 2px 5px rgba(0,0,0,0.08);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+            --shadow-lg: 0 8px 25px rgba(0,0,0,0.12);
+            --shadow-hover: 0 4px 15px rgba(0,0,0,0.15);
+            --border-radius-sm: 4px;
             --border-radius: 8px;
+            --border-radius-lg: 12px;
+            --border-radius-xl: 16px;
+            --transition-fast: all 0.15s ease;
             --transition: all 0.2s ease;
+            --transition-slow: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             --spacing-xs: 0.25rem;
             --spacing-sm: 0.5rem;
             --spacing-md: 1rem;
             --spacing-lg: 1.5rem;
             --spacing-xl: 2rem;
+            --header-height: 56px;
+            --nav-height: 44px;
+            --filter-bar-height: 52px;
+            --sidebar-width: 260px;
         }
 
         [data-theme="dark"] {
-            --bg-primary: #1a1a1a;
-            --bg-secondary: #2d2d2d;
-            --text-primary: #ffffff;
-            --text-secondary: #b0b0b0;
-            --shadow: rgba(255,255,255,0.05);
-            --shadow-hover: rgba(255,255,255,0.1);
+            --bg-primary: #131921;
+            --bg-secondary: #1A242F;
+            --bg-tertiary: #232F3E;
+            --text-primary: #E8E8E8;
+            --text-secondary: #B0B0B0;
+            --text-muted: #888888;
+            --border-color: #3D4F61;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.2);
+            --shadow: 0 2px 5px rgba(0,0,0,0.25);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.3);
+            --shadow-lg: 0 8px 25px rgba(0,0,0,0.35);
+            --shadow-hover: 0 4px 15px rgba(0,0,0,0.4);
+            --success-light: rgba(6, 125, 98, 0.15);
+            --warning-light: rgba(240, 173, 78, 0.15);
+            --danger-light: rgba(209, 50, 18, 0.15);
         }
 
         * {
@@ -52,139 +83,186 @@
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Amazon Ember', sans-serif;
+            font-family: 'Amazon Ember', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background-color: var(--bg-secondary);
             color: var(--text-primary);
             line-height: 1.5;
-            transition: var(--transition);
+            transition: background-color 0.3s, color 0.3s;
         }
 
-        /* Compact Header */
+        /* Modern Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--text-muted);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-secondary);
+        }
+
+        /* Modern Header */
         .header {
-            background: linear-gradient(90deg, var(--amazon-blue) 0%, var(--amazon-blue-dark) 100%);
+            background: linear-gradient(135deg, var(--amazon-dark) 0%, var(--amazon-blue) 100%);
             color: white;
-            padding: 0.75rem 0;
+            padding: 0;
+            height: var(--header-height);
             position: sticky;
             top: 0;
-            z-index: 100;
-            box-shadow: 0 2px 8px var(--shadow);
+            z-index: 1000;
+            box-shadow: var(--shadow-md);
         }
 
         .header-content {
-            max-width: 1400px;
+            max-width: 100%;
+            height: 100%;
             margin: 0 auto;
-            padding: 0 var(--spacing-md);
+            padding: 0 1.5rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            gap: var(--spacing-md);
+            gap: 1rem;
         }
 
         .header-title {
             display: flex;
             align-items: center;
-            gap: var(--spacing-sm);
+            gap: 1rem;
         }
 
         .amazon-logo {
-            height: 32px;
             display: flex;
             align-items: center;
-            font-weight: bold;
-            font-size: 1.5rem;
+            gap: 0.25rem;
+            font-weight: 800;
+            font-size: 1.35rem;
+        }
+
+        .amazon-logo span:first-child {
+            color: white;
+        }
+
+        .amazon-smile {
             color: var(--amazon-orange);
+            font-size: 1.5rem;
+            line-height: 0;
+            margin-top: -2px;
         }
 
         .header h1 {
-            font-size: 1.25rem;
-            font-weight: 400;
+            font-size: 1.1rem;
+            font-weight: 500;
+            opacity: 0.95;
             display: flex;
             align-items: center;
-            gap: var(--spacing-sm);
+            gap: 0.5rem;
         }
 
         .header-subtitle {
-            font-size: 0.85rem;
-            opacity: 0.9;
+            font-size: 0.75rem;
+            opacity: 0.7;
             display: flex;
             align-items: center;
-            gap: var(--spacing-xs);
+            gap: 0.5rem;
         }
 
         .header-actions {
             display: flex;
-            gap: var(--spacing-sm);
+            gap: 0.5rem;
             align-items: center;
         }
 
-        /* Mode Toggle */
         .mode-toggle {
             background: rgba(255,255,255,0.1);
-            border: 1px solid rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.15);
             border-radius: 20px;
-            padding: 0.4rem 0.8rem;
+            padding: 0.4rem 0.75rem;
             color: white;
             cursor: pointer;
             display: flex;
             align-items: center;
-            gap: var(--spacing-xs);
-            transition: var(--transition);
-            font-size: 0.85rem;
+            gap: 0.35rem;
+            transition: var(--transition-fast);
+            font-size: 0.8rem;
+            font-weight: 500;
         }
 
         .mode-toggle:hover {
             background: rgba(255,255,255,0.2);
+            border-color: rgba(255,255,255,0.3);
         }
 
-        /* Compact Navigation */
+        /* Modern Navigation with Global Filter Bar */
         .nav-container {
             background: var(--bg-primary);
-            box-shadow: 0 1px 4px var(--shadow);
+            box-shadow: var(--shadow-sm);
             position: sticky;
-            top: 56px;
-            z-index: 90;
+            top: var(--header-height);
+            z-index: 900;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .nav-inner {
+            display: flex;
+            align-items: stretch;
+            justify-content: space-between;
+            padding: 0 1rem;
         }
 
         .nav-tabs {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 var(--spacing-md);
             display: flex;
             gap: 0;
             overflow-x: auto;
-            scrollbar-width: thin;
+            scrollbar-width: none;
+        }
+
+        .nav-tabs::-webkit-scrollbar {
+            display: none;
         }
 
         .nav-tab {
-            padding: 0.6rem 1.2rem;
+            padding: 0.75rem 1rem;
             cursor: pointer;
-            transition: var(--transition);
+            transition: var(--transition-fast);
             white-space: nowrap;
             font-weight: 500;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             position: relative;
             background: transparent;
             color: var(--text-secondary);
-            border-bottom: 3px solid transparent;
+            border: none;
+            border-bottom: 2px solid transparent;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .nav-tab .tab-icon {
+            font-size: 1rem;
         }
 
         .nav-tab .notification-badge {
             position: absolute;
-            top: 6px;
-            right: 8px;
+            top: 8px;
+            right: 4px;
             background: var(--danger);
             color: #fff;
             border-radius: 999px;
-            padding: 0 6px;
-            font-size: 0.7rem;
+            padding: 0 5px;
+            font-size: 0.65rem;
             font-weight: 700;
             display: none;
             align-items: center;
             justify-content: center;
-            min-width: 18px;
-            height: 18px;
+            min-width: 16px;
+            height: 16px;
         }
 
         .nav-tab:hover {
@@ -196,6 +274,72 @@
             color: var(--amazon-orange);
             border-bottom-color: var(--amazon-orange);
             font-weight: 600;
+            background: var(--bg-secondary);
+        }
+
+        /* Global Filter Bar */
+        .global-filter-bar {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem 0;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            background: var(--bg-secondary);
+            padding: 0.35rem 0.75rem;
+            border-radius: var(--border-radius);
+            border: 1px solid var(--border-color);
+            transition: var(--transition-fast);
+        }
+
+        .filter-group:hover {
+            border-color: var(--amazon-orange);
+        }
+
+        .filter-group label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .filter-group select {
+            border: none;
+            background: transparent;
+            color: var(--text-primary);
+            font-size: 0.8rem;
+            font-weight: 500;
+            padding: 0.25rem 1.5rem 0.25rem 0.25rem;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' fill='%23565959' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0 center;
+            min-width: 100px;
+        }
+
+        .filter-group select:focus {
+            outline: none;
+        }
+
+        .filter-sync-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.7rem;
+            color: var(--success);
+            padding: 0.25rem 0.5rem;
+            background: var(--success-light);
+            border-radius: 4px;
+        }
+
+        .filter-sync-indicator i {
+            font-size: 0.6rem;
         }
 
         .nav-tab-icon {
@@ -1443,40 +1587,50 @@
 
         /* ==================== WBR MEETING DASHBOARD STYLES ==================== */
 
-        /* Meeting Mode Layout */
+        /* Meeting Mode Layout - Fixed Sidebar */
         .wbr-meeting-layout {
-            display: grid;
-            grid-template-columns: 280px 1fr;
-            gap: 0;
-            min-height: calc(100vh - 120px);
+            display: flex;
+            min-height: calc(100vh - var(--header-height) - var(--nav-height));
             background: var(--bg-secondary);
-        }
-
-        .wbr-meeting-layout.sidebar-collapsed {
-            grid-template-columns: 60px 1fr;
+            position: relative;
         }
 
         .wbr-meeting-layout.presentation-mode {
-            grid-template-columns: 1fr;
+            display: block;
         }
 
         .wbr-meeting-layout.presentation-mode .wbr-sidebar {
             display: none;
         }
 
-        /* Meeting Sidebar / Agenda */
+        /* Fixed Meeting Sidebar / Agenda */
         .wbr-sidebar {
-            background: linear-gradient(180deg, var(--amazon-blue) 0%, #1a2533 100%);
+            width: var(--sidebar-width);
+            min-width: var(--sidebar-width);
+            background: linear-gradient(180deg, var(--amazon-dark) 0%, var(--amazon-blue) 100%);
             color: white;
             padding: 0;
             display: flex;
             flex-direction: column;
-            position: sticky;
-            top: 100px;
-            height: calc(100vh - 100px);
+            position: fixed;
+            left: 0;
+            top: calc(var(--header-height) + var(--nav-height));
+            height: calc(100vh - var(--header-height) - var(--nav-height));
             overflow: hidden;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 4px 0 20px rgba(0,0,0,0.15);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 2px 0 15px rgba(0,0,0,0.2);
+            z-index: 800;
+        }
+
+        /* Spacer for fixed sidebar */
+        .wbr-sidebar-spacer {
+            width: var(--sidebar-width);
+            min-width: var(--sidebar-width);
+            flex-shrink: 0;
+        }
+
+        .wbr-meeting-layout.presentation-mode .wbr-sidebar-spacer {
+            display: none;
         }
 
         .sidebar-header {
@@ -1673,8 +1827,10 @@
 
         /* Main Meeting Content Area */
         .wbr-main-content {
+            flex: 1;
             padding: 1.5rem;
             overflow-y: auto;
+            min-width: 0;
         }
 
         /* Modern Command Header */
@@ -2239,6 +2395,15 @@
             }
         }
 
+        @media (max-width: 1024px) {
+            .global-filter-bar {
+                display: none;
+            }
+            .nav-inner {
+                justify-content: center;
+            }
+        }
+
         @media (max-width: 768px) {
             .wbr-color-legend-bar .legend-items-row {
                 flex-direction: column;
@@ -2249,15 +2414,55 @@
                 flex-wrap: wrap;
                 gap: 0.5rem;
             }
-            .wbr-meeting-layout {
-                grid-template-columns: 1fr;
-            }
             .wbr-sidebar {
+                transform: translateX(-100%);
+                width: 280px;
+            }
+            .wbr-sidebar.mobile-open {
+                transform: translateX(0);
+            }
+            .wbr-sidebar-spacer {
                 display: none;
+            }
+            .wbr-main-content {
+                padding: 1rem;
             }
             .executive-metrics {
                 grid-template-columns: repeat(2, 1fr);
             }
+            .mobile-sidebar-toggle {
+                display: flex !important;
+            }
+        }
+
+        /* Mobile Sidebar Toggle Button */
+        .mobile-sidebar-toggle {
+            display: none;
+            position: fixed;
+            bottom: 1.5rem;
+            left: 1rem;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: var(--amazon-blue);
+            color: white;
+            border: none;
+            cursor: pointer;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            box-shadow: var(--shadow-lg);
+            z-index: 850;
+            transition: var(--transition);
+        }
+
+        .mobile-sidebar-toggle:hover {
+            background: var(--amazon-orange);
+            transform: scale(1.1);
+        }
+
+        .mobile-sidebar-toggle.active i {
+            transform: rotate(180deg);
         }
 
         /* ==================== UNIVERSAL DASHBOARD STYLES ==================== */
@@ -3926,36 +4131,60 @@
         </div>
     </header>
 
-    <!-- Navigation -->
+    <!-- Navigation with Global Filters -->
     <nav class="nav-container">
-        <div class="nav-tabs">
-            <div class="nav-tab active" data-module="overview" onclick="switchModule('overview', event)">
-                <span class="nav-tab-icon">📊</span>
-                <span>Overview</span>
+        <div class="nav-inner">
+            <div class="nav-tabs">
+                <div class="nav-tab active" data-module="overview" onclick="switchModule('overview', event)">
+                    <span class="tab-icon">📊</span>
+                    <span>Overview</span>
+                </div>
+                <div class="nav-tab" data-module="injury" onclick="switchModule('injury', event)">
+                    <span class="tab-icon">🏥</span>
+                    <span>Injury</span>
+                </div>
+                <div class="nav-tab" data-module="nearmiss" onclick="switchModule('nearmiss', event)">
+                    <span class="tab-icon">⚠️</span>
+                    <span>Near Miss</span>
+                </div>
+                <div class="nav-tab" data-module="combined" onclick="switchModule('combined', event)">
+                    <span class="tab-icon">📈</span>
+                    <span>Combined</span>
+                </div>
+                <div class="nav-tab" data-module="inspections" onclick="switchModule('inspections', event)">
+                    <span class="tab-icon">📋</span>
+                    <span>Inspections</span>
+                </div>
+                <div class="nav-tab" data-module="wbr" onclick="switchModule('wbr', event)">
+                    <span class="tab-icon">🎯</span>
+                    <span>Weekly Meeting</span>
+                </div>
+                <div class="nav-tab" data-module="reports" onclick="switchModule('reports', event)">
+                    <span class="tab-icon">📄</span>
+                    <span>Reports</span>
+                </div>
             </div>
-            <div class="nav-tab" data-module="injury" onclick="switchModule('injury', event)">
-                <span class="nav-tab-icon">🏥</span>
-                <span>Injury & Illness</span>
-            </div>
-            <div class="nav-tab" data-module="nearmiss" onclick="switchModule('nearmiss', event)">
-                <span class="nav-tab-icon">⚠️</span>
-                <span>Near Miss</span>
-            </div>
-            <div class="nav-tab" data-module="combined" onclick="switchModule('combined', event)">
-                <span class="nav-tab-icon">📈</span>
-                <span>Combined Analytics</span>
-            </div>
-            <div class="nav-tab" data-module="inspections" onclick="switchModule('inspections', event)">
-                <span class="nav-tab-icon">📋</span>
-                <span>Inspections</span>
-            </div>
-            <div class="nav-tab" data-module="wbr" onclick="switchModule('wbr', event)">
-                <span class="nav-tab-icon">🎯</span>
-                <span>WBR Dashboard</span>
-            </div>
-            <div class="nav-tab" data-module="reports" onclick="switchModule('reports', event)">
-                <span class="nav-tab-icon">📄</span>
-                <span>Reports</span>
+            <div class="global-filter-bar">
+                <div class="filter-group">
+                    <label>Period</label>
+                    <select id="globalTimePeriod" onchange="applyGlobalFilters()">
+                        <option value="all">All Time</option>
+                        <option value="week">Last Week</option>
+                        <option value="month">Last Month</option>
+                        <option value="quarter">Last Quarter</option>
+                        <option value="ytd">Year to Date</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Station</label>
+                    <select id="globalStation" onchange="applyGlobalFilters()">
+                        <option value="">All Stations</option>
+                    </select>
+                </div>
+                <div class="filter-sync-indicator" id="filterSyncIndicator">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Synced</span>
+                </div>
             </div>
         </div>
     </nav>
@@ -5430,6 +5659,9 @@
                     </div>
                 </aside>
 
+                <!-- Sidebar Spacer (for fixed positioning) -->
+                <div class="wbr-sidebar-spacer"></div>
+
                 <!-- Main Meeting Content -->
                 <main class="wbr-main-content" id="wbrMainContent">
                     <!-- Modern Command Header -->
@@ -5441,34 +5673,23 @@
                                 <span class="wbr-date-badge" id="wbrDateBadge">Week of Dec 2, 2024</span>
                             </p>
                         </div>
-                        <div class="wbr-header-controls">
-                            <div class="wbr-filter-group">
-                                <div class="wbr-filter-section">
-                                    <label for="wbrTimePeriodFilter">Period:</label>
-                                    <select id="wbrTimePeriodFilter" class="wbr-station-select" onchange="applyWBRTimePeriodFilter()">
-                                        <option value="all">All Time</option>
-                                        <option value="week" selected>Last Week</option>
-                                        <option value="month">Last Month</option>
-                                        <option value="ytd">Year to Date</option>
-                                    </select>
-                                </div>
-                                <div class="wbr-filter-section">
-                                    <label for="wbrStationFilter">Station:</label>
-                                    <select id="wbrStationFilter" class="wbr-station-select" onchange="applyWBRStationFilter()">
-                                        <option value="">All Stations</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="wbr-header-actions">
-                                <button class="btn btn-secondary wbr-presentation-btn" onclick="togglePresentationMode()">
-                                    <i class="fas fa-expand"></i> Present
-                                </button>
-                                <button class="btn btn-primary btn-lg wbr-export-btn" onclick="generateOneClickWBRDeck()">
-                                    <i class="fas fa-file-powerpoint"></i> Export WBR Deck
-                                </button>
-                            </div>
+                        <div class="wbr-header-actions">
+                            <button class="btn btn-secondary wbr-presentation-btn" onclick="togglePresentationMode()">
+                                <i class="fas fa-expand"></i> Present
+                            </button>
+                            <button class="btn btn-secondary" onclick="refreshWBRData()">
+                                <i class="fas fa-sync-alt"></i> Refresh
+                            </button>
+                            <button class="btn btn-primary btn-lg wbr-export-btn" onclick="generateOneClickWBRDeck()">
+                                <i class="fas fa-file-powerpoint"></i> Export Deck
+                            </button>
                         </div>
                     </div>
+
+                    <!-- Mobile Sidebar Toggle -->
+                    <button class="mobile-sidebar-toggle" id="mobileSidebarToggle" onclick="toggleMobileSidebar()">
+                        <i class="fas fa-bars"></i>
+                    </button>
 
                     <!-- Executive Summary Section -->
                     <section class="wbr-executive-summary" id="wbrSectionExecutive">
@@ -6298,8 +6519,196 @@ const state = {
     },
     currentModule: 'overview',
     theme: 'light',
-    itemsPerPage: 20
+    itemsPerPage: 20,
+    // Global filter state - synced across all modules
+    globalFilters: {
+        timePeriod: 'all',
+        station: ''
+    }
 };
+
+// ==================== GLOBAL FILTER SYNCHRONIZATION ====================
+
+// Apply global filters across all modules
+function applyGlobalFilters() {
+    const timePeriod = document.getElementById('globalTimePeriod').value;
+    const station = document.getElementById('globalStation').value;
+
+    // Update state
+    state.globalFilters.timePeriod = timePeriod;
+    state.globalFilters.station = station;
+
+    // Show sync indicator animation
+    const indicator = document.getElementById('filterSyncIndicator');
+    if (indicator) {
+        indicator.innerHTML = '<i class="fas fa-sync fa-spin"></i><span>Syncing...</span>';
+        indicator.style.background = 'var(--warning-light)';
+        indicator.style.color = 'var(--warning)';
+    }
+
+    // Sync to all individual module filters
+    syncFiltersToModules(timePeriod, station);
+
+    // Apply filters to each module's data
+    applyFiltersToAllModules();
+
+    // Update sync indicator
+    setTimeout(() => {
+        if (indicator) {
+            indicator.innerHTML = '<i class="fas fa-check-circle"></i><span>Synced</span>';
+            indicator.style.background = 'var(--success-light)';
+            indicator.style.color = 'var(--success)';
+        }
+    }, 500);
+
+    showStatus(`Filters applied: ${getTimePeriodLabel(timePeriod)}${station ? ', ' + station : ''}`, 'success');
+}
+
+// Get human-readable time period label
+function getTimePeriodLabel(value) {
+    const labels = {
+        'all': 'All Time',
+        'week': 'Last Week',
+        'month': 'Last Month',
+        'quarter': 'Last Quarter',
+        'ytd': 'Year to Date'
+    };
+    return labels[value] || value;
+}
+
+// Sync global filters to individual module filter dropdowns
+function syncFiltersToModules(timePeriod, station) {
+    // List of all time period filter selects across modules
+    const timePeriodSelects = [
+        'injuryTimePeriodFilter',
+        'nearMissTimePeriodFilter',
+        'overviewTimePeriodFilter',
+        'combinedTimePeriodFilter',
+        'inspectionTimePeriodFilter',
+        'wbrTimePeriodFilter'
+    ];
+
+    // List of all station filter selects
+    const stationSelects = [
+        'injuryStationFilter',
+        'nearMissStationFilter',
+        'overviewStationFilter',
+        'wbrStationFilter'
+    ];
+
+    // Sync time period
+    timePeriodSelects.forEach(id => {
+        const select = document.getElementById(id);
+        if (select) {
+            select.value = timePeriod;
+        }
+    });
+
+    // Sync station
+    stationSelects.forEach(id => {
+        const select = document.getElementById(id);
+        if (select) {
+            select.value = station;
+        }
+    });
+}
+
+// Apply filters to all modules' data
+function applyFiltersToAllModules() {
+    // Apply to injury module
+    if (typeof applyInjuryTimePeriodFilter === 'function') {
+        applyInjuryTimePeriodFilter();
+    }
+
+    // Apply to near miss module
+    if (typeof applyNearMissTimePeriodFilter === 'function') {
+        applyNearMissTimePeriodFilter();
+    }
+
+    // Apply to overview module
+    if (typeof applyOverviewTimePeriodFilter === 'function') {
+        applyOverviewTimePeriodFilter();
+    }
+
+    // Apply to combined module
+    if (typeof applyCombinedTimePeriodFilter === 'function') {
+        applyCombinedTimePeriodFilter();
+    }
+
+    // Apply to WBR module
+    if (typeof applyWBRTimePeriodFilter === 'function') {
+        applyWBRTimePeriodFilter();
+    }
+
+    // Refresh WBR data
+    if (typeof refreshWBRData === 'function' && state.currentModule === 'wbr') {
+        refreshWBRData();
+    }
+}
+
+// Populate global station filter from data
+function populateGlobalStationFilter() {
+    const select = document.getElementById('globalStation');
+    if (!select) return;
+
+    const stations = new Set();
+
+    // Collect stations from injury data
+    state.injury.rawData.forEach(record => {
+        const station = record.site || record.station || record.location || record.facility;
+        if (station && station.trim()) {
+            stations.add(station.trim());
+        }
+    });
+
+    // Collect stations from near miss data
+    state.nearMiss.rawData.forEach(record => {
+        const station = record.site || record.station || record.location || record.facility;
+        if (station && station.trim()) {
+            stations.add(station.trim());
+        }
+    });
+
+    // Clear and repopulate
+    select.innerHTML = '<option value="">All Stations</option>';
+    Array.from(stations).sort().forEach(station => {
+        const option = document.createElement('option');
+        option.value = station;
+        option.textContent = station;
+        select.appendChild(option);
+    });
+}
+
+// Initialize global filters on page load
+function initializeGlobalFilters() {
+    // Restore from state
+    const globalTime = document.getElementById('globalTimePeriod');
+    const globalStation = document.getElementById('globalStation');
+
+    if (globalTime) globalTime.value = state.globalFilters.timePeriod;
+    if (globalStation) globalStation.value = state.globalFilters.station;
+
+    // Populate station filter
+    populateGlobalStationFilter();
+}
+
+// Toggle mobile sidebar
+function toggleMobileSidebar() {
+    const sidebar = document.getElementById('wbrSidebar');
+    const toggle = document.getElementById('mobileSidebarToggle');
+
+    if (sidebar) {
+        sidebar.classList.toggle('mobile-open');
+    }
+
+    if (toggle) {
+        toggle.classList.toggle('active');
+        const icon = toggle.querySelector('i');
+        if (icon) {
+            icon.className = sidebar.classList.contains('mobile-open') ? 'fas fa-times' : 'fas fa-bars';
+        }
+    }
+}
 
 // Constants
 const SEVERITY_COLORS = {
@@ -8770,6 +9179,9 @@ function parseCSV(csvText, type) {
             }
 
             updateOverview();
+
+            // Populate global station filter with new data
+            populateGlobalStationFilter();
         },
         error: function(error) {
             showStatus('Failed to parse CSV: ' + error.message, 'error');
