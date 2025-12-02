@@ -15,36 +15,67 @@
         :root {
             --amazon-orange: #FF9900;
             --amazon-orange-dark: #e88600;
-            --amazon-dark: #232F3E;
+            --amazon-orange-light: #FFB84D;
+            --amazon-dark: #131921;
             --amazon-blue: #232F3E;
             --amazon-blue-dark: #37475A;
+            --amazon-blue-light: #485769;
             --amazon-yellow: #FFD814;
-            --success: #4CAF50;
-            --warning: #FFC107;
-            --danger: #FF5722;
+            --amazon-teal: #007185;
+            --success: #067D62;
+            --success-light: #E7F4E4;
+            --warning: #F0AD4E;
+            --warning-light: #FFF4E5;
+            --danger: #D13212;
+            --danger-light: #FFF0EE;
             --critical: #B71C1C;
+            --info: #0066C0;
             --bg-primary: #ffffff;
-            --bg-secondary: #f5f5f5;
-            --text-primary: #212121;
-            --text-secondary: #757575;
-            --shadow: rgba(0,0,0,0.08);
-            --shadow-hover: rgba(0,0,0,0.12);
+            --bg-secondary: #F7F8F8;
+            --bg-tertiary: #EAEDED;
+            --text-primary: #0F1111;
+            --text-secondary: #565959;
+            --text-muted: #888C8C;
+            --border-color: #D5D9D9;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+            --shadow: 0 2px 5px rgba(0,0,0,0.08);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+            --shadow-lg: 0 8px 25px rgba(0,0,0,0.12);
+            --shadow-hover: 0 4px 15px rgba(0,0,0,0.15);
+            --border-radius-sm: 4px;
             --border-radius: 8px;
+            --border-radius-lg: 12px;
+            --border-radius-xl: 16px;
+            --transition-fast: all 0.15s ease;
             --transition: all 0.2s ease;
+            --transition-slow: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             --spacing-xs: 0.25rem;
             --spacing-sm: 0.5rem;
             --spacing-md: 1rem;
             --spacing-lg: 1.5rem;
             --spacing-xl: 2rem;
+            --header-height: 56px;
+            --nav-height: 44px;
+            --filter-bar-height: 52px;
+            --sidebar-width: 260px;
         }
 
         [data-theme="dark"] {
-            --bg-primary: #1a1a1a;
-            --bg-secondary: #2d2d2d;
-            --text-primary: #ffffff;
-            --text-secondary: #b0b0b0;
-            --shadow: rgba(255,255,255,0.05);
-            --shadow-hover: rgba(255,255,255,0.1);
+            --bg-primary: #131921;
+            --bg-secondary: #1A242F;
+            --bg-tertiary: #232F3E;
+            --text-primary: #E8E8E8;
+            --text-secondary: #B0B0B0;
+            --text-muted: #888888;
+            --border-color: #3D4F61;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.2);
+            --shadow: 0 2px 5px rgba(0,0,0,0.25);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.3);
+            --shadow-lg: 0 8px 25px rgba(0,0,0,0.35);
+            --shadow-hover: 0 4px 15px rgba(0,0,0,0.4);
+            --success-light: rgba(6, 125, 98, 0.15);
+            --warning-light: rgba(240, 173, 78, 0.15);
+            --danger-light: rgba(209, 50, 18, 0.15);
         }
 
         * {
@@ -52,139 +83,186 @@
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Amazon Ember', sans-serif;
+            font-family: 'Amazon Ember', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background-color: var(--bg-secondary);
             color: var(--text-primary);
             line-height: 1.5;
-            transition: var(--transition);
+            transition: background-color 0.3s, color 0.3s;
         }
 
-        /* Compact Header */
+        /* Modern Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--text-muted);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-secondary);
+        }
+
+        /* Modern Header */
         .header {
-            background: linear-gradient(90deg, var(--amazon-blue) 0%, var(--amazon-blue-dark) 100%);
+            background: linear-gradient(135deg, var(--amazon-dark) 0%, var(--amazon-blue) 100%);
             color: white;
-            padding: 0.75rem 0;
+            padding: 0;
+            height: var(--header-height);
             position: sticky;
             top: 0;
-            z-index: 100;
-            box-shadow: 0 2px 8px var(--shadow);
+            z-index: 1000;
+            box-shadow: var(--shadow-md);
         }
 
         .header-content {
-            max-width: 1400px;
+            max-width: 100%;
+            height: 100%;
             margin: 0 auto;
-            padding: 0 var(--spacing-md);
+            padding: 0 1.5rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            gap: var(--spacing-md);
+            gap: 1rem;
         }
 
         .header-title {
             display: flex;
             align-items: center;
-            gap: var(--spacing-sm);
+            gap: 1rem;
         }
 
         .amazon-logo {
-            height: 32px;
             display: flex;
             align-items: center;
-            font-weight: bold;
-            font-size: 1.5rem;
+            gap: 0.25rem;
+            font-weight: 800;
+            font-size: 1.35rem;
+        }
+
+        .amazon-logo span:first-child {
+            color: white;
+        }
+
+        .amazon-smile {
             color: var(--amazon-orange);
+            font-size: 1.5rem;
+            line-height: 0;
+            margin-top: -2px;
         }
 
         .header h1 {
-            font-size: 1.25rem;
-            font-weight: 400;
+            font-size: 1.1rem;
+            font-weight: 500;
+            opacity: 0.95;
             display: flex;
             align-items: center;
-            gap: var(--spacing-sm);
+            gap: 0.5rem;
         }
 
         .header-subtitle {
-            font-size: 0.85rem;
-            opacity: 0.9;
+            font-size: 0.75rem;
+            opacity: 0.7;
             display: flex;
             align-items: center;
-            gap: var(--spacing-xs);
+            gap: 0.5rem;
         }
 
         .header-actions {
             display: flex;
-            gap: var(--spacing-sm);
+            gap: 0.5rem;
             align-items: center;
         }
 
-        /* Mode Toggle */
         .mode-toggle {
             background: rgba(255,255,255,0.1);
-            border: 1px solid rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.15);
             border-radius: 20px;
-            padding: 0.4rem 0.8rem;
+            padding: 0.4rem 0.75rem;
             color: white;
             cursor: pointer;
             display: flex;
             align-items: center;
-            gap: var(--spacing-xs);
-            transition: var(--transition);
-            font-size: 0.85rem;
+            gap: 0.35rem;
+            transition: var(--transition-fast);
+            font-size: 0.8rem;
+            font-weight: 500;
         }
 
         .mode-toggle:hover {
             background: rgba(255,255,255,0.2);
+            border-color: rgba(255,255,255,0.3);
         }
 
-        /* Compact Navigation */
+        /* Modern Navigation with Global Filter Bar */
         .nav-container {
             background: var(--bg-primary);
-            box-shadow: 0 1px 4px var(--shadow);
+            box-shadow: var(--shadow-sm);
             position: sticky;
-            top: 56px;
-            z-index: 90;
+            top: var(--header-height);
+            z-index: 900;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .nav-inner {
+            display: flex;
+            align-items: stretch;
+            justify-content: space-between;
+            padding: 0 1rem;
         }
 
         .nav-tabs {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 var(--spacing-md);
             display: flex;
             gap: 0;
             overflow-x: auto;
-            scrollbar-width: thin;
+            scrollbar-width: none;
+        }
+
+        .nav-tabs::-webkit-scrollbar {
+            display: none;
         }
 
         .nav-tab {
-            padding: 0.6rem 1.2rem;
+            padding: 0.75rem 1rem;
             cursor: pointer;
-            transition: var(--transition);
+            transition: var(--transition-fast);
             white-space: nowrap;
             font-weight: 500;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             position: relative;
             background: transparent;
             color: var(--text-secondary);
-            border-bottom: 3px solid transparent;
+            border: none;
+            border-bottom: 2px solid transparent;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .nav-tab .tab-icon {
+            font-size: 1rem;
         }
 
         .nav-tab .notification-badge {
             position: absolute;
-            top: 6px;
-            right: 8px;
+            top: 8px;
+            right: 4px;
             background: var(--danger);
             color: #fff;
             border-radius: 999px;
-            padding: 0 6px;
-            font-size: 0.7rem;
+            padding: 0 5px;
+            font-size: 0.65rem;
             font-weight: 700;
             display: none;
             align-items: center;
             justify-content: center;
-            min-width: 18px;
-            height: 18px;
+            min-width: 16px;
+            height: 16px;
         }
 
         .nav-tab:hover {
@@ -196,6 +274,72 @@
             color: var(--amazon-orange);
             border-bottom-color: var(--amazon-orange);
             font-weight: 600;
+            background: var(--bg-secondary);
+        }
+
+        /* Global Filter Bar */
+        .global-filter-bar {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem 0;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            background: var(--bg-secondary);
+            padding: 0.35rem 0.75rem;
+            border-radius: var(--border-radius);
+            border: 1px solid var(--border-color);
+            transition: var(--transition-fast);
+        }
+
+        .filter-group:hover {
+            border-color: var(--amazon-orange);
+        }
+
+        .filter-group label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .filter-group select {
+            border: none;
+            background: transparent;
+            color: var(--text-primary);
+            font-size: 0.8rem;
+            font-weight: 500;
+            padding: 0.25rem 1.5rem 0.25rem 0.25rem;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' fill='%23565959' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0 center;
+            min-width: 100px;
+        }
+
+        .filter-group select:focus {
+            outline: none;
+        }
+
+        .filter-sync-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.7rem;
+            color: var(--success);
+            padding: 0.25rem 0.5rem;
+            background: var(--success-light);
+            border-radius: 4px;
+        }
+
+        .filter-sync-indicator i {
+            font-size: 0.6rem;
         }
 
         .nav-tab-icon {
@@ -1441,84 +1585,605 @@
             font-size: 0.9em;
         }
 
-        /* ==================== WBR DASHBOARD STYLES ==================== */
+        /* ==================== WBR MEETING DASHBOARD STYLES ==================== */
 
-        /* WBR Command Header */
-        .wbr-command-header {
-            background: linear-gradient(135deg, var(--amazon-blue) 0%, var(--amazon-blue-dark) 100%);
+        /* Meeting Mode Layout - Fixed Sidebar */
+        .wbr-meeting-layout {
+            display: flex;
+            min-height: calc(100vh - var(--header-height) - var(--nav-height));
+            background: var(--bg-secondary);
+            position: relative;
+        }
+
+        .wbr-meeting-layout.presentation-mode {
+            display: block;
+        }
+
+        .wbr-meeting-layout.presentation-mode .wbr-sidebar {
+            display: none;
+        }
+
+        /* Fixed Meeting Sidebar / Agenda */
+        .wbr-sidebar {
+            width: var(--sidebar-width);
+            min-width: var(--sidebar-width);
+            background: linear-gradient(180deg, var(--amazon-dark) 0%, var(--amazon-blue) 100%);
             color: white;
-            border-radius: var(--border-radius);
-            padding: var(--spacing-lg) var(--spacing-xl);
-            margin-bottom: var(--spacing-lg);
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            left: 0;
+            top: calc(var(--header-height) + var(--nav-height));
+            height: calc(100vh - var(--header-height) - var(--nav-height));
+            overflow: hidden;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 2px 0 15px rgba(0,0,0,0.2);
+            z-index: 800;
+        }
+
+        /* Spacer for fixed sidebar */
+        .wbr-sidebar-spacer {
+            width: var(--sidebar-width);
+            min-width: var(--sidebar-width);
+            flex-shrink: 0;
+        }
+
+        .wbr-meeting-layout.presentation-mode .wbr-sidebar-spacer {
+            display: none;
+        }
+
+        .sidebar-header {
+            padding: 1.25rem;
+            background: rgba(0,0,0,0.2);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .sidebar-header h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin: 0 0 0.5rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .meeting-timer {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: rgba(255, 153, 0, 0.2);
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            margin-top: 0.75rem;
+        }
+
+        .meeting-timer.running {
+            background: rgba(76, 175, 80, 0.2);
+            animation: pulse-glow 2s infinite;
+        }
+
+        .meeting-timer.overtime {
+            background: rgba(183, 28, 28, 0.3);
+            animation: pulse-danger 1s infinite;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.4); }
+            50% { box-shadow: 0 0 0 8px rgba(76, 175, 80, 0); }
+        }
+
+        @keyframes pulse-danger {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(183, 28, 28, 0.4); }
+            50% { box-shadow: 0 0 0 8px rgba(183, 28, 28, 0); }
+        }
+
+        .timer-display {
+            font-size: 1.5rem;
+            font-weight: 700;
+            font-family: 'SF Mono', 'Monaco', monospace;
+            letter-spacing: 2px;
+        }
+
+        .timer-controls {
+            display: flex;
+            gap: 0.25rem;
+        }
+
+        .timer-btn {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: none;
+            background: rgba(255,255,255,0.15);
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            transition: all 0.2s;
+        }
+
+        .timer-btn:hover {
+            background: var(--amazon-orange);
+            transform: scale(1.1);
+        }
+
+        /* Meeting Agenda List */
+        .agenda-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+        }
+
+        .agenda-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            padding: 0.875rem;
+            margin-bottom: 0.5rem;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            background: rgba(255,255,255,0.05);
+            border: 1px solid transparent;
+        }
+
+        .agenda-item:hover {
+            background: rgba(255,255,255,0.1);
+            border-color: rgba(255, 153, 0, 0.3);
+        }
+
+        .agenda-item.active {
+            background: linear-gradient(135deg, rgba(255, 153, 0, 0.3), rgba(255, 153, 0, 0.1));
+            border-color: var(--amazon-orange);
+            box-shadow: 0 4px 15px rgba(255, 153, 0, 0.2);
+        }
+
+        .agenda-item.completed {
+            opacity: 0.6;
+        }
+
+        .agenda-item.completed .agenda-checkbox {
+            background: var(--success);
+            border-color: var(--success);
+        }
+
+        .agenda-checkbox {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            border: 2px solid rgba(255,255,255,0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            flex-shrink: 0;
+            transition: all 0.2s;
+        }
+
+        .agenda-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .agenda-title {
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+            line-height: 1.3;
+        }
+
+        .agenda-meta {
+            font-size: 0.7rem;
+            opacity: 0.7;
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .agenda-duration {
+            background: rgba(255,255,255,0.15);
+            padding: 0.1rem 0.4rem;
+            border-radius: 4px;
+        }
+
+        /* Sidebar Footer / Quick Actions */
+        .sidebar-footer {
+            padding: 1rem;
+            background: rgba(0,0,0,0.2);
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .sidebar-quick-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+        }
+
+        .sidebar-action-btn {
+            padding: 0.6rem;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            cursor: pointer;
+            font-size: 0.75rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.25rem;
+            transition: all 0.2s;
+        }
+
+        .sidebar-action-btn:hover {
+            background: var(--amazon-orange);
+            transform: translateY(-2px);
+        }
+
+        .sidebar-action-btn i {
+            font-size: 1rem;
+        }
+
+        /* Main Meeting Content Area */
+        .wbr-main-content {
+            flex: 1;
+            padding: 1.5rem;
+            overflow-y: auto;
+            min-width: 0;
+        }
+
+        /* Modern Command Header */
+        .wbr-command-header {
+            background: linear-gradient(135deg, var(--amazon-blue) 0%, #1a2533 50%, var(--amazon-blue-dark) 100%);
+            color: white;
+            border-radius: 16px;
+            padding: 1.5rem 2rem;
+            margin-bottom: 1.5rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: var(--spacing-md);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            gap: 1rem;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .wbr-command-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 300px;
+            height: 100%;
+            background: linear-gradient(135deg, transparent, rgba(255, 153, 0, 0.1));
+            pointer-events: none;
+        }
+
+        .wbr-title-section {
+            position: relative;
+            z-index: 1;
         }
 
         .wbr-title-section h2 {
-            font-size: 1.8rem;
+            font-size: 1.75rem;
             font-weight: 700;
             margin: 0;
             display: flex;
             align-items: center;
-            gap: var(--spacing-sm);
+            gap: 0.75rem;
         }
 
         .wbr-icon {
             font-size: 2rem;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
         }
 
         .wbr-subtitle {
-            font-size: 0.95rem;
+            font-size: 0.9rem;
+            opacity: 0.85;
+            margin-top: 0.35rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .wbr-date-badge {
+            background: rgba(255, 153, 0, 0.25);
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .wbr-header-controls {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .wbr-filter-group {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .wbr-filter-section {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 0.5rem 1rem;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.15);
+        }
+
+        .wbr-filter-section label {
+            font-size: 0.8rem;
+            font-weight: 500;
+            white-space: nowrap;
             opacity: 0.9;
-            margin-top: var(--spacing-xs);
+        }
+
+        .wbr-station-select {
+            padding: 0.4rem 2rem 0.4rem 0.75rem;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 0.85rem;
+            min-width: 150px;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='white' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center;
+            transition: all 0.2s;
+        }
+
+        .wbr-station-select:hover, .wbr-station-select:focus {
+            border-color: var(--amazon-orange);
+            background-color: rgba(255, 255, 255, 0.15);
+            outline: none;
+        }
+
+        .wbr-station-select option {
+            background: var(--amazon-blue);
+            color: white;
         }
 
         .wbr-header-actions {
             display: flex;
-            gap: var(--spacing-sm);
+            gap: 0.5rem;
         }
 
         .btn-lg {
             padding: 0.75rem 1.5rem;
-            font-size: 1rem;
+            font-size: 0.95rem;
+            font-weight: 600;
         }
 
         .wbr-export-btn {
-            background: linear-gradient(135deg, var(--amazon-orange), var(--amazon-orange-dark));
-            box-shadow: 0 4px 15px rgba(255, 153, 0, 0.3);
-            transition: all 0.3s ease;
+            background: linear-gradient(135deg, var(--amazon-orange), #e88600);
+            box-shadow: 0 4px 15px rgba(255, 153, 0, 0.35);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 10px;
         }
 
         .wbr-export-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255, 153, 0, 0.45);
+        }
+
+        .wbr-presentation-btn {
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.3);
+            backdrop-filter: blur(10px);
+            border-radius: 10px;
+        }
+
+        .wbr-presentation-btn:hover {
+            background: rgba(255,255,255,0.25);
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(255, 153, 0, 0.4);
+        }
+
+        /* Executive Summary Section */
+        .wbr-executive-summary {
+            background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border: 1px solid rgba(255, 153, 0, 0.15);
+        }
+
+        [data-theme="dark"] .wbr-executive-summary {
+            background: linear-gradient(135deg, var(--bg-primary) 0%, #252525 100%);
+            border-color: rgba(255, 153, 0, 0.2);
+        }
+
+        .executive-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.25rem;
+        }
+
+        .executive-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--amazon-blue);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        [data-theme="dark"] .executive-title {
+            color: var(--amazon-orange);
+        }
+
+        .executive-status {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.35rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .status-indicator.good {
+            background: rgba(76, 175, 80, 0.15);
+            color: var(--success);
+        }
+
+        .status-indicator.warning {
+            background: rgba(255, 152, 0, 0.15);
+            color: #F57C00;
+        }
+
+        .status-indicator.danger {
+            background: rgba(183, 28, 28, 0.15);
+            color: var(--critical);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+        .executive-metrics {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 1rem;
+        }
+
+        .exec-metric-card {
+            background: var(--bg-primary);
+            border-radius: 12px;
+            padding: 1rem;
+            text-align: center;
+            border: 1px solid transparent;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .exec-metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--amazon-orange);
+        }
+
+        .exec-metric-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            border-color: rgba(255, 153, 0, 0.3);
+        }
+
+        .exec-metric-card.highlight {
+            border-color: var(--amazon-orange);
+        }
+
+        .exec-metric-card.highlight::before {
+            background: linear-gradient(90deg, var(--amazon-orange), #FFD814);
+        }
+
+        .exec-metric-icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .exec-metric-value {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            line-height: 1.2;
+        }
+
+        .exec-metric-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
+        }
+
+        .exec-metric-trend {
+            font-size: 0.7rem;
+            margin-top: 0.35rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.2rem;
+            padding: 0.15rem 0.5rem;
+            border-radius: 10px;
+        }
+
+        .exec-metric-trend.up {
+            background: rgba(183, 28, 28, 0.1);
+            color: var(--danger);
+        }
+
+        .exec-metric-trend.down {
+            background: rgba(76, 175, 80, 0.1);
+            color: var(--success);
         }
 
         /* WBR Section Grid */
         .wbr-section-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
-            gap: var(--spacing-lg);
-            margin-bottom: var(--spacing-lg);
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.25rem;
+            margin-bottom: 1.25rem;
         }
 
-        /* WBR Cards */
+        /* Modern WBR Cards with Glassmorphism */
         .wbr-card {
             background: var(--bg-primary);
-            border-radius: 12px;
-            padding: var(--spacing-lg);
-            box-shadow: 0 2px 12px var(--shadow);
-            transition: all 0.3s ease;
-            border: 1px solid transparent;
+            border-radius: 16px;
+            padding: 1.25rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(0,0,0,0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        [data-theme="dark"] .wbr-card {
+            border-color: rgba(255,255,255,0.08);
+        }
+
+        .wbr-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--amazon-orange), transparent);
+            opacity: 0;
+            transition: opacity 0.3s;
         }
 
         .wbr-card:hover {
-            box-shadow: 0 4px 20px var(--shadow-hover);
-            border-color: rgba(255, 153, 0, 0.2);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 35px rgba(0,0,0,0.1);
+        }
+
+        .wbr-card:hover::after {
+            opacity: 1;
         }
 
         .wbr-card.full-width {
@@ -1529,147 +2194,164 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: var(--spacing-md);
-            padding-bottom: var(--spacing-sm);
-            border-bottom: 2px solid var(--bg-secondary);
+            margin-bottom: 1rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--bg-secondary);
         }
 
         .wbr-card-header h3 {
-            font-size: 1.1rem;
-            font-weight: 600;
+            font-size: 1rem;
+            font-weight: 700;
             display: flex;
             align-items: center;
-            gap: var(--spacing-sm);
+            gap: 0.5rem;
             margin: 0;
+            color: var(--text-primary);
         }
 
         .card-icon {
-            font-size: 1.3rem;
+            font-size: 1.2rem;
         }
 
         .wbr-badge {
             padding: 0.3rem 0.75rem;
             border-radius: 20px;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             font-weight: 600;
             background: var(--bg-secondary);
             color: var(--text-primary);
         }
 
         .wbr-badge.danger {
-            background: rgba(183, 28, 28, 0.15);
+            background: linear-gradient(135deg, rgba(183, 28, 28, 0.15), rgba(255, 87, 34, 0.1));
             color: var(--critical);
         }
 
         .wbr-badge.success {
-            background: rgba(76, 175, 80, 0.15);
+            background: linear-gradient(135deg, rgba(76, 175, 80, 0.15), rgba(129, 199, 132, 0.1));
             color: var(--success);
         }
 
         .wbr-badge.warning {
-            background: rgba(255, 193, 7, 0.15);
-            color: #F57C00;
+            background: linear-gradient(135deg, rgba(255, 193, 7, 0.2), rgba(255, 152, 0, 0.1));
+            color: #E65100;
         }
 
         .wbr-subtitle-text {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             color: var(--text-secondary);
         }
 
         .wbr-select {
             padding: 0.4rem 0.8rem;
-            border: 1px solid var(--border);
-            border-radius: 6px;
+            border: 1px solid var(--bg-secondary);
+            border-radius: 8px;
             background: var(--bg-secondary);
             color: var(--text-primary);
-            font-size: 0.85rem;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .wbr-select:hover, .wbr-select:focus {
+            border-color: var(--amazon-orange);
+            outline: none;
         }
 
         .wbr-info-badge {
             cursor: help;
             font-size: 1rem;
-            opacity: 0.7;
+            opacity: 0.6;
+            transition: opacity 0.2s;
         }
 
-        /* WBR Station Filter */
-        .wbr-filter-section {
-            display: flex;
-            align-items: center;
-            gap: var(--spacing-md);
-            background: rgba(255, 255, 255, 0.1);
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
-            margin-left: var(--spacing-lg);
+        .wbr-info-badge:hover {
+            opacity: 1;
         }
 
-        .wbr-filter-section label {
-            font-size: 0.9rem;
-            font-weight: 500;
-            white-space: nowrap;
-        }
-
-        .wbr-station-select {
-            padding: 0.5rem 2rem 0.5rem 0.75rem;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 6px;
-            background: rgba(255, 255, 255, 0.15);
-            color: white;
-            font-size: 0.9rem;
-            min-width: 180px;
-            cursor: pointer;
-            appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='white' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 0.75rem center;
-        }
-
-        .wbr-station-select:hover {
-            border-color: var(--amazon-orange);
-            background-color: rgba(255, 255, 255, 0.2);
-        }
-
-        .wbr-station-select option {
-            background: var(--amazon-blue);
-            color: white;
-        }
-
-        /* Dashboard Color Legend Bar */
+        /* Collapsible Color Legend */
         .wbr-color-legend-bar {
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-            border: 1px solid #dee2e6;
-            border-radius: 8px;
-            padding: 12px 20px;
-            margin-bottom: var(--spacing-lg);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            background: linear-gradient(135deg, #f8f9fa 0%, #fff 100%);
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            margin-bottom: 1.25rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            overflow: hidden;
+        }
+
+        [data-theme="dark"] .wbr-color-legend-bar {
+            background: linear-gradient(135deg, #2d2d2d 0%, var(--bg-primary) 100%);
+            border-color: #404040;
+        }
+
+        .legend-toggle {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 1.25rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .legend-toggle:hover {
+            background: rgba(255, 153, 0, 0.05);
         }
 
         .wbr-color-legend-bar .legend-title {
             font-weight: 600;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             color: var(--amazon-blue);
-            margin-bottom: 10px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        [data-theme="dark"] .wbr-color-legend-bar .legend-title {
+            color: var(--amazon-orange);
+        }
+
+        .legend-toggle-icon {
+            font-size: 0.75rem;
+            transition: transform 0.3s;
+        }
+
+        .wbr-color-legend-bar.collapsed .legend-toggle-icon {
+            transform: rotate(-90deg);
+        }
+
+        .legend-content {
+            padding: 0 1.25rem 1rem;
+            max-height: 150px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .wbr-color-legend-bar.collapsed .legend-content {
+            max-height: 0;
+            padding-top: 0;
+            padding-bottom: 0;
         }
 
         .wbr-color-legend-bar .legend-items-row {
             display: flex;
             flex-wrap: wrap;
-            gap: 20px;
+            gap: 1.5rem;
             align-items: flex-start;
         }
 
         .wbr-color-legend-bar .legend-group {
             display: flex;
             flex-direction: column;
-            gap: 4px;
+            gap: 0.3rem;
         }
 
         .wbr-color-legend-bar .legend-group-title {
             font-weight: 600;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             color: var(--text-secondary);
-            margin-bottom: 4px;
+            margin-bottom: 0.25rem;
             text-transform: uppercase;
             letter-spacing: 0.3px;
         }
@@ -1677,45 +2359,110 @@
         .wbr-color-legend-bar .legend-item-inline {
             display: flex;
             align-items: center;
-            gap: 6px;
-            font-size: 0.8rem;
+            gap: 0.4rem;
+            font-size: 0.75rem;
             color: var(--text-primary);
         }
 
         .wbr-color-legend-bar .color-dot {
-            width: 12px;
-            height: 12px;
+            width: 10px;
+            height: 10px;
             border-radius: 50%;
             flex-shrink: 0;
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
         }
 
         .wbr-color-legend-bar .legend-divider {
             width: 1px;
-            height: 80px;
+            height: 60px;
             background: #dee2e6;
             align-self: center;
         }
 
+        [data-theme="dark"] .wbr-color-legend-bar .legend-divider {
+            background: #404040;
+        }
+
         @media (max-width: 1200px) {
             .wbr-color-legend-bar .legend-items-row {
-                gap: 15px;
+                gap: 1rem;
             }
             .wbr-color-legend-bar .legend-divider {
                 display: none;
+            }
+            .executive-metrics {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .global-filter-bar {
+                display: none;
+            }
+            .nav-inner {
+                justify-content: center;
             }
         }
 
         @media (max-width: 768px) {
             .wbr-color-legend-bar .legend-items-row {
                 flex-direction: column;
-                gap: 12px;
+                gap: 0.75rem;
             }
             .wbr-color-legend-bar .legend-group {
                 flex-direction: row;
                 flex-wrap: wrap;
-                gap: 8px;
+                gap: 0.5rem;
             }
+            .wbr-sidebar {
+                transform: translateX(-100%);
+                width: 280px;
+            }
+            .wbr-sidebar.mobile-open {
+                transform: translateX(0);
+            }
+            .wbr-sidebar-spacer {
+                display: none;
+            }
+            .wbr-main-content {
+                padding: 1rem;
+            }
+            .executive-metrics {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .mobile-sidebar-toggle {
+                display: flex !important;
+            }
+        }
+
+        /* Mobile Sidebar Toggle Button */
+        .mobile-sidebar-toggle {
+            display: none;
+            position: fixed;
+            bottom: 1.5rem;
+            left: 1rem;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: var(--amazon-blue);
+            color: white;
+            border: none;
+            cursor: pointer;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            box-shadow: var(--shadow-lg);
+            z-index: 850;
+            transition: var(--transition);
+        }
+
+        .mobile-sidebar-toggle:hover {
+            background: var(--amazon-orange);
+            transform: scale(1.1);
+        }
+
+        .mobile-sidebar-toggle.active i {
+            transform: rotate(180deg);
         }
 
         /* ==================== UNIVERSAL DASHBOARD STYLES ==================== */
@@ -2860,6 +3607,435 @@
             font-style: italic;
         }
 
+        /* Action Items Section */
+        .wbr-action-items {
+            background: var(--bg-primary);
+            border-radius: 16px;
+            padding: 1.25rem;
+            margin-bottom: 1.25rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .action-items-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--bg-secondary);
+        }
+
+        .action-items-title {
+            font-size: 1rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 0;
+        }
+
+        .action-items-count {
+            background: var(--amazon-orange);
+            color: white;
+            padding: 0.2rem 0.6rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .add-action-btn {
+            padding: 0.4rem 0.8rem;
+            border: 1px dashed var(--amazon-orange);
+            border-radius: 8px;
+            background: transparent;
+            color: var(--amazon-orange);
+            cursor: pointer;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            transition: all 0.2s;
+        }
+
+        .add-action-btn:hover {
+            background: var(--amazon-orange);
+            color: white;
+            border-style: solid;
+        }
+
+        .action-items-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .action-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            padding: 0.875rem;
+            background: var(--bg-secondary);
+            border-radius: 10px;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+
+        .action-item:hover {
+            background: rgba(255, 153, 0, 0.05);
+        }
+
+        .action-item.high-priority {
+            border-left-color: var(--critical);
+        }
+
+        .action-item.medium-priority {
+            border-left-color: var(--warning);
+        }
+
+        .action-item.low-priority {
+            border-left-color: var(--success);
+        }
+
+        .action-item.completed {
+            opacity: 0.6;
+        }
+
+        .action-item.completed .action-text {
+            text-decoration: line-through;
+        }
+
+        .action-checkbox {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            border: 2px solid var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            flex-shrink: 0;
+            transition: all 0.2s;
+        }
+
+        .action-checkbox:hover {
+            border-color: var(--amazon-orange);
+        }
+
+        .action-checkbox.checked {
+            background: var(--success);
+            border-color: var(--success);
+            color: white;
+        }
+
+        .action-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .action-text {
+            font-size: 0.9rem;
+            color: var(--text-primary);
+            margin-bottom: 0.35rem;
+        }
+
+        .action-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .action-owner {
+            background: rgba(255, 153, 0, 0.15);
+            color: var(--amazon-orange-dark);
+            padding: 0.15rem 0.5rem;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+
+        .action-due {
+            display: flex;
+            align-items: center;
+            gap: 0.2rem;
+        }
+
+        .action-due.overdue {
+            color: var(--critical);
+        }
+
+        /* Meeting Notes Section */
+        .wbr-meeting-notes {
+            background: var(--bg-primary);
+            border-radius: 16px;
+            padding: 1.25rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .meeting-notes-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .meeting-notes-title {
+            font-size: 1rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 0;
+        }
+
+        .notes-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .notes-btn {
+            padding: 0.35rem 0.7rem;
+            border: none;
+            border-radius: 6px;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            cursor: pointer;
+            font-size: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            transition: all 0.2s;
+        }
+
+        .notes-btn:hover {
+            background: var(--amazon-orange);
+            color: white;
+        }
+
+        .meeting-notes-textarea {
+            width: 100%;
+            min-height: 150px;
+            padding: 1rem;
+            border: 1px solid var(--bg-secondary);
+            border-radius: 10px;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            line-height: 1.6;
+            resize: vertical;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+
+        .meeting-notes-textarea:focus {
+            outline: none;
+            border-color: var(--amazon-orange);
+            background: var(--bg-primary);
+        }
+
+        .meeting-notes-textarea::placeholder {
+            color: var(--text-secondary);
+        }
+
+        /* Quick Stats Bar (Modern) */
+        .wbr-quick-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            padding: 1.25rem;
+            background: linear-gradient(135deg, var(--amazon-blue) 0%, #1a2533 100%);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+            margin-top: 1.25rem;
+        }
+
+        .quick-stat {
+            text-align: center;
+            padding: 1rem 0.75rem;
+            background: rgba(255,255,255,0.08);
+            border-radius: 12px;
+            transition: all 0.3s;
+        }
+
+        .quick-stat:hover {
+            background: rgba(255,255,255,0.12);
+            transform: translateY(-2px);
+        }
+
+        .quick-stat .stat-icon {
+            font-size: 1.75rem;
+            display: block;
+            margin-bottom: 0.5rem;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+        }
+
+        .quick-stat .stat-value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--amazon-orange);
+            display: block;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .quick-stat .stat-label {
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.8);
+            margin-top: 0.25rem;
+        }
+
+        /* Floating Action Button */
+        .wbr-fab {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--amazon-orange), #e88600);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 6px 20px rgba(255, 153, 0, 0.4);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 100;
+        }
+
+        .wbr-fab:hover {
+            transform: scale(1.1) rotate(90deg);
+            box-shadow: 0 8px 30px rgba(255, 153, 0, 0.5);
+        }
+
+        .wbr-fab-menu {
+            position: fixed;
+            bottom: 6rem;
+            right: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(20px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 99;
+        }
+
+        .wbr-fab-menu.open {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .fab-menu-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            justify-content: flex-end;
+        }
+
+        .fab-menu-label {
+            background: var(--amazon-blue);
+            color: white;
+            padding: 0.5rem 0.75rem;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            white-space: nowrap;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .fab-menu-btn {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: var(--amazon-blue);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: all 0.2s;
+        }
+
+        .fab-menu-btn:hover {
+            background: var(--amazon-orange);
+            transform: scale(1.1);
+        }
+
+        /* Keyboard Shortcuts Modal */
+        .shortcuts-modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--bg-primary);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.25);
+            z-index: 1001;
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .shortcuts-modal.active {
+            display: block;
+            animation: fadeInScale 0.2s ease-out;
+        }
+
+        @keyframes fadeInScale {
+            from { opacity: 0; transform: translate(-50%, -50%) scale(0.95); }
+            to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        }
+
+        .shortcuts-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+
+        .shortcuts-overlay.active {
+            display: block;
+        }
+
+        .shortcut-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--bg-secondary);
+        }
+
+        .shortcut-key {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .shortcut-key kbd {
+            background: var(--bg-secondary);
+            padding: 0.3rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-family: 'SF Mono', monospace;
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+
         /* WBR Responsive */
         @media (max-width: 1024px) {
             .wbr-section-grid {
@@ -2869,6 +4045,12 @@
             .wbr-command-header {
                 flex-direction: column;
                 text-align: center;
+            }
+
+            .wbr-header-controls {
+                width: 100%;
+                justify-content: center;
+                flex-wrap: wrap;
             }
 
             .quality-scorecard {
@@ -2891,6 +4073,29 @@
 
             .chaser-summary-cards {
                 grid-template-columns: 1fr;
+            }
+
+            .wbr-fab {
+                bottom: 1rem;
+                right: 1rem;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .wbr-main-content {
+                padding: 1rem;
+            }
+
+            .executive-metrics {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .exec-metric-card {
+                padding: 0.75rem;
+            }
+
+            .exec-metric-value {
+                font-size: 1.5rem;
             }
         }
     </style>
@@ -2926,36 +4131,60 @@
         </div>
     </header>
 
-    <!-- Navigation -->
+    <!-- Navigation with Global Filters -->
     <nav class="nav-container">
-        <div class="nav-tabs">
-            <div class="nav-tab active" data-module="overview" onclick="switchModule('overview', event)">
-                <span class="nav-tab-icon">📊</span>
-                <span>Overview</span>
+        <div class="nav-inner">
+            <div class="nav-tabs">
+                <div class="nav-tab active" data-module="overview" onclick="switchModule('overview', event)">
+                    <span class="tab-icon">📊</span>
+                    <span>Overview</span>
+                </div>
+                <div class="nav-tab" data-module="injury" onclick="switchModule('injury', event)">
+                    <span class="tab-icon">🏥</span>
+                    <span>Injury</span>
+                </div>
+                <div class="nav-tab" data-module="nearmiss" onclick="switchModule('nearmiss', event)">
+                    <span class="tab-icon">⚠️</span>
+                    <span>Near Miss</span>
+                </div>
+                <div class="nav-tab" data-module="combined" onclick="switchModule('combined', event)">
+                    <span class="tab-icon">📈</span>
+                    <span>Combined</span>
+                </div>
+                <div class="nav-tab" data-module="inspections" onclick="switchModule('inspections', event)">
+                    <span class="tab-icon">📋</span>
+                    <span>Inspections</span>
+                </div>
+                <div class="nav-tab" data-module="wbr" onclick="switchModule('wbr', event)">
+                    <span class="tab-icon">🎯</span>
+                    <span>Weekly Meeting</span>
+                </div>
+                <div class="nav-tab" data-module="reports" onclick="switchModule('reports', event)">
+                    <span class="tab-icon">📄</span>
+                    <span>Reports</span>
+                </div>
             </div>
-            <div class="nav-tab" data-module="injury" onclick="switchModule('injury', event)">
-                <span class="nav-tab-icon">🏥</span>
-                <span>Injury & Illness</span>
-            </div>
-            <div class="nav-tab" data-module="nearmiss" onclick="switchModule('nearmiss', event)">
-                <span class="nav-tab-icon">⚠️</span>
-                <span>Near Miss</span>
-            </div>
-            <div class="nav-tab" data-module="combined" onclick="switchModule('combined', event)">
-                <span class="nav-tab-icon">📈</span>
-                <span>Combined Analytics</span>
-            </div>
-            <div class="nav-tab" data-module="inspections" onclick="switchModule('inspections', event)">
-                <span class="nav-tab-icon">📋</span>
-                <span>Inspections</span>
-            </div>
-            <div class="nav-tab" data-module="wbr" onclick="switchModule('wbr', event)">
-                <span class="nav-tab-icon">🎯</span>
-                <span>WBR Dashboard</span>
-            </div>
-            <div class="nav-tab" data-module="reports" onclick="switchModule('reports', event)">
-                <span class="nav-tab-icon">📄</span>
-                <span>Reports</span>
+            <div class="global-filter-bar">
+                <div class="filter-group">
+                    <label>Period</label>
+                    <select id="globalTimePeriod" onchange="applyGlobalFilters()">
+                        <option value="all">All Time</option>
+                        <option value="week">Last Week</option>
+                        <option value="month">Last Month</option>
+                        <option value="quarter">Last Quarter</option>
+                        <option value="ytd">Year to Date</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Station</label>
+                    <select id="globalStation" onchange="applyGlobalFilters()">
+                        <option value="">All Stations</option>
+                    </select>
+                </div>
+                <div class="filter-sync-indicator" id="filterSyncIndicator">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Synced</span>
+                </div>
             </div>
         </div>
     </nav>
@@ -4338,80 +5567,217 @@
             </div>
         </div>
 
-        <!-- WBR Dashboard Module - DSM Command Center -->
+        <!-- WBR Dashboard Module - Weekly Meeting Command Center -->
         <div id="wbr" class="tab-content">
-            <!-- WBR Header with One-Click Export -->
-            <div class="wbr-command-header">
-                <div class="wbr-title-section">
-                    <h2><span class="wbr-icon">🎯</span> WBR Command Center</h2>
-                    <p class="wbr-subtitle">Your Weekly Business Review Intelligence Dashboard</p>
-                </div>
-                <div class="wbr-filter-section">
-                    <label for="wbrTimePeriodFilter">Period:</label>
-                    <select id="wbrTimePeriodFilter" class="wbr-station-select" onchange="applyWBRTimePeriodFilter()">
-                        <option value="all">All Time</option>
-                        <option value="week">Last Week</option>
-                        <option value="month">Last Month</option>
-                        <option value="ytd">Year to Date</option>
-                    </select>
-                </div>
-                <div class="wbr-filter-section">
-                    <label for="wbrStationFilter">Station:</label>
-                    <select id="wbrStationFilter" class="wbr-station-select" onchange="applyWBRStationFilter()">
-                        <option value="">All Stations</option>
-                    </select>
-                </div>
-                <div class="wbr-header-actions">
-                    <button class="btn btn-primary btn-lg wbr-export-btn" onclick="generateOneClickWBRDeck()">
-                        <span>📊</span> One-Click WBR Deck
-                    </button>
-                    <button class="btn btn-secondary" onclick="refreshWBRData()">
-                        <span>🔄</span> Refresh Data
-                    </button>
-                </div>
-            </div>
+            <div class="wbr-meeting-layout" id="wbrMeetingLayout">
+                <!-- Meeting Sidebar / Agenda Panel -->
+                <aside class="wbr-sidebar" id="wbrSidebar">
+                    <div class="sidebar-header">
+                        <h3><i class="fas fa-clipboard-list"></i> Meeting Agenda</h3>
+                        <div class="meeting-timer" id="meetingTimer">
+                            <span class="timer-display" id="timerDisplay">00:00</span>
+                            <div class="timer-controls">
+                                <button class="timer-btn" onclick="toggleMeetingTimer()" id="timerPlayBtn" title="Start/Pause">
+                                    <i class="fas fa-play"></i>
+                                </button>
+                                <button class="timer-btn" onclick="resetMeetingTimer()" title="Reset">
+                                    <i class="fas fa-redo"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="agenda-list" id="agendaList">
+                        <div class="agenda-item active" data-section="executive" onclick="scrollToSection('executive')">
+                            <div class="agenda-checkbox">1</div>
+                            <div class="agenda-content">
+                                <div class="agenda-title">Executive Summary</div>
+                                <div class="agenda-meta"><span class="agenda-duration">2 min</span></div>
+                            </div>
+                        </div>
+                        <div class="agenda-item" data-section="indicators" onclick="scrollToSection('indicators')">
+                            <div class="agenda-checkbox">2</div>
+                            <div class="agenda-content">
+                                <div class="agenda-title">Safety Indicators</div>
+                                <div class="agenda-meta"><span class="agenda-duration">3 min</span></div>
+                            </div>
+                        </div>
+                        <div class="agenda-item" data-section="bodymap" onclick="scrollToSection('bodymap')">
+                            <div class="agenda-checkbox">3</div>
+                            <div class="agenda-content">
+                                <div class="agenda-title">Body Map & Risk Areas</div>
+                                <div class="agenda-meta"><span class="agenda-duration">4 min</span></div>
+                            </div>
+                        </div>
+                        <div class="agenda-item" data-section="inspections" onclick="scrollToSection('inspections')">
+                            <div class="agenda-checkbox">4</div>
+                            <div class="agenda-content">
+                                <div class="agenda-title">Inspections & Audits</div>
+                                <div class="agenda-meta"><span class="agenda-duration">3 min</span></div>
+                            </div>
+                        </div>
+                        <div class="agenda-item" data-section="predictions" onclick="scrollToSection('predictions')">
+                            <div class="agenda-checkbox">5</div>
+                            <div class="agenda-content">
+                                <div class="agenda-title">Predictive Insights</div>
+                                <div class="agenda-meta"><span class="agenda-duration">3 min</span></div>
+                            </div>
+                        </div>
+                        <div class="agenda-item" data-section="nearmisses" onclick="scrollToSection('nearmisses')">
+                            <div class="agenda-checkbox">6</div>
+                            <div class="agenda-content">
+                                <div class="agenda-title">Noteworthy Near Misses</div>
+                                <div class="agenda-meta"><span class="agenda-duration">4 min</span></div>
+                            </div>
+                        </div>
+                        <div class="agenda-item" data-section="actions" onclick="scrollToSection('actions')">
+                            <div class="agenda-checkbox">7</div>
+                            <div class="agenda-content">
+                                <div class="agenda-title">Action Items</div>
+                                <div class="agenda-meta"><span class="agenda-duration">5 min</span></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="sidebar-footer">
+                        <div class="sidebar-quick-actions">
+                            <button class="sidebar-action-btn" onclick="generateOneClickWBRDeck()">
+                                <i class="fas fa-file-export"></i>
+                                <span>Export</span>
+                            </button>
+                            <button class="sidebar-action-btn" onclick="togglePresentationMode()">
+                                <i class="fas fa-expand"></i>
+                                <span>Present</span>
+                            </button>
+                            <button class="sidebar-action-btn" onclick="copyMeetingNotes()">
+                                <i class="fas fa-copy"></i>
+                                <span>Copy Notes</span>
+                            </button>
+                            <button class="sidebar-action-btn" onclick="showKeyboardShortcuts()">
+                                <i class="fas fa-keyboard"></i>
+                                <span>Shortcuts</span>
+                            </button>
+                        </div>
+                    </div>
+                </aside>
 
-            <!-- Dashboard Color Legend -->
-            <div class="wbr-color-legend-bar">
-                <div class="legend-title">Dashboard Color Guide:</div>
-                <div class="legend-items-row">
-                    <div class="legend-group">
-                        <span class="legend-group-title">Severity</span>
-                        <div class="legend-item-inline"><span class="color-dot" style="background: #B71C1C;"></span><span>A - Critical</span></div>
-                        <div class="legend-item-inline"><span class="color-dot" style="background: #FF9800;"></span><span>B - High</span></div>
-                        <div class="legend-item-inline"><span class="color-dot" style="background: #FFC107;"></span><span>C - Medium</span></div>
-                        <div class="legend-item-inline"><span class="color-dot" style="background: #4CAF50;"></span><span>D - Low</span></div>
-                    </div>
-                    <div class="legend-divider"></div>
-                    <div class="legend-group">
-                        <span class="legend-group-title">Risk Score</span>
-                        <div class="legend-item-inline"><span class="color-dot" style="background: #B71C1C;"></span><span>20-25 (Critical)</span></div>
-                        <div class="legend-item-inline"><span class="color-dot" style="background: #FF9800;"></span><span>15-19 (High)</span></div>
-                        <div class="legend-item-inline"><span class="color-dot" style="background: #FFC107;"></span><span>8-14 (Medium)</span></div>
-                        <div class="legend-item-inline"><span class="color-dot" style="background: #4CAF50;"></span><span>1-7 (Low)</span></div>
-                    </div>
-                    <div class="legend-divider"></div>
-                    <div class="legend-group">
-                        <span class="legend-group-title">NM:Injury Ratio</span>
-                        <div class="legend-item-inline"><span class="color-dot" style="background: #B71C1C;"></span><span>&lt;5:1 (Critical)</span></div>
-                        <div class="legend-item-inline"><span class="color-dot" style="background: #FFC107;"></span><span>5-10:1 (Caution)</span></div>
-                        <div class="legend-item-inline"><span class="color-dot" style="background: #4CAF50;"></span><span>&gt;10:1 (Good)</span></div>
-                    </div>
-                    <div class="legend-divider"></div>
-                    <div class="legend-group">
-                        <span class="legend-group-title">Data Quality</span>
-                        <div class="legend-item-inline"><span class="color-dot" style="background: #4CAF50;"></span><span>90%+ (Excellent)</span></div>
-                        <div class="legend-item-inline"><span class="color-dot" style="background: #FFC107;"></span><span>70-89% (Good)</span></div>
-                        <div class="legend-item-inline"><span class="color-dot" style="background: #FF9800;"></span><span>50-69% (Fair)</span></div>
-                        <div class="legend-item-inline"><span class="color-dot" style="background: #B71C1C;"></span><span>&lt;50% (Poor)</span></div>
-                    </div>
-                </div>
-            </div>
+                <!-- Sidebar Spacer (for fixed positioning) -->
+                <div class="wbr-sidebar-spacer"></div>
 
-            <!-- Leading vs Lagging Indicator Section -->
-            <div class="wbr-section-grid">
-                <!-- Leading/Lagging Gauge Card -->
-                <div class="wbr-card wbr-gauge-card">
+                <!-- Main Meeting Content -->
+                <main class="wbr-main-content" id="wbrMainContent">
+                    <!-- Modern Command Header -->
+                    <div class="wbr-command-header">
+                        <div class="wbr-title-section">
+                            <h2><span class="wbr-icon">🎯</span> Weekly Safety Review</h2>
+                            <p class="wbr-subtitle">
+                                <span>WBR Command Center</span>
+                                <span class="wbr-date-badge" id="wbrDateBadge">Week of Dec 2, 2024</span>
+                            </p>
+                        </div>
+                        <div class="wbr-header-actions">
+                            <button class="btn btn-secondary wbr-presentation-btn" onclick="togglePresentationMode()">
+                                <i class="fas fa-expand"></i> Present
+                            </button>
+                            <button class="btn btn-secondary" onclick="refreshWBRData()">
+                                <i class="fas fa-sync-alt"></i> Refresh
+                            </button>
+                            <button class="btn btn-primary btn-lg wbr-export-btn" onclick="generateOneClickWBRDeck()">
+                                <i class="fas fa-file-powerpoint"></i> Export Deck
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Mobile Sidebar Toggle -->
+                    <button class="mobile-sidebar-toggle" id="mobileSidebarToggle" onclick="toggleMobileSidebar()">
+                        <i class="fas fa-bars"></i>
+                    </button>
+
+                    <!-- Executive Summary Section -->
+                    <section class="wbr-executive-summary" id="wbrSectionExecutive">
+                        <div class="executive-header">
+                            <h3 class="executive-title"><i class="fas fa-chart-line"></i> Executive Summary</h3>
+                            <div class="executive-status">
+                                <span class="status-indicator good" id="execStatusSafety"><span class="status-dot"></span> Safety On Track</span>
+                                <span class="status-indicator warning" id="execStatusQuality"><span class="status-dot"></span> Data Quality: Review</span>
+                            </div>
+                        </div>
+                        <div class="executive-metrics">
+                            <div class="exec-metric-card highlight">
+                                <div class="exec-metric-icon">🔢</div>
+                                <div class="exec-metric-value" id="execTotalIncidents">0</div>
+                                <div class="exec-metric-label">Total Incidents</div>
+                                <div class="exec-metric-trend down" id="execIncidentsTrend"><i class="fas fa-arrow-down"></i> 12%</div>
+                            </div>
+                            <div class="exec-metric-card">
+                                <div class="exec-metric-icon">🏥</div>
+                                <div class="exec-metric-value" id="execRecordables">0</div>
+                                <div class="exec-metric-label">Recordables</div>
+                                <div class="exec-metric-trend down" id="execRecordablesTrend"><i class="fas fa-arrow-down"></i> 8%</div>
+                            </div>
+                            <div class="exec-metric-card">
+                                <div class="exec-metric-icon">⚠️</div>
+                                <div class="exec-metric-value" id="execNearMisses">0</div>
+                                <div class="exec-metric-label">Near Misses</div>
+                                <div class="exec-metric-trend up" id="execNearMissTrend"><i class="fas fa-arrow-up"></i> 15%</div>
+                            </div>
+                            <div class="exec-metric-card">
+                                <div class="exec-metric-icon">📅</div>
+                                <div class="exec-metric-value" id="execDaysSafe">0</div>
+                                <div class="exec-metric-label">Days Safe</div>
+                            </div>
+                            <div class="exec-metric-card">
+                                <div class="exec-metric-icon">📊</div>
+                                <div class="exec-metric-value" id="execNMRatio">0:1</div>
+                                <div class="exec-metric-label">NM:Injury Ratio</div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Collapsible Color Legend -->
+                    <div class="wbr-color-legend-bar" id="wbrColorLegend">
+                        <div class="legend-toggle" onclick="toggleColorLegend()">
+                            <div class="legend-title"><i class="fas fa-palette"></i> Dashboard Color Guide</div>
+                            <i class="fas fa-chevron-down legend-toggle-icon"></i>
+                        </div>
+                        <div class="legend-content">
+                            <div class="legend-items-row">
+                                <div class="legend-group">
+                                    <span class="legend-group-title">Severity</span>
+                                    <div class="legend-item-inline"><span class="color-dot" style="background: #B71C1C;"></span><span>A - Critical</span></div>
+                                    <div class="legend-item-inline"><span class="color-dot" style="background: #FF9800;"></span><span>B - High</span></div>
+                                    <div class="legend-item-inline"><span class="color-dot" style="background: #FFC107;"></span><span>C - Medium</span></div>
+                                    <div class="legend-item-inline"><span class="color-dot" style="background: #4CAF50;"></span><span>D - Low</span></div>
+                                </div>
+                                <div class="legend-divider"></div>
+                                <div class="legend-group">
+                                    <span class="legend-group-title">Risk Score</span>
+                                    <div class="legend-item-inline"><span class="color-dot" style="background: #B71C1C;"></span><span>20-25 Critical</span></div>
+                                    <div class="legend-item-inline"><span class="color-dot" style="background: #FF9800;"></span><span>15-19 High</span></div>
+                                    <div class="legend-item-inline"><span class="color-dot" style="background: #FFC107;"></span><span>8-14 Medium</span></div>
+                                    <div class="legend-item-inline"><span class="color-dot" style="background: #4CAF50;"></span><span>1-7 Low</span></div>
+                                </div>
+                                <div class="legend-divider"></div>
+                                <div class="legend-group">
+                                    <span class="legend-group-title">NM:Injury Ratio</span>
+                                    <div class="legend-item-inline"><span class="color-dot" style="background: #B71C1C;"></span><span>&lt;5:1 Critical</span></div>
+                                    <div class="legend-item-inline"><span class="color-dot" style="background: #FFC107;"></span><span>5-10:1 Caution</span></div>
+                                    <div class="legend-item-inline"><span class="color-dot" style="background: #4CAF50;"></span><span>&gt;10:1 Good</span></div>
+                                </div>
+                                <div class="legend-divider"></div>
+                                <div class="legend-group">
+                                    <span class="legend-group-title">Data Quality</span>
+                                    <div class="legend-item-inline"><span class="color-dot" style="background: #4CAF50;"></span><span>90%+ Excellent</span></div>
+                                    <div class="legend-item-inline"><span class="color-dot" style="background: #FFC107;"></span><span>70-89% Good</span></div>
+                                    <div class="legend-item-inline"><span class="color-dot" style="background: #FF9800;"></span><span>50-69% Fair</span></div>
+                                    <div class="legend-item-inline"><span class="color-dot" style="background: #B71C1C;"></span><span>&lt;50% Poor</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Leading vs Lagging Indicator Section -->
+                    <section class="wbr-section-grid" id="wbrSectionIndicators">
+                        <!-- Leading/Lagging Gauge Card -->
+                        <div class="wbr-card wbr-gauge-card">
                     <div class="wbr-card-header">
                         <h3><span class="card-icon">📈</span> Leading vs Lagging Indicator Ratio</h3>
                         <span class="wbr-info-badge" title="Leading indicators (Near Misses, Safety Observations) vs Lagging indicators (Recordable Injuries)">ℹ️</span>
@@ -4489,12 +5855,12 @@
                         </div>
                     </div>
                 </div>
-            </div>
+                    </section>
 
-            <!-- Body Part Injury Man & Station Heat Map -->
-            <div class="wbr-section-grid gemba-section">
-                <!-- Body Part Injury Man -->
-                <div class="wbr-card wbr-body-card">
+                    <!-- Body Part Injury Man & Station Heat Map -->
+                    <section class="wbr-section-grid gemba-section" id="wbrSectionBodymap">
+                        <!-- Body Part Injury Man -->
+                        <div class="wbr-card wbr-body-card">
                     <div class="wbr-card-header">
                         <h3><span class="card-icon">🦴</span> Injury Body Map</h3>
                         <span class="wbr-subtitle-text">Focus Areas for Safety Training</span>
@@ -4613,12 +5979,12 @@
                         </div>
                     </div>
                 </div>
-            </div>
+                    </section>
 
-            <!-- Austin Integration & Inspection Gap Analysis -->
-            <div class="wbr-section-grid austin-section">
-                <!-- Austin Deep Links & Overdue Inspections -->
-                <div class="wbr-card wbr-austin-card">
+                    <!-- Austin Integration & Inspection Gap Analysis -->
+                    <section class="wbr-section-grid austin-section" id="wbrSectionInspections">
+                        <!-- Austin Deep Links & Overdue Inspections -->
+                        <div class="wbr-card wbr-austin-card">
                     <div class="wbr-card-header">
                         <h3><span class="card-icon">🔗</span> Austin Integration</h3>
                         <span class="wbr-badge danger" id="overdueAuditBadge">0 Overdue</span>
@@ -4663,10 +6029,10 @@
                         </div>
                     </div>
                 </div>
-            </div>
+                    </section>
 
-            <!-- Predictive Analytics - "Crystal Ball" -->
-            <div class="wbr-card wbr-predictive-card full-width">
+                    <!-- Predictive Analytics - "Crystal Ball" -->
+                    <section class="wbr-card wbr-predictive-card full-width" id="wbrSectionPredictions">
                 <div class="wbr-card-header">
                     <h3><span class="card-icon">🔮</span> Predictive Risk Analysis - "Crystal Ball"</h3>
                     <span class="wbr-subtitle-text">AI-Powered Incident Forecasting</span>
@@ -4696,8 +6062,10 @@
                 </div>
             </div>
 
-            <!-- Noteworthy Near Misses Section -->
-            <div class="wbr-card wbr-noteworthy-card full-width">
+                    </section>
+
+                    <!-- Noteworthy Near Misses Section -->
+                    <section class="wbr-card wbr-noteworthy-card full-width" id="wbrSectionNearmisses">
                 <div class="wbr-card-header">
                     <h3><span class="card-icon">📢</span> Noteworthy Near Misses This Week</h3>
                     <span class="wbr-subtitle-text">High-potential incidents for team awareness</span>
@@ -4717,27 +6085,170 @@
                 </div>
             </div>
 
-            <!-- WBR Quick Stats Footer -->
-            <div class="wbr-quick-stats">
-                <div class="quick-stat">
-                    <span class="stat-icon">📊</span>
-                    <span class="stat-value" id="wbrTotalIncidents">0</span>
-                    <span class="stat-label">Total Incidents</span>
+                    </section>
+
+                    <!-- Action Items Section -->
+                    <section class="wbr-action-items" id="wbrSectionActions">
+                        <div class="action-items-header">
+                            <h3 class="action-items-title">
+                                <i class="fas fa-tasks"></i> Action Items
+                                <span class="action-items-count" id="actionItemsCount">0</span>
+                            </h3>
+                            <button class="add-action-btn" onclick="addActionItem()">
+                                <i class="fas fa-plus"></i> Add Action
+                            </button>
+                        </div>
+                        <div class="action-items-list" id="actionItemsList">
+                            <div class="action-item high-priority">
+                                <div class="action-checkbox" onclick="toggleActionItem(this)"></div>
+                                <div class="action-content">
+                                    <div class="action-text">Review and update safety procedures for Pick area</div>
+                                    <div class="action-meta">
+                                        <span class="action-owner">@Safety Lead</span>
+                                        <span class="action-due"><i class="fas fa-calendar"></i> Due: Dec 9</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="action-item medium-priority">
+                                <div class="action-checkbox" onclick="toggleActionItem(this)"></div>
+                                <div class="action-content">
+                                    <div class="action-text">Schedule ergonomics training for new hires</div>
+                                    <div class="action-meta">
+                                        <span class="action-owner">@Training Coord</span>
+                                        <span class="action-due"><i class="fas fa-calendar"></i> Due: Dec 15</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="action-item low-priority completed">
+                                <div class="action-checkbox checked" onclick="toggleActionItem(this)"><i class="fas fa-check"></i></div>
+                                <div class="action-content">
+                                    <div class="action-text">Complete monthly equipment inspection</div>
+                                    <div class="action-meta">
+                                        <span class="action-owner">@Maintenance</span>
+                                        <span class="action-due"><i class="fas fa-check-circle"></i> Completed</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Meeting Notes Section -->
+                    <section class="wbr-meeting-notes" id="wbrSectionNotes">
+                        <div class="meeting-notes-header">
+                            <h3 class="meeting-notes-title">
+                                <i class="fas fa-sticky-note"></i> Meeting Notes
+                            </h3>
+                            <div class="notes-actions">
+                                <button class="notes-btn" onclick="clearMeetingNotes()">
+                                    <i class="fas fa-eraser"></i> Clear
+                                </button>
+                                <button class="notes-btn" onclick="copyMeetingNotes()">
+                                    <i class="fas fa-copy"></i> Copy
+                                </button>
+                                <button class="notes-btn" onclick="downloadMeetingNotes()">
+                                    <i class="fas fa-download"></i> Download
+                                </button>
+                            </div>
+                        </div>
+                        <textarea class="meeting-notes-textarea" id="meetingNotesTextarea" placeholder="Take notes during the meeting...
+
+Key Discussion Points:
+-
+
+Decisions Made:
+-
+
+Follow-up Items:
+- "></textarea>
+                    </section>
+
+                    <!-- WBR Quick Stats Footer -->
+                    <div class="wbr-quick-stats">
+                        <div class="quick-stat">
+                            <span class="stat-icon">📊</span>
+                            <span class="stat-value" id="wbrTotalIncidents">0</span>
+                            <span class="stat-label">Total Incidents</span>
+                        </div>
+                        <div class="quick-stat">
+                            <span class="stat-icon">📝</span>
+                            <span class="stat-value" id="wbrRecordableRate">0%</span>
+                            <span class="stat-label">Recordable Rate</span>
+                        </div>
+                        <div class="quick-stat">
+                            <span class="stat-icon">📅</span>
+                            <span class="stat-value" id="wbrDaysSinceLast">0</span>
+                            <span class="stat-label">Days Since Last</span>
+                        </div>
+                        <div class="quick-stat">
+                            <span class="stat-icon">🎯</span>
+                            <span class="stat-value" id="wbrSafetyIndex">--</span>
+                            <span class="stat-label">Safety Index</span>
+                        </div>
+                    </div>
+                </main>
+            </div>
+
+            <!-- Floating Action Button -->
+            <button class="wbr-fab" id="wbrFab" onclick="toggleFabMenu()">
+                <i class="fas fa-plus"></i>
+            </button>
+            <div class="wbr-fab-menu" id="wbrFabMenu">
+                <div class="fab-menu-item">
+                    <span class="fab-menu-label">Export WBR</span>
+                    <button class="fab-menu-btn" onclick="generateOneClickWBRDeck()"><i class="fas fa-file-export"></i></button>
                 </div>
-                <div class="quick-stat">
-                    <span class="stat-icon">📝</span>
-                    <span class="stat-value" id="wbrRecordableRate">0%</span>
-                    <span class="stat-label">Recordable Rate</span>
+                <div class="fab-menu-item">
+                    <span class="fab-menu-label">Add Action Item</span>
+                    <button class="fab-menu-btn" onclick="addActionItem()"><i class="fas fa-plus-circle"></i></button>
                 </div>
-                <div class="quick-stat">
-                    <span class="stat-icon">📅</span>
-                    <span class="stat-value" id="wbrDaysSinceLast">0</span>
-                    <span class="stat-label">Days Since Last Recordable</span>
+                <div class="fab-menu-item">
+                    <span class="fab-menu-label">Refresh Data</span>
+                    <button class="fab-menu-btn" onclick="refreshWBRData()"><i class="fas fa-sync"></i></button>
                 </div>
-                <div class="quick-stat">
-                    <span class="stat-icon">🎯</span>
-                    <span class="stat-value" id="wbrSafetyIndex">--</span>
-                    <span class="stat-label">Safety Index</span>
+                <div class="fab-menu-item">
+                    <span class="fab-menu-label">Present Mode</span>
+                    <button class="fab-menu-btn" onclick="togglePresentationMode()"><i class="fas fa-expand"></i></button>
+                </div>
+            </div>
+
+            <!-- Keyboard Shortcuts Modal -->
+            <div class="shortcuts-overlay" id="shortcutsOverlay" onclick="hideKeyboardShortcuts()"></div>
+            <div class="shortcuts-modal" id="shortcutsModal">
+                <div class="modal-header">
+                    <h3><i class="fas fa-keyboard"></i> Keyboard Shortcuts</h3>
+                    <button class="modal-close" onclick="hideKeyboardShortcuts()">&times;</button>
+                </div>
+                <div class="shortcut-row">
+                    <span>Start/Pause Timer</span>
+                    <span class="shortcut-key"><kbd>Space</kbd></span>
+                </div>
+                <div class="shortcut-row">
+                    <span>Reset Timer</span>
+                    <span class="shortcut-key"><kbd>R</kbd></span>
+                </div>
+                <div class="shortcut-row">
+                    <span>Toggle Presentation Mode</span>
+                    <span class="shortcut-key"><kbd>P</kbd></span>
+                </div>
+                <div class="shortcut-row">
+                    <span>Export WBR Deck</span>
+                    <span class="shortcut-key"><kbd>E</kbd></span>
+                </div>
+                <div class="shortcut-row">
+                    <span>Next Agenda Item</span>
+                    <span class="shortcut-key"><kbd>N</kbd></span>
+                </div>
+                <div class="shortcut-row">
+                    <span>Previous Agenda Item</span>
+                    <span class="shortcut-key"><kbd>B</kbd></span>
+                </div>
+                <div class="shortcut-row">
+                    <span>Toggle Color Legend</span>
+                    <span class="shortcut-key"><kbd>L</kbd></span>
+                </div>
+                <div class="shortcut-row">
+                    <span>Show Shortcuts</span>
+                    <span class="shortcut-key"><kbd>?</kbd></span>
                 </div>
             </div>
         </div>
@@ -5002,8 +6513,196 @@ const state = {
     },
     currentModule: 'overview',
     theme: 'light',
-    itemsPerPage: 20
+    itemsPerPage: 20,
+    // Global filter state - synced across all modules
+    globalFilters: {
+        timePeriod: 'all',
+        station: ''
+    }
 };
+
+// ==================== GLOBAL FILTER SYNCHRONIZATION ====================
+
+// Apply global filters across all modules
+function applyGlobalFilters() {
+    const timePeriod = document.getElementById('globalTimePeriod').value;
+    const station = document.getElementById('globalStation').value;
+
+    // Update state
+    state.globalFilters.timePeriod = timePeriod;
+    state.globalFilters.station = station;
+
+    // Show sync indicator animation
+    const indicator = document.getElementById('filterSyncIndicator');
+    if (indicator) {
+        indicator.innerHTML = '<i class="fas fa-sync fa-spin"></i><span>Syncing...</span>';
+        indicator.style.background = 'var(--warning-light)';
+        indicator.style.color = 'var(--warning)';
+    }
+
+    // Sync to all individual module filters
+    syncFiltersToModules(timePeriod, station);
+
+    // Apply filters to each module's data
+    applyFiltersToAllModules();
+
+    // Update sync indicator
+    setTimeout(() => {
+        if (indicator) {
+            indicator.innerHTML = '<i class="fas fa-check-circle"></i><span>Synced</span>';
+            indicator.style.background = 'var(--success-light)';
+            indicator.style.color = 'var(--success)';
+        }
+    }, 500);
+
+    showStatus(`Filters applied: ${getTimePeriodLabel(timePeriod)}${station ? ', ' + station : ''}`, 'success');
+}
+
+// Get human-readable time period label
+function getTimePeriodLabel(value) {
+    const labels = {
+        'all': 'All Time',
+        'week': 'Last Week',
+        'month': 'Last Month',
+        'quarter': 'Last Quarter',
+        'ytd': 'Year to Date'
+    };
+    return labels[value] || value;
+}
+
+// Sync global filters to individual module filter dropdowns
+function syncFiltersToModules(timePeriod, station) {
+    // List of all time period filter selects across modules
+    const timePeriodSelects = [
+        'injuryTimePeriodFilter',
+        'nearMissTimePeriodFilter',
+        'overviewTimePeriodFilter',
+        'combinedTimePeriodFilter',
+        'inspectionTimePeriodFilter',
+        'wbrTimePeriodFilter'
+    ];
+
+    // List of all station filter selects
+    const stationSelects = [
+        'injuryStationFilter',
+        'nearMissStationFilter',
+        'overviewStationFilter',
+        'wbrStationFilter'
+    ];
+
+    // Sync time period
+    timePeriodSelects.forEach(id => {
+        const select = document.getElementById(id);
+        if (select) {
+            select.value = timePeriod;
+        }
+    });
+
+    // Sync station
+    stationSelects.forEach(id => {
+        const select = document.getElementById(id);
+        if (select) {
+            select.value = station;
+        }
+    });
+}
+
+// Apply filters to all modules' data
+function applyFiltersToAllModules() {
+    // Apply to injury module
+    if (typeof applyInjuryTimePeriodFilter === 'function') {
+        applyInjuryTimePeriodFilter();
+    }
+
+    // Apply to near miss module
+    if (typeof applyNearMissTimePeriodFilter === 'function') {
+        applyNearMissTimePeriodFilter();
+    }
+
+    // Apply to overview module
+    if (typeof applyOverviewTimePeriodFilter === 'function') {
+        applyOverviewTimePeriodFilter();
+    }
+
+    // Apply to combined module
+    if (typeof applyCombinedTimePeriodFilter === 'function') {
+        applyCombinedTimePeriodFilter();
+    }
+
+    // Apply to WBR module
+    if (typeof applyWBRTimePeriodFilter === 'function') {
+        applyWBRTimePeriodFilter();
+    }
+
+    // Refresh WBR data
+    if (typeof refreshWBRData === 'function' && state.currentModule === 'wbr') {
+        refreshWBRData();
+    }
+}
+
+// Populate global station filter from data
+function populateGlobalStationFilter() {
+    const select = document.getElementById('globalStation');
+    if (!select) return;
+
+    const stations = new Set();
+
+    // Collect stations from injury data
+    state.injury.rawData.forEach(record => {
+        const station = record.site || record.station || record.location || record.facility;
+        if (station && station.trim()) {
+            stations.add(station.trim());
+        }
+    });
+
+    // Collect stations from near miss data
+    state.nearMiss.rawData.forEach(record => {
+        const station = record.site || record.station || record.location || record.facility;
+        if (station && station.trim()) {
+            stations.add(station.trim());
+        }
+    });
+
+    // Clear and repopulate
+    select.innerHTML = '<option value="">All Stations</option>';
+    Array.from(stations).sort().forEach(station => {
+        const option = document.createElement('option');
+        option.value = station;
+        option.textContent = station;
+        select.appendChild(option);
+    });
+}
+
+// Initialize global filters on page load
+function initializeGlobalFilters() {
+    // Restore from state
+    const globalTime = document.getElementById('globalTimePeriod');
+    const globalStation = document.getElementById('globalStation');
+
+    if (globalTime) globalTime.value = state.globalFilters.timePeriod;
+    if (globalStation) globalStation.value = state.globalFilters.station;
+
+    // Populate station filter
+    populateGlobalStationFilter();
+}
+
+// Toggle mobile sidebar
+function toggleMobileSidebar() {
+    const sidebar = document.getElementById('wbrSidebar');
+    const toggle = document.getElementById('mobileSidebarToggle');
+
+    if (sidebar) {
+        sidebar.classList.toggle('mobile-open');
+    }
+
+    if (toggle) {
+        toggle.classList.toggle('active');
+        const icon = toggle.querySelector('i');
+        if (icon) {
+            icon.className = sidebar.classList.contains('mobile-open') ? 'fas fa-times' : 'fas fa-bars';
+        }
+    }
+}
 
 // Constants
 const SEVERITY_COLORS = {
@@ -7474,6 +9173,9 @@ function parseCSV(csvText, type) {
             }
 
             updateOverview();
+
+            // Populate global station filter with new data
+            populateGlobalStationFilter();
         },
         error: function(error) {
             showStatus('Failed to parse CSV: ' + error.message, 'error');
@@ -17633,6 +19335,342 @@ function getNoteworthyNearMissesForExport() {
         .slice(0, 5);
 }
 
+// ==================== WBR MEETING FUNCTIONALITY ====================
+
+// Meeting Timer State
+let meetingTimerState = {
+    running: false,
+    seconds: 0,
+    interval: null
+};
+
+// Toggle Meeting Timer
+function toggleMeetingTimer() {
+    const timer = document.getElementById('meetingTimer');
+    const playBtn = document.getElementById('timerPlayBtn');
+
+    if (meetingTimerState.running) {
+        clearInterval(meetingTimerState.interval);
+        meetingTimerState.running = false;
+        timer.classList.remove('running');
+        playBtn.innerHTML = '<i class="fas fa-play"></i>';
+    } else {
+        meetingTimerState.interval = setInterval(() => {
+            meetingTimerState.seconds++;
+            updateTimerDisplay();
+
+            // Check for overtime (30 minutes)
+            if (meetingTimerState.seconds >= 1800) {
+                document.getElementById('meetingTimer').classList.add('overtime');
+            }
+        }, 1000);
+        meetingTimerState.running = true;
+        timer.classList.add('running');
+        timer.classList.remove('overtime');
+        playBtn.innerHTML = '<i class="fas fa-pause"></i>';
+    }
+}
+
+// Reset Meeting Timer
+function resetMeetingTimer() {
+    clearInterval(meetingTimerState.interval);
+    meetingTimerState.running = false;
+    meetingTimerState.seconds = 0;
+    updateTimerDisplay();
+
+    const timer = document.getElementById('meetingTimer');
+    timer.classList.remove('running', 'overtime');
+    document.getElementById('timerPlayBtn').innerHTML = '<i class="fas fa-play"></i>';
+}
+
+// Update Timer Display
+function updateTimerDisplay() {
+    const minutes = Math.floor(meetingTimerState.seconds / 60);
+    const seconds = meetingTimerState.seconds % 60;
+    document.getElementById('timerDisplay').textContent =
+        `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+}
+
+// Scroll to Section (Agenda Navigation)
+function scrollToSection(sectionId) {
+    const sectionMap = {
+        'executive': 'wbrSectionExecutive',
+        'indicators': 'wbrSectionIndicators',
+        'bodymap': 'wbrSectionBodymap',
+        'inspections': 'wbrSectionInspections',
+        'predictions': 'wbrSectionPredictions',
+        'nearmisses': 'wbrSectionNearmisses',
+        'actions': 'wbrSectionActions'
+    };
+
+    const elementId = sectionMap[sectionId];
+    const element = document.getElementById(elementId);
+
+    if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+        // Update agenda items
+        document.querySelectorAll('.agenda-item').forEach(item => {
+            item.classList.remove('active');
+            if (item.dataset.section === sectionId) {
+                item.classList.add('active');
+            }
+        });
+    }
+}
+
+// Toggle Presentation Mode
+function togglePresentationMode() {
+    const layout = document.getElementById('wbrMeetingLayout');
+    const fab = document.getElementById('wbrFab');
+
+    layout.classList.toggle('presentation-mode');
+
+    if (layout.classList.contains('presentation-mode')) {
+        document.body.style.overflow = 'auto';
+        if (fab) fab.style.display = 'none';
+        showStatus('Presentation mode enabled. Press P to exit.', 'info');
+    } else {
+        if (fab) fab.style.display = 'flex';
+        showStatus('Presentation mode disabled.', 'info');
+    }
+}
+
+// Toggle Color Legend
+function toggleColorLegend() {
+    const legend = document.getElementById('wbrColorLegend');
+    legend.classList.toggle('collapsed');
+}
+
+// Toggle FAB Menu
+function toggleFabMenu() {
+    const menu = document.getElementById('wbrFabMenu');
+    const fab = document.getElementById('wbrFab');
+
+    menu.classList.toggle('open');
+
+    if (menu.classList.contains('open')) {
+        fab.style.transform = 'rotate(45deg)';
+    } else {
+        fab.style.transform = 'rotate(0deg)';
+    }
+}
+
+// Action Items Functions
+function toggleActionItem(checkbox) {
+    const actionItem = checkbox.closest('.action-item');
+    actionItem.classList.toggle('completed');
+    checkbox.classList.toggle('checked');
+
+    if (checkbox.classList.contains('checked')) {
+        checkbox.innerHTML = '<i class="fas fa-check"></i>';
+    } else {
+        checkbox.innerHTML = '';
+    }
+
+    updateActionItemsCount();
+}
+
+function addActionItem() {
+    const text = prompt('Enter action item:');
+    if (!text) return;
+
+    const owner = prompt('Enter owner (e.g., @Safety Lead):') || '@TBD';
+    const dueDate = prompt('Enter due date (e.g., Dec 15):') || 'TBD';
+
+    const actionsList = document.getElementById('actionItemsList');
+    const newItem = document.createElement('div');
+    newItem.className = 'action-item medium-priority';
+    newItem.innerHTML = `
+        <div class="action-checkbox" onclick="toggleActionItem(this)"></div>
+        <div class="action-content">
+            <div class="action-text">${text}</div>
+            <div class="action-meta">
+                <span class="action-owner">${owner}</span>
+                <span class="action-due"><i class="fas fa-calendar"></i> Due: ${dueDate}</span>
+            </div>
+        </div>
+    `;
+
+    actionsList.insertBefore(newItem, actionsList.firstChild);
+    updateActionItemsCount();
+    showStatus('Action item added successfully', 'success');
+}
+
+function updateActionItemsCount() {
+    const total = document.querySelectorAll('.action-item').length;
+    const completed = document.querySelectorAll('.action-item.completed').length;
+    const pending = total - completed;
+    document.getElementById('actionItemsCount').textContent = pending;
+}
+
+// Meeting Notes Functions
+function clearMeetingNotes() {
+    if (confirm('Are you sure you want to clear all meeting notes?')) {
+        document.getElementById('meetingNotesTextarea').value = '';
+        showStatus('Meeting notes cleared', 'info');
+    }
+}
+
+function copyMeetingNotes() {
+    const notes = document.getElementById('meetingNotesTextarea').value;
+    if (!notes.trim()) {
+        showStatus('No notes to copy', 'warning');
+        return;
+    }
+
+    navigator.clipboard.writeText(notes).then(() => {
+        showStatus('Meeting notes copied to clipboard', 'success');
+    }).catch(() => {
+        showStatus('Failed to copy notes', 'error');
+    });
+}
+
+function downloadMeetingNotes() {
+    const notes = document.getElementById('meetingNotesTextarea').value;
+    if (!notes.trim()) {
+        showStatus('No notes to download', 'warning');
+        return;
+    }
+
+    const today = new Date().toISOString().split('T')[0];
+    const blob = new Blob([notes], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `WBR-Meeting-Notes-${today}.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
+    showStatus('Meeting notes downloaded', 'success');
+}
+
+// Keyboard Shortcuts
+function showKeyboardShortcuts() {
+    document.getElementById('shortcutsOverlay').classList.add('active');
+    document.getElementById('shortcutsModal').classList.add('active');
+}
+
+function hideKeyboardShortcuts() {
+    document.getElementById('shortcutsOverlay').classList.remove('active');
+    document.getElementById('shortcutsModal').classList.remove('active');
+}
+
+// Initialize WBR Meeting keyboard shortcuts
+document.addEventListener('keydown', function(e) {
+    // Only in WBR tab and not in input fields
+    if (state.currentModule !== 'wbr') return;
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
+
+    switch(e.key.toLowerCase()) {
+        case ' ':
+            e.preventDefault();
+            toggleMeetingTimer();
+            break;
+        case 'r':
+            if (!e.ctrlKey && !e.metaKey) resetMeetingTimer();
+            break;
+        case 'p':
+            togglePresentationMode();
+            break;
+        case 'e':
+            generateOneClickWBRDeck();
+            break;
+        case 'n':
+            navigateAgenda(1);
+            break;
+        case 'b':
+            navigateAgenda(-1);
+            break;
+        case 'l':
+            toggleColorLegend();
+            break;
+        case '?':
+            showKeyboardShortcuts();
+            break;
+        case 'escape':
+            hideKeyboardShortcuts();
+            const layout = document.getElementById('wbrMeetingLayout');
+            if (layout && layout.classList.contains('presentation-mode')) {
+                togglePresentationMode();
+            }
+            break;
+    }
+});
+
+// Navigate Agenda
+function navigateAgenda(direction) {
+    const items = document.querySelectorAll('.agenda-item');
+    let currentIndex = -1;
+
+    items.forEach((item, index) => {
+        if (item.classList.contains('active')) {
+            currentIndex = index;
+        }
+    });
+
+    const newIndex = Math.max(0, Math.min(items.length - 1, currentIndex + direction));
+    if (newIndex !== currentIndex) {
+        const section = items[newIndex].dataset.section;
+        scrollToSection(section);
+    }
+}
+
+// Update Executive Summary
+function updateExecutiveSummary() {
+    const injuryData = state.injury.rawData;
+    const nearMissData = state.nearMiss.rawData;
+
+    // Calculate metrics
+    const totalIncidents = injuryData.length;
+    const recordables = injuryData.filter(r =>
+        r.recordable === 'Yes' || r.recordable === true || r.recordable === 'Y'
+    ).length;
+    const nearMisses = nearMissData.length;
+
+    // Days since last recordable
+    let daysSafe = 0;
+    const recordableIncidents = injuryData.filter(r =>
+        (r.recordable === 'Yes' || r.recordable === true || r.recordable === 'Y') && r.parsedDate
+    ).sort((a, b) => new Date(b.parsedDate) - new Date(a.parsedDate));
+
+    if (recordableIncidents.length > 0) {
+        const lastRecordable = new Date(recordableIncidents[0].parsedDate);
+        const today = new Date();
+        daysSafe = Math.floor((today - lastRecordable) / (1000 * 60 * 60 * 24));
+    }
+
+    // NM:Injury ratio
+    const ratio = recordables > 0 ? (nearMisses / recordables).toFixed(1) : nearMisses;
+    const ratioDisplay = recordables > 0 ? `${ratio}:1` : `${nearMisses}:0`;
+
+    // Update DOM
+    document.getElementById('execTotalIncidents').textContent = totalIncidents;
+    document.getElementById('execRecordables').textContent = recordables;
+    document.getElementById('execNearMisses').textContent = nearMisses;
+    document.getElementById('execDaysSafe').textContent = daysSafe;
+    document.getElementById('execNMRatio').textContent = ratioDisplay;
+
+    // Update status indicators
+    const safetyStatus = document.getElementById('execStatusSafety');
+    if (recordables === 0) {
+        safetyStatus.className = 'status-indicator good';
+        safetyStatus.innerHTML = '<span class="status-dot"></span> Safety On Track';
+    } else if (recordables <= 2) {
+        safetyStatus.className = 'status-indicator warning';
+        safetyStatus.innerHTML = '<span class="status-dot"></span> Needs Attention';
+    } else {
+        safetyStatus.className = 'status-indicator danger';
+        safetyStatus.innerHTML = '<span class="status-dot"></span> Critical';
+    }
+
+    // Update date badge
+    const today = new Date();
+    const weekStart = new Date(today);
+    weekStart.setDate(today.getDate() - today.getDay());
+    const dateStr = weekStart.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    document.getElementById('wbrDateBadge').textContent = `Week of ${dateStr}`;
+}
+
 // Refresh all WBR Dashboard data
 function refreshWBRData() {
     showStatus('Refreshing WBR Dashboard data...', 'info');
@@ -17641,6 +19679,7 @@ function refreshWBRData() {
     populateWBRStationFilter();
 
     // Update all WBR components
+    updateExecutiveSummary();
     updateLeadingLaggingGauge();
     updateBodyMap();
     updateStationHeatMap();
@@ -17650,6 +19689,7 @@ function refreshWBRData() {
     updateWBRQuickStats();
     updateDataQualityScorecard();
     updateNoteworthyNearMisses();
+    updateActionItemsCount();
 
     showStatus('WBR Dashboard refreshed successfully', 'success');
 }
