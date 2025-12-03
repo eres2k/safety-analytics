@@ -8904,6 +8904,7 @@ document.addEventListener('DOMContentLoaded', function() {
     setupTableSorting('injury');
     setupTableSorting('nearMiss');
     initializeChartCaptureButtons();
+    initializeGlobalFilters();
 
     // Check for saved theme preference
     const savedTheme = localStorage.getItem('theme') || 'light';
@@ -9238,6 +9239,7 @@ function parseCSV(csvText, type) {
 
             // Populate global station filter with new data
             populateGlobalStationFilter();
+            populateWBRStationFilter();
         },
         error: function(error) {
             showStatus('Failed to parse CSV: ' + error.message, 'error');
@@ -18720,9 +18722,11 @@ function loadSampleData() {
     populateNearMissFilters();
     applyFilters('nearmiss');
     calculateQualityMetrics('nearmiss');
-    
+
     updateOverview();
     initializeChartSelections();
+    populateGlobalStationFilter();
+    populateWBRStationFilter();
     showStatus('Sample data loaded successfully!', 'success');
 }
 
@@ -19102,11 +19106,29 @@ function populateWBRStationFilter() {
     const stationSelect = document.getElementById('wbrStationFilter');
     if (!stationSelect) return;
 
-    // Collect all unique stations from injury and near miss data
-    const stations = new Set([
-        ...state.injury.rawData.map(r => r.site),
-        ...state.nearMiss.rawData.map(r => r.site)
-    ]);
+    // Collect all unique stations from available datasets
+    const stations = new Set();
+
+    if (state.injury && Array.isArray(state.injury.rawData)) {
+        state.injury.rawData.forEach(record => {
+            const station = record.site || record.station || record.location || record.facility;
+            if (station) stations.add(station);
+        });
+    }
+
+    if (state.nearMiss && Array.isArray(state.nearMiss.rawData)) {
+        state.nearMiss.rawData.forEach(record => {
+            const station = record.site || record.station || record.location || record.facility;
+            if (station) stations.add(station);
+        });
+    }
+
+    if (state.inspections && Array.isArray(state.inspections.rawData)) {
+        state.inspections.rawData.forEach(record => {
+            const station = record.site || record.station || record.location || record.facility;
+            if (station) stations.add(station);
+        });
+    }
 
     const currentValue = stationSelect.value;
     stationSelect.innerHTML = '<option value="">All Stations</option>';
