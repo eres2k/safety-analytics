@@ -6037,64 +6037,63 @@
                 </div>
                     </section>
 
-                    <!-- Predictive Analytics - "Crystal Ball" -->
-                    <section class="wbr-card wbr-predictive-card full-width" id="wbrSectionPredictions">
-                <div class="wbr-card-header">
-                    <h3><span class="card-icon">🔮</span> Predictive Risk Analysis - "Crystal Ball"</h3>
-                    <span class="wbr-subtitle-text">AI-Powered Incident Forecasting</span>
-                </div>
-                <div class="predictive-container">
-                    <div class="prediction-cards">
-                        <div class="prediction-card" id="predictionHighRisk">
-                            <div class="prediction-header">
-                                <span class="prediction-confidence" id="predictionConfidence">--% confidence</span>
+                    <!-- Predictive Analytics & Noteworthy Near Misses -->
+                    <section class="wbr-section-grid" id="wbrSectionPredictions">
+                        <div class="wbr-card wbr-predictive-card">
+                            <div class="wbr-card-header">
+                                <h3><span class="card-icon">🔮</span> Predictive Risk Analysis - "Crystal Ball"</h3>
+                                <span class="wbr-subtitle-text">AI-Powered Incident Forecasting</span>
                             </div>
-                            <div class="prediction-content">
-                                <p class="prediction-text" id="predictionText">Load data to generate predictive insights</p>
+                            <div class="predictive-container">
+                                <div class="prediction-cards">
+                                    <div class="prediction-card" id="predictionHighRisk">
+                                        <div class="prediction-header">
+                                            <span class="prediction-confidence" id="predictionConfidence">--% confidence</span>
+                                        </div>
+                                        <div class="prediction-content">
+                                            <p class="prediction-text" id="predictionText">Load data to generate predictive insights</p>
+                                        </div>
+                                        <div class="prediction-factors" id="predictionFactors">
+                                            <!-- Risk factors will be populated dynamically -->
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="predictive-charts">
+                                    <div class="chart-container predictive-chart">
+                                        <canvas id="predictiveTrendChart"></canvas>
+                                    </div>
+                                    <div class="chart-container predictive-chart">
+                                        <canvas id="riskFactorChart"></canvas>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="prediction-factors" id="predictionFactors">
-                                <!-- Risk factors will be populated dynamically -->
+                        </div>
+
+                        <!-- Noteworthy Near Misses Section -->
+                        <div class="wbr-card wbr-noteworthy-card" id="wbrSectionNearmisses">
+                            <div class="wbr-card-header">
+                                <h3><span class="card-icon">📢</span> Noteworthy Near Misses This Week</h3>
+                                <span class="wbr-subtitle-text">High-potential incidents for team awareness</span>
+                            </div>
+                            <div class="noteworthy-near-misses-container">
+                                <p class="noteworthy-description">These near misses represent significant safety learning opportunities. Share these with your team during safety standups and toolbox talks.</p>
+                                <div id="noteworthyNearMissesList">
+                                    <p class="no-data-msg">Load near miss data to see noteworthy incidents</p>
+                                </div>
+                                <div class="noteworthy-email-hint">
+                                    <span class="noteworthy-email-hint-icon">📧</span>
+                                    <div class="noteworthy-email-hint-text">
+                                        <strong>Weekly Email Distribution</strong>
+                                        <small>Export this WBR Deck and share it with all station managers weekly. Include these near misses to drive proactive safety conversations.</small>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="predictive-charts">
-                        <div class="chart-container predictive-chart">
-                            <canvas id="predictiveTrendChart"></canvas>
-                        </div>
-                        <div class="chart-container predictive-chart">
-                            <canvas id="riskFactorChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-                    </section>
-
-                    <!-- Noteworthy Near Misses Section -->
-                    <section class="wbr-card wbr-noteworthy-card full-width" id="wbrSectionNearmisses">
-                <div class="wbr-card-header">
-                    <h3><span class="card-icon">📢</span> Noteworthy Near Misses This Week</h3>
-                    <span class="wbr-subtitle-text">High-potential incidents for team awareness</span>
-                </div>
-                <div class="noteworthy-near-misses-container">
-                    <p class="noteworthy-description">These near misses represent significant safety learning opportunities. Share these with your team during safety standups and toolbox talks.</p>
-                    <div id="noteworthyNearMissesList">
-                        <p class="no-data-msg">Load near miss data to see noteworthy incidents</p>
-                    </div>
-                    <div class="noteworthy-email-hint">
-                        <span class="noteworthy-email-hint-icon">📧</span>
-                        <div class="noteworthy-email-hint-text">
-                            <strong>Weekly Email Distribution</strong>
-                            <small>Export this WBR Deck and share it with all station managers weekly. Include these near misses to drive proactive safety conversations.</small>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
                     </section>
 
                     <!-- Action Items Section -->
-                    <section class="wbr-action-items" id="wbrSectionActions">
+                    <section class="wbr-section-grid" id="wbrSectionActionsGrid">
+                        <div class="wbr-card wbr-action-items" id="wbrSectionActions">
                         <div class="action-items-header">
                             <h3 class="action-items-title">
                                 <i class="fas fa-tasks"></i> Action Items
@@ -6136,10 +6135,10 @@
                                 </div>
                             </div>
                         </div>
-                    </section>
+                        </div>
 
-                    <!-- Meeting Notes Section -->
-                    <section class="wbr-meeting-notes" id="wbrSectionNotes">
+                        <!-- Meeting Notes Section -->
+                        <div class="wbr-card wbr-meeting-notes" id="wbrSectionNotes">
                         <div class="meeting-notes-header">
                             <h3 class="meeting-notes-title">
                                 <i class="fas fa-sticky-note"></i> Meeting Notes
@@ -6166,31 +6165,34 @@ Decisions Made:
 
 Follow-up Items:
 - "></textarea>
+                        </div>
                     </section>
 
                     <!-- WBR Quick Stats Footer -->
-                    <div class="wbr-quick-stats">
-                        <div class="quick-stat">
-                            <span class="stat-icon">📊</span>
-                            <span class="stat-value" id="wbrTotalIncidents">0</span>
-                            <span class="stat-label">Total Incidents</span>
+                    <section class="wbr-section-grid" id="wbrSectionQuickStats">
+                        <div class="wbr-card wbr-quick-stats full-width">
+                            <div class="quick-stat">
+                                <span class="stat-icon">📊</span>
+                                <span class="stat-value" id="wbrTotalIncidents">0</span>
+                                <span class="stat-label">Total Incidents</span>
+                            </div>
+                            <div class="quick-stat">
+                                <span class="stat-icon">📝</span>
+                                <span class="stat-value" id="wbrRecordableRate">0%</span>
+                                <span class="stat-label">Recordable Rate</span>
+                            </div>
+                            <div class="quick-stat">
+                                <span class="stat-icon">📅</span>
+                                <span class="stat-value" id="wbrDaysSinceLast">0</span>
+                                <span class="stat-label">Days Since Last</span>
+                            </div>
+                            <div class="quick-stat">
+                                <span class="stat-icon">🎯</span>
+                                <span class="stat-value" id="wbrSafetyIndex">--</span>
+                                <span class="stat-label">Safety Index</span>
+                            </div>
                         </div>
-                        <div class="quick-stat">
-                            <span class="stat-icon">📝</span>
-                            <span class="stat-value" id="wbrRecordableRate">0%</span>
-                            <span class="stat-label">Recordable Rate</span>
-                        </div>
-                        <div class="quick-stat">
-                            <span class="stat-icon">📅</span>
-                            <span class="stat-value" id="wbrDaysSinceLast">0</span>
-                            <span class="stat-label">Days Since Last</span>
-                        </div>
-                        <div class="quick-stat">
-                            <span class="stat-icon">🎯</span>
-                            <span class="stat-value" id="wbrSafetyIndex">--</span>
-                            <span class="stat-label">Safety Index</span>
-                        </div>
-                    </div>
+                    </section>
                 </main>
             </div>
 
@@ -19094,7 +19096,12 @@ function getWBRFilteredData() {
     // Apply time period filter
     if (selectedTimePeriod && selectedTimePeriod !== 'all') {
         injuries = injuries.filter(r => isWithinTimePeriod(r.incident_date || r.parsedDate, selectedTimePeriod));
-        nearMisses = nearMisses.filter(r => isWithinTimePeriod(r.incident_date || r.parsedDate || r.date_reported, selectedTimePeriod));
+        nearMisses = nearMisses.filter(r =>
+            isWithinTimePeriod(
+                r.nearmiss_date || r.incident_date || r.parsedDate || r.date_reported,
+                selectedTimePeriod
+            )
+        );
         inspections = inspections.filter(r => isWithinTimePeriod(r.inspection_date || r.date, selectedTimePeriod));
     }
 
