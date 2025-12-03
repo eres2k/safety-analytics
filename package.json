@@ -3,6 +3,6 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "build": "mkdir -p dist && cp safetyanalyticsplatform.html dist/index.html"
+    "build": "rm -rf dist && mkdir -p dist && cp safetyanalyticsplatform.html dist/index.html && cp ai.html dist/ai.html && cp whs.html dist/whs.html && cp -r assets dist/assets && cp netlify.toml dist/netlify.toml"
   }
 }

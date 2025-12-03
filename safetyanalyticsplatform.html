@@ -4,7 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Safety Analytics Platform - Amazon WHS Austria | Developed by Erwin Esener @eeesener</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/modern.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script type="module" src="assets/modern.js" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.js"></script>
@@ -4143,7 +4148,75 @@
         }
     </style>
 </head>
-<body>
+<body class="modernized" data-page="Safety Analytics Platform">
+    <div class="neo-shell">
+        <header class="neo-topbar">
+            <div class="neo-brand">
+                <div class="neo-brand__mark">SAP</div>
+                <div class="neo-brand__meta">
+                    <p class="neo-brand__title">Safety Analytics Platform</p>
+                    <p class="neo-brand__subtitle">Enterprise WHS Intelligence</p>
+                </div>
+            </div>
+            <div class="neo-topbar__controls">
+                <button class="neo-chip" data-open-command>
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <span>Search workspace</span>
+                    <kbd>Ctrl</kbd><kbd>K</kbd>
+                </button>
+                <button class="neo-chip" data-toggle-theme>
+                    <i class="fa-solid fa-circle-half-stroke"></i>
+                    <span>Theme</span>
+                </button>
+                <button class="neo-chip" data-open-quicktour>
+                    <i class="fa-solid fa-compass-drafting"></i>
+                    <span>Guided focus</span>
+                </button>
+            </div>
+        </header>
+
+        <section class="neo-ribbon" aria-label="experience signals">
+            <div class="neo-ribbon__item">
+                <p class="label">Operational coverage</p>
+                <div class="value">All workflows preserved</div>
+            </div>
+            <div class="neo-ribbon__item">
+                <p class="label">Performance mode</p>
+                <div class="value">Modern shell · Cached assets</div>
+            </div>
+            <div class="neo-ribbon__item">
+                <p class="label">Assistive layer</p>
+                <div class="value">Context-aware shortcuts</div>
+            </div>
+        </section>
+
+        <section class="neo-quickbar" aria-label="priority actions">
+            <div class="neo-quickbar__content">
+                <div>
+                    <p class="eyebrow">Priority controls</p>
+                    <p class="headline">Jump directly to the tools you use most</p>
+                </div>
+                <div class="neo-quick-actions" data-quick-actions></div>
+            </div>
+            <div class="neo-context-hints" data-context-hints>
+                <p class="eyebrow">Smart guidance</p>
+                <p class="hint">Hover or focus on any form to receive tailored shortcuts.</p>
+            </div>
+        </section>
+    </div>
+
+    <div class="neo-command" data-command-palette hidden>
+        <div class="neo-command__dialog" role="dialog" aria-modal="true" aria-label="Command Palette">
+            <div class="neo-command__header">
+                <input type="search" placeholder="Find pages, sections, or actions" data-command-input />
+                <button class="neo-command__close" data-close-command aria-label="Close">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="neo-command__results" data-command-results></div>
+        </div>
+    </div>
+
     <!-- Header -->
     <header class="header">
         <div class="header-content">
