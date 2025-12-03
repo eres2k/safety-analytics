@@ -6581,7 +6581,8 @@ function getTimePeriodLabel(value) {
 
 // Sync global filters to individual module filter dropdowns
 function syncFiltersToModules(timePeriod, station) {
-    // List of all time period filter selects across modules
+    // List of all time period filter selects across modules (these don't exist as DOM elements,
+    // but module functions now read from state.globalFilters directly)
     const timePeriodSelects = [
         'injuryTimePeriodFilter',
         'nearMissTimePeriodFilter',
@@ -6591,15 +6592,13 @@ function syncFiltersToModules(timePeriod, station) {
         'wbrTimePeriodFilter'
     ];
 
-    // List of all station filter selects
+    // List of all station/site filter selects - using actual element IDs that exist in the HTML
     const stationSelects = [
-        'injuryStationFilter',
-        'nearMissSiteFilter',
-        'nearMissStationFilter',
-        'overviewStationFilter',
-        'overviewSiteFilter',
-        'wbrStationFilter',
         'injurySiteFilter',
+        'nearMissSiteFilter',
+        'overviewSiteFilter',
+        'combinedSiteFilter',
+        'inspectionSiteFilter',
         'heatmapSiteSelect'
     ];
 
@@ -6646,6 +6645,11 @@ function applyFiltersToAllModules() {
     // Apply to combined module
     if (typeof applyCombinedTimePeriodFilter === 'function') {
         applyCombinedTimePeriodFilter();
+    }
+
+    // Apply to inspections module (site filter is already synced, just trigger filter application)
+    if (state.inspections && state.inspections.rawData && state.inspections.rawData.length > 0) {
+        applyFilters('inspections');
     }
 
     // Refresh WBR components with new filter state
@@ -11654,7 +11658,8 @@ function applyFilters(type) {
 
 // Apply Injury Time Period Filter
 function applyInjuryTimePeriodFilter() {
-    const timePeriod = document.getElementById('injuryTimePeriodFilter')?.value || 'all';
+    // Use global filter state as source of truth (fallback to element if exists, then 'all')
+    const timePeriod = state.globalFilters?.timePeriod || document.getElementById('injuryTimePeriodFilter')?.value || 'all';
     const dateFromInput = document.getElementById('injuryDateFrom');
     const dateToInput = document.getElementById('injuryDateTo');
 
@@ -11720,7 +11725,8 @@ function applyInjuryRecordableQuickFilter() {
 
 // Apply Near Miss Time Period Filter
 function applyNearMissTimePeriodFilter() {
-    const timePeriod = document.getElementById('nearMissTimePeriodFilter')?.value || 'all';
+    // Use global filter state as source of truth (fallback to element if exists, then 'all')
+    const timePeriod = state.globalFilters?.timePeriod || document.getElementById('nearMissTimePeriodFilter')?.value || 'all';
     const dateFromInput = document.getElementById('nearMissDateFrom');
     const dateToInput = document.getElementById('nearMissDateTo');
 
@@ -11824,7 +11830,8 @@ function applyNearMissRiskQuickFilter() {
 
 // Apply Overview Time Period Filter
 function applyOverviewTimePeriodFilter() {
-    const timePeriod = document.getElementById('overviewTimePeriodFilter')?.value || 'all';
+    // Use global filter state as source of truth (fallback to element if exists, then 'all')
+    const timePeriod = state.globalFilters?.timePeriod || document.getElementById('overviewTimePeriodFilter')?.value || 'all';
 
     const today = new Date();
     today.setHours(23, 59, 59, 999);
@@ -11965,7 +11972,8 @@ function applyInspectionsTimePeriodFilter() {
 
 // Apply Combined Time Period Filter
 function applyCombinedTimePeriodFilter() {
-    const timePeriod = document.getElementById('combinedTimePeriodFilter')?.value || 'all';
+    // Use global filter state as source of truth (fallback to element if exists, then 'all')
+    const timePeriod = state.globalFilters?.timePeriod || document.getElementById('combinedTimePeriodFilter')?.value || 'all';
 
     const today = new Date();
     today.setHours(23, 59, 59, 999);
@@ -19902,13 +19910,14 @@ function normalizeBodyPart(part) {
 
 // Update Station Heat Map
 function updateStationHeatMap() {
-    const selectedSite = document.getElementById('heatmapSiteSelect')?.value || '';
+    // Use global filtered data to respect both station and time period filters
+    const filteredData = getWBRFilteredData();
 
-    // Combine injury and near miss data
+    // Combine filtered injury and near miss data
     const allData = [
-        ...state.injury.rawData.map(r => ({ ...r, type: 'injury' })),
-        ...state.nearMiss.rawData.map(r => ({ ...r, type: 'nearmiss' }))
-    ].filter(r => !selectedSite || r.site === selectedSite);
+        ...filteredData.injuries.map(r => ({ ...r, type: 'injury' })),
+        ...filteredData.nearMisses.map(r => ({ ...r, type: 'nearmiss' }))
+    ];
 
     // Map process paths to station zones
     const zoneCounts = {
