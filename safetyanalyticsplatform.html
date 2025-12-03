@@ -1710,6 +1710,49 @@
             transform: scale(1.1);
         }
 
+        /* WBR Filter Status Display */
+        .wbr-filter-status {
+            padding: 1rem 1.25rem;
+            background: rgba(255, 153, 0, 0.15);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .filter-status-header {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--amazon-orange);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .filter-status-items {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        .filter-status-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+        }
+
+        .filter-status-label {
+            color: rgba(255,255,255,0.7);
+            min-width: 55px;
+        }
+
+        .filter-status-value {
+            background: rgba(255,255,255,0.1);
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+            font-weight: 600;
+            color: white;
+        }
+
         /* Meeting Agenda List */
         .agenda-list {
             flex: 1;
@@ -4201,16 +4244,6 @@
                     <h2><span class="dashboard-icon">📊</span> Safety Overview Dashboard</h2>
                     <p class="dashboard-subtitle">Real-time safety metrics and performance indicators</p>
                 </div>
-                <div class="dashboard-filter-section">
-                    <label for="overviewTimePeriodFilter">Period:</label>
-                    <select id="overviewTimePeriodFilter" class="dashboard-select" onchange="applyOverviewTimePeriodFilter()">
-                        <option value="all">All Time</option>
-                        <option value="week">Last Week</option>
-                        <option value="month">Last Month</option>
-                        <option value="quarter">Last Quarter</option>
-                        <option value="ytd">Year to Date</option>
-                    </select>
-                </div>
                 <div class="dashboard-header-actions">
                     <button class="btn btn-primary btn-lg wbr-export-btn" onclick="generateOverviewReport()">
                         <span>📄</span> Generate Report
@@ -4406,24 +4439,6 @@
                 <div class="dashboard-title-section">
                     <h2><span class="dashboard-icon">🏥</span> Injury & Illness Analysis</h2>
                     <p class="dashboard-subtitle">Track, analyze, and prevent workplace injuries</p>
-                </div>
-                <div class="dashboard-filter-section">
-                    <label for="injuryTimePeriodFilter">Period:</label>
-                    <select id="injuryTimePeriodFilter" class="dashboard-select" onchange="applyInjuryTimePeriodFilter()">
-                        <option value="all">All Time</option>
-                        <option value="week">Last Week</option>
-                        <option value="month">Last Month</option>
-                        <option value="quarter">Last Quarter</option>
-                        <option value="ytd">Year to Date</option>
-                    </select>
-                </div>
-                <div class="dashboard-filter-section">
-                    <label for="injuryRecordableQuickFilter">Type:</label>
-                    <select id="injuryRecordableQuickFilter" class="dashboard-select" onchange="applyInjuryRecordableQuickFilter()">
-                        <option value="">All Cases</option>
-                        <option value="1">Recordable Only</option>
-                        <option value="0">Non-Recordable</option>
-                    </select>
                 </div>
                 <div class="dashboard-header-actions">
                     <button class="btn btn-primary btn-lg wbr-export-btn" onclick="generateInjuryReport()">
@@ -4815,25 +4830,6 @@
                 <div class="dashboard-title-section">
                     <h2><span class="dashboard-icon">⚠️</span> Near Miss Analysis</h2>
                     <p class="dashboard-subtitle">Identify and prevent potential incidents before they happen</p>
-                </div>
-                <div class="dashboard-filter-section">
-                    <label for="nearMissTimePeriodFilter">Period:</label>
-                    <select id="nearMissTimePeriodFilter" class="dashboard-select" onchange="applyNearMissTimePeriodFilter()">
-                        <option value="all">All Time</option>
-                        <option value="week">Last Week</option>
-                        <option value="month">Last Month</option>
-                        <option value="quarter">Last Quarter</option>
-                        <option value="ytd">Year to Date</option>
-                    </select>
-                </div>
-                <div class="dashboard-filter-section">
-                    <label for="nearMissRiskQuickFilter">Risk Level:</label>
-                    <select id="nearMissRiskQuickFilter" class="dashboard-select" onchange="applyNearMissRiskQuickFilter()">
-                        <option value="">All Risk Levels</option>
-                        <option value="high">High Risk (15+)</option>
-                        <option value="medium">Medium Risk (8-14)</option>
-                        <option value="low">Low Risk (1-7)</option>
-                    </select>
                 </div>
                 <div class="dashboard-header-actions">
                     <button class="btn btn-primary btn-lg wbr-export-btn" onclick="generateNearMissReport()">
@@ -5230,16 +5226,6 @@
                     <h2><span class="dashboard-icon">📈</span> Combined Safety Analytics</h2>
                     <p class="dashboard-subtitle">Cross-reference injury and near miss data for comprehensive insights</p>
                 </div>
-                <div class="dashboard-filter-section">
-                    <label for="combinedTimePeriodFilter">Period:</label>
-                    <select id="combinedTimePeriodFilter" class="dashboard-select" onchange="applyCombinedTimePeriodFilter()">
-                        <option value="all">All Time</option>
-                        <option value="week">Last Week</option>
-                        <option value="month">Last Month</option>
-                        <option value="quarter">Last Quarter</option>
-                        <option value="ytd">Year to Date</option>
-                    </select>
-                </div>
                 <div class="dashboard-header-actions">
                     <button class="btn btn-primary btn-lg wbr-export-btn" onclick="generateWBRReport()">
                         <span>📄</span> Generate Combined Report
@@ -5428,15 +5414,6 @@
                     <h2><span class="dashboard-icon">📋</span> Austin Inspections Tracking</h2>
                     <p class="dashboard-subtitle">Monitor compliance and track inspection schedules</p>
                 </div>
-                <div class="dashboard-filter-section">
-                    <label for="inspectionsTimePeriodFilter">Period:</label>
-                    <select id="inspectionsTimePeriodFilter" class="dashboard-select" onchange="applyInspectionsTimePeriodFilter()">
-                        <option value="all">All Time</option>
-                        <option value="week">This Week</option>
-                        <option value="month">This Month</option>
-                        <option value="quarter">This Quarter</option>
-                    </select>
-                </div>
                 <div class="dashboard-header-actions">
                     <input type="file" id="inspectionsUpload" class="file-input" accept=".csv" onchange="handleFileUpload(event, 'inspections')">
                     <label for="inspectionsUpload" class="btn btn-primary btn-lg wbr-export-btn">
@@ -5583,6 +5560,22 @@
                                 <button class="timer-btn" onclick="resetMeetingTimer()" title="Reset">
                                     <i class="fas fa-redo"></i>
                                 </button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Active Filter Display -->
+                    <div class="wbr-filter-status" id="wbrFilterStatus">
+                        <div class="filter-status-header">
+                            <i class="fas fa-filter"></i> Active Filters
+                        </div>
+                        <div class="filter-status-items">
+                            <div class="filter-status-item">
+                                <span class="filter-status-label">Period:</span>
+                                <span class="filter-status-value" id="wbrFilterPeriodDisplay">All Time</span>
+                            </div>
+                            <div class="filter-status-item">
+                                <span class="filter-status-label">Station:</span>
+                                <span class="filter-status-value" id="wbrFilterStationDisplay">All Stations</span>
                             </div>
                         </div>
                     </div>
@@ -6555,7 +6548,23 @@ function applyGlobalFilters() {
         }
     }, 500);
 
+    // Update WBR sidebar filter display
+    updateWBRFilterDisplay(timePeriod, station);
+
     showStatus(`Filters applied: ${getTimePeriodLabel(timePeriod)}${station ? ', ' + station : ''}`, 'success');
+}
+
+// Update WBR sidebar filter status display
+function updateWBRFilterDisplay(timePeriod, station) {
+    const periodDisplay = document.getElementById('wbrFilterPeriodDisplay');
+    const stationDisplay = document.getElementById('wbrFilterStationDisplay');
+
+    if (periodDisplay) {
+        periodDisplay.textContent = getTimePeriodLabel(timePeriod);
+    }
+    if (stationDisplay) {
+        stationDisplay.textContent = station || 'All Stations';
+    }
 }
 
 // Get human-readable time period label
@@ -20715,6 +20724,10 @@ function generateEnhancedWBRDeck() {
     const selectedStation = wbrDashboardState.selectedStation;
     const stationLabel = selectedStation || 'All Stations';
 
+    // Get selected period from global filters
+    const selectedPeriod = state.globalFilters?.timePeriod || 'all';
+    const periodLabel = getTimePeriodLabel(selectedPeriod);
+
     // Calculate filtered metrics
     const nearMissCount = filteredData.nearMisses.length;
     const injuryCount = filteredData.injuries.length;
@@ -20788,6 +20801,7 @@ function generateEnhancedWBRDeck() {
         year,
         dateGenerated: today.toLocaleDateString(),
         selectedStation: stationLabel,
+        selectedPeriod: periodLabel,
 
         // Leading/Lagging Metrics
         nearMissCount,
@@ -20951,6 +20965,10 @@ function generateWBRDeckHTML(data) {
         ? `<span style="background: #FF9900; color: white; padding: 4px 12px; border-radius: 4px; font-size: 0.85rem; margin-left: 10px;">${data.selectedStation}</span>`
         : '';
 
+    const periodBadge = data.selectedPeriod && data.selectedPeriod !== 'All Time'
+        ? `<span style="background: #1565C0; color: white; padding: 4px 12px; border-radius: 4px; font-size: 0.85rem; margin-left: 10px;">${data.selectedPeriod}</span>`
+        : '';
+
     const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -20964,7 +20982,9 @@ function generateWBRDeckHTML(data) {
         .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 4px solid #FF9900; padding-bottom: 20px; margin-bottom: 30px; }
         .header h1 { font-size: 2rem; color: #232F3E; }
         .header .meta { text-align: right; color: #666; }
-        .station-label { background: #232F3E; color: white; padding: 6px 16px; border-radius: 20px; font-size: 0.9rem; display: inline-block; margin-top: 8px; }
+        .station-label { background: #232F3E; color: white; padding: 6px 16px; border-radius: 20px; font-size: 0.9rem; display: inline-block; margin-top: 8px; margin-right: 8px; }
+        .period-label { background: #1565C0; color: white; padding: 6px 16px; border-radius: 20px; font-size: 0.9rem; display: inline-block; margin-top: 8px; }
+        .filter-badges { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
         .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 30px; }
         .kpi-card { background: linear-gradient(135deg, #232F3E, #37475A); color: white; padding: 20px; border-radius: 8px; text-align: center; }
         .kpi-card.orange { background: linear-gradient(135deg, #FF9900, #ec7211); }
@@ -21008,9 +21028,12 @@ function generateWBRDeckHTML(data) {
     <div class="page">
         <div class="header">
             <div>
-                <h1>Safety WBR Deck ${stationBadge}</h1>
+                <h1>Safety WBR Deck ${periodBadge}${stationBadge}</h1>
                 <p style="color: #FF9900; font-weight: 600;">Weekly Business Review - CW${data.weekNumber} ${data.year}</p>
-                <span class="station-label">${data.selectedStation || 'All Stations'}</span>
+                <div class="filter-badges">
+                    <span class="period-label">${data.selectedPeriod || 'All Time'}</span>
+                    <span class="station-label">${data.selectedStation || 'All Stations'}</span>
+                </div>
             </div>
             <div class="meta">
                 <p>Generated: ${data.dateGenerated}</p>
@@ -21076,7 +21099,10 @@ function generateWBRDeckHTML(data) {
         <div class="header">
             <div>
                 <h1>Recent Incidents (Last 7 Days)</h1>
-                <span class="station-label">${data.selectedStation || 'All Stations'}</span>
+                <div class="filter-badges">
+                    <span class="period-label">${data.selectedPeriod || 'All Time'}</span>
+                    <span class="station-label">${data.selectedStation || 'All Stations'}</span>
+                </div>
             </div>
             <div class="meta">
                 <p>CW${data.weekNumber} ${data.year}</p>
@@ -21131,7 +21157,10 @@ function generateWBRDeckHTML(data) {
             <div>
                 <h1>Noteworthy Near Misses</h1>
                 <p style="color: #666; font-size: 0.9rem;">High-potential incidents for team awareness and discussion</p>
-                <span class="station-label">${data.selectedStation || 'All Stations'}</span>
+                <div class="filter-badges">
+                    <span class="period-label">${data.selectedPeriod || 'All Time'}</span>
+                    <span class="station-label">${data.selectedStation || 'All Stations'}</span>
+                </div>
             </div>
             <div class="meta">
                 <p>CW${data.weekNumber} ${data.year}</p>
@@ -21161,7 +21190,10 @@ function generateWBRDeckHTML(data) {
 </body>
 </html>`;
 
-    // Create filename with station if specific station selected
+    // Create filename with period and station if specific values selected
+    const periodSuffix = data.selectedPeriod && data.selectedPeriod !== 'All Time'
+        ? `_${data.selectedPeriod.replace(/[^a-zA-Z0-9]/g, '')}`
+        : '';
     const stationSuffix = data.selectedStation && data.selectedStation !== 'All Stations'
         ? `_${data.selectedStation.replace(/[^a-zA-Z0-9]/g, '')}`
         : '';
@@ -21171,16 +21203,17 @@ function generateWBRDeckHTML(data) {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `Safety_WBR_Deck${stationSuffix}_CW${data.weekNumber}_${data.year}.html`;
+    a.download = `Safety_WBR_Deck${periodSuffix}${stationSuffix}_CW${data.weekNumber}_${data.year}.html`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
 
-    const stationMsg = data.selectedStation && data.selectedStation !== 'All Stations'
-        ? ` for ${data.selectedStation}`
-        : '';
-    showStatus(`WBR Deck generated successfully${stationMsg}! Open the HTML file and print to PDF for your slide deck.`, 'success');
+    const filterMsg = [];
+    if (data.selectedPeriod && data.selectedPeriod !== 'All Time') filterMsg.push(data.selectedPeriod);
+    if (data.selectedStation && data.selectedStation !== 'All Stations') filterMsg.push(data.selectedStation);
+    const filterSuffix = filterMsg.length > 0 ? ` (${filterMsg.join(' - ')})` : '';
+    showStatus(`WBR Deck generated successfully${filterSuffix}! Open the HTML file and print to PDF for your slide deck.`, 'success');
 }
 
 // Helper functions for Chaser
