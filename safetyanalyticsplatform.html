@@ -6066,8 +6066,6 @@
                         </div>
                     </div>
                 </div>
-            </div>
-
                     </section>
 
                     <!-- Noteworthy Near Misses Section -->
@@ -6089,8 +6087,6 @@
                         </div>
                     </div>
                 </div>
-            </div>
-
                     </section>
 
                     <!-- Action Items Section -->
@@ -19075,6 +19071,20 @@ function isWithinTimePeriod(dateValue, period) {
     return itemDate >= dateRange.startDate && itemDate <= dateRange.endDate;
 }
 
+// Normalize station values and compare across common fields
+function normalizeStationValue(value) {
+    return value ? value.toString().trim().toLowerCase() : '';
+}
+
+function matchesSelectedStation(record, selectedStation) {
+    if (!selectedStation) return true;
+    const target = normalizeStationValue(selectedStation);
+    if (!target) return true;
+
+    return [record.site, record.station, record.location, record.facility]
+        .some(value => normalizeStationValue(value) === target);
+}
+
 // Get filtered data based on selected station and time period
 function getWBRFilteredData() {
     const selectedStation = wbrDashboardState.selectedStation;
@@ -19086,16 +19096,25 @@ function getWBRFilteredData() {
 
     // Apply station filter
     if (selectedStation) {
-        injuries = injuries.filter(r => r.site === selectedStation);
-        nearMisses = nearMisses.filter(r => r.site === selectedStation);
-        inspections = inspections.filter(r => r.site === selectedStation);
+        injuries = injuries.filter(r => matchesSelectedStation(r, selectedStation));
+        nearMisses = nearMisses.filter(r => matchesSelectedStation(r, selectedStation));
+        inspections = inspections.filter(r => matchesSelectedStation(r, selectedStation));
     }
 
     // Apply time period filter
     if (selectedTimePeriod && selectedTimePeriod !== 'all') {
-        injuries = injuries.filter(r => isWithinTimePeriod(r.incident_date || r.parsedDate, selectedTimePeriod));
-        nearMisses = nearMisses.filter(r => isWithinTimePeriod(r.incident_date || r.parsedDate || r.date_reported, selectedTimePeriod));
-        inspections = inspections.filter(r => isWithinTimePeriod(r.inspection_date || r.date, selectedTimePeriod));
+        injuries = injuries.filter(r =>
+            isWithinTimePeriod(r.incident_date || r.injury_date || r.parsedDate, selectedTimePeriod)
+        );
+        nearMisses = nearMisses.filter(r =>
+            isWithinTimePeriod(
+                r.nearmiss_date || r.incident_date || r.parsedDate || r.date_reported,
+                selectedTimePeriod
+            )
+        );
+        inspections = inspections.filter(r =>
+            isWithinTimePeriod(r.inspection_date || r.date || r.due_date, selectedTimePeriod)
+        );
     }
 
     return { injuries, nearMisses, inspections };
@@ -19112,21 +19131,21 @@ function populateWBRStationFilter() {
     if (state.injury && Array.isArray(state.injury.rawData)) {
         state.injury.rawData.forEach(record => {
             const station = record.site || record.station || record.location || record.facility;
-            if (station) stations.add(station);
+            if (station) stations.add(station.toString().trim());
         });
     }
 
     if (state.nearMiss && Array.isArray(state.nearMiss.rawData)) {
         state.nearMiss.rawData.forEach(record => {
             const station = record.site || record.station || record.location || record.facility;
-            if (station) stations.add(station);
+            if (station) stations.add(station.toString().trim());
         });
     }
 
     if (state.inspections && Array.isArray(state.inspections.rawData)) {
         state.inspections.rawData.forEach(record => {
             const station = record.site || record.station || record.location || record.facility;
-            if (station) stations.add(station);
+            if (station) stations.add(station.toString().trim());
         });
     }
 
@@ -19179,6 +19198,7 @@ function applyWBRTimePeriodFilter() {
 
 // Refresh all WBR components
 function refreshWBRComponents() {
+    updateExecutiveSummary();
     updateLeadingLaggingGaugeFiltered();
     updateBodyMapFiltered();
     updateStationHeatMap();
