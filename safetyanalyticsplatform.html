@@ -5666,6 +5666,19 @@
                                 <span class="wbr-date-badge" id="wbrDateBadge">Week of Dec 2, 2024</span>
                             </p>
                         </div>
+                        <div class="wbr-active-filters" style="display: flex; gap: 1rem; align-items: center; background: rgba(255,255,255,0.1); padding: 0.5rem 1rem; border-radius: 8px;">
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                <i class="fas fa-map-marker-alt" style="opacity: 0.7;"></i>
+                                <span style="font-size: 0.85rem; opacity: 0.8;">Site:</span>
+                                <strong id="wbrHeaderSiteDisplay" style="font-size: 0.9rem;">All Stations</strong>
+                            </div>
+                            <div style="width: 1px; height: 20px; background: rgba(255,255,255,0.3);"></div>
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                <i class="fas fa-calendar-alt" style="opacity: 0.7;"></i>
+                                <span style="font-size: 0.85rem; opacity: 0.8;">Period:</span>
+                                <strong id="wbrHeaderPeriodDisplay" style="font-size: 0.9rem;">All Time</strong>
+                            </div>
+                        </div>
                         <div class="wbr-header-actions">
                             <button class="btn btn-secondary wbr-presentation-btn" onclick="togglePresentationMode()">
                                 <i class="fas fa-expand"></i> Present
@@ -6554,16 +6567,31 @@ function applyGlobalFilters() {
     showStatus(`Filters applied: ${getTimePeriodLabel(timePeriod)}${station ? ', ' + station : ''}`, 'success');
 }
 
-// Update WBR sidebar filter status display
+// Update WBR sidebar and header filter status display
 function updateWBRFilterDisplay(timePeriod, station) {
+    const periodLabel = getTimePeriodLabel(timePeriod);
+    const stationLabel = station || 'All Stations';
+
+    // Update sidebar display
     const periodDisplay = document.getElementById('wbrFilterPeriodDisplay');
     const stationDisplay = document.getElementById('wbrFilterStationDisplay');
 
     if (periodDisplay) {
-        periodDisplay.textContent = getTimePeriodLabel(timePeriod);
+        periodDisplay.textContent = periodLabel;
     }
     if (stationDisplay) {
-        stationDisplay.textContent = station || 'All Stations';
+        stationDisplay.textContent = stationLabel;
+    }
+
+    // Update WBR header display
+    const headerPeriodDisplay = document.getElementById('wbrHeaderPeriodDisplay');
+    const headerSiteDisplay = document.getElementById('wbrHeaderSiteDisplay');
+
+    if (headerPeriodDisplay) {
+        headerPeriodDisplay.textContent = periodLabel;
+    }
+    if (headerSiteDisplay) {
+        headerSiteDisplay.textContent = stationLabel;
     }
 }
 
@@ -6581,7 +6609,8 @@ function getTimePeriodLabel(value) {
 
 // Sync global filters to individual module filter dropdowns
 function syncFiltersToModules(timePeriod, station) {
-    // List of all time period filter selects across modules
+    // List of all time period filter selects across modules (these don't exist as DOM elements,
+    // but module functions now read from state.globalFilters directly)
     const timePeriodSelects = [
         'injuryTimePeriodFilter',
         'nearMissTimePeriodFilter',
@@ -6591,15 +6620,13 @@ function syncFiltersToModules(timePeriod, station) {
         'wbrTimePeriodFilter'
     ];
 
-    // List of all station filter selects
+    // List of all station/site filter selects - using actual element IDs that exist in the HTML
     const stationSelects = [
-        'injuryStationFilter',
-        'nearMissSiteFilter',
-        'nearMissStationFilter',
-        'overviewStationFilter',
-        'overviewSiteFilter',
-        'wbrStationFilter',
         'injurySiteFilter',
+        'nearMissSiteFilter',
+        'overviewSiteFilter',
+        'combinedSiteFilter',
+        'inspectionSiteFilter',
         'heatmapSiteSelect'
     ];
 
@@ -6648,6 +6675,11 @@ function applyFiltersToAllModules() {
         applyCombinedTimePeriodFilter();
     }
 
+    // Apply to inspections module (site filter is already synced, just trigger filter application)
+    if (state.inspections && state.inspections.rawData && state.inspections.rawData.length > 0) {
+        applyFilters('inspections');
+    }
+
     // Refresh WBR components with new filter state
     if (typeof refreshWBRComponents === 'function') {
         refreshWBRComponents();
@@ -6662,20 +6694,34 @@ function populateGlobalStationFilter() {
     const stations = new Set();
 
     // Collect stations from injury data
-    state.injury.rawData.forEach(record => {
-        const station = record.site || record.station || record.location || record.facility;
-        if (station && station.trim()) {
-            stations.add(station.trim());
-        }
-    });
+    if (state.injury && state.injury.rawData) {
+        state.injury.rawData.forEach(record => {
+            const station = record.site || record.station || record.location || record.facility;
+            if (station && station.trim()) {
+                stations.add(station.trim());
+            }
+        });
+    }
 
     // Collect stations from near miss data
-    state.nearMiss.rawData.forEach(record => {
-        const station = record.site || record.station || record.location || record.facility;
-        if (station && station.trim()) {
-            stations.add(station.trim());
-        }
-    });
+    if (state.nearMiss && state.nearMiss.rawData) {
+        state.nearMiss.rawData.forEach(record => {
+            const station = record.site || record.station || record.location || record.facility;
+            if (station && station.trim()) {
+                stations.add(station.trim());
+            }
+        });
+    }
+
+    // Collect stations from inspections data
+    if (state.inspections && state.inspections.rawData) {
+        state.inspections.rawData.forEach(record => {
+            const station = record.site || record.station || record.location || record.facility;
+            if (station && station.trim()) {
+                stations.add(station.trim());
+            }
+        });
+    }
 
     // Clear and repopulate
     select.innerHTML = '<option value="">All Stations</option>';
@@ -6685,6 +6731,8 @@ function populateGlobalStationFilter() {
         option.textContent = station;
         select.appendChild(option);
     });
+
+    console.log('Global station filter populated with', stations.size, 'stations:', Array.from(stations));
 }
 
 // Initialize global filters on page load
@@ -11654,7 +11702,8 @@ function applyFilters(type) {
 
 // Apply Injury Time Period Filter
 function applyInjuryTimePeriodFilter() {
-    const timePeriod = document.getElementById('injuryTimePeriodFilter')?.value || 'all';
+    // Use global filter state as source of truth (fallback to element if exists, then 'all')
+    const timePeriod = state.globalFilters?.timePeriod || document.getElementById('injuryTimePeriodFilter')?.value || 'all';
     const dateFromInput = document.getElementById('injuryDateFrom');
     const dateToInput = document.getElementById('injuryDateTo');
 
@@ -11720,7 +11769,8 @@ function applyInjuryRecordableQuickFilter() {
 
 // Apply Near Miss Time Period Filter
 function applyNearMissTimePeriodFilter() {
-    const timePeriod = document.getElementById('nearMissTimePeriodFilter')?.value || 'all';
+    // Use global filter state as source of truth (fallback to element if exists, then 'all')
+    const timePeriod = state.globalFilters?.timePeriod || document.getElementById('nearMissTimePeriodFilter')?.value || 'all';
     const dateFromInput = document.getElementById('nearMissDateFrom');
     const dateToInput = document.getElementById('nearMissDateTo');
 
@@ -11824,7 +11874,8 @@ function applyNearMissRiskQuickFilter() {
 
 // Apply Overview Time Period Filter
 function applyOverviewTimePeriodFilter() {
-    const timePeriod = document.getElementById('overviewTimePeriodFilter')?.value || 'all';
+    // Use global filter state as source of truth (fallback to element if exists, then 'all')
+    const timePeriod = state.globalFilters?.timePeriod || document.getElementById('overviewTimePeriodFilter')?.value || 'all';
 
     const today = new Date();
     today.setHours(23, 59, 59, 999);
@@ -11965,7 +12016,8 @@ function applyInspectionsTimePeriodFilter() {
 
 // Apply Combined Time Period Filter
 function applyCombinedTimePeriodFilter() {
-    const timePeriod = document.getElementById('combinedTimePeriodFilter')?.value || 'all';
+    // Use global filter state as source of truth (fallback to element if exists, then 'all')
+    const timePeriod = state.globalFilters?.timePeriod || document.getElementById('combinedTimePeriodFilter')?.value || 'all';
 
     const today = new Date();
     today.setHours(23, 59, 59, 999);
@@ -19631,8 +19683,10 @@ function navigateAgenda(direction) {
 
 // Update Executive Summary
 function updateExecutiveSummary() {
-    const injuryData = state.injury.rawData;
-    const nearMissData = state.nearMiss.rawData;
+    // Use filtered data based on global filters
+    const filteredData = getWBRFilteredData();
+    const injuryData = filteredData.injuries;
+    const nearMissData = filteredData.nearMisses;
 
     // Calculate metrics
     const totalIncidents = injuryData.length;
@@ -19692,17 +19746,20 @@ function refreshWBRData() {
     // Populate station filter
     populateWBRStationFilter();
 
-    // Update all WBR components
+    // Sync WBR state with global filters
+    if (typeof state !== 'undefined' && state.globalFilters) {
+        wbrDashboardState.selectedTimePeriod = state.globalFilters.timePeriod || 'all';
+        wbrDashboardState.selectedStation = state.globalFilters.station || '';
+    }
+
+    // Update WBR filter displays
+    updateWBRFilterDisplay(wbrDashboardState.selectedTimePeriod, wbrDashboardState.selectedStation);
+
+    // Update all WBR components using filtered data
     updateExecutiveSummary();
-    updateLeadingLaggingGauge();
-    updateBodyMap();
-    updateStationHeatMap();
+    refreshWBRComponents(); // This calls filtered versions of all WBR updates
     updateAustinIntegration();
     updateInspectionGapAnalysis();
-    updatePredictiveAnalytics();
-    updateWBRQuickStats();
-    updateDataQualityScorecard();
-    updateNoteworthyNearMisses();
     updateActionItemsCount();
 
     showStatus('WBR Dashboard refreshed successfully', 'success');
@@ -19902,13 +19959,14 @@ function normalizeBodyPart(part) {
 
 // Update Station Heat Map
 function updateStationHeatMap() {
-    const selectedSite = document.getElementById('heatmapSiteSelect')?.value || '';
+    // Use global filtered data to respect both station and time period filters
+    const filteredData = getWBRFilteredData();
 
-    // Combine injury and near miss data
+    // Combine filtered injury and near miss data
     const allData = [
-        ...state.injury.rawData.map(r => ({ ...r, type: 'injury' })),
-        ...state.nearMiss.rawData.map(r => ({ ...r, type: 'nearmiss' }))
-    ].filter(r => !selectedSite || r.site === selectedSite);
+        ...filteredData.injuries.map(r => ({ ...r, type: 'injury' })),
+        ...filteredData.nearMisses.map(r => ({ ...r, type: 'nearmiss' }))
+    ];
 
     // Map process paths to station zones
     const zoneCounts = {
