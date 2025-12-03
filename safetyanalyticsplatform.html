@@ -354,6 +354,103 @@
             padding: var(--spacing-lg) var(--spacing-md);
         }
 
+        /* Logistics Innovation Deck */
+        .ops-innovation {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .ops-card {
+            background: var(--bg-primary);
+            border-radius: 14px;
+            padding: var(--spacing-md);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 153, 0, 0.15);
+        }
+
+        .ops-card::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 20% 20%, rgba(255, 153, 0, 0.08), transparent 35%),
+                        radial-gradient(circle at 80% 10%, rgba(35, 47, 62, 0.08), transparent 30%);
+            pointer-events: none;
+        }
+
+        .ops-card h3 {
+            margin-bottom: var(--spacing-sm);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+        }
+
+        .ops-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.35rem 0.65rem;
+            border-radius: 999px;
+            background: rgba(35, 47, 62, 0.1);
+            color: var(--amazon-blue);
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .ops-chip.critical { background: rgba(183, 28, 28, 0.12); color: var(--critical); }
+        .ops-chip.success { background: rgba(76, 175, 80, 0.12); color: var(--success); }
+
+        .ops-pills { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: var(--spacing-sm); }
+        .ops-pill { background: var(--bg-secondary); padding: 0.35rem 0.55rem; border-radius: 6px; font-size: 0.8rem; }
+
+        .ops-cta { margin-top: var(--spacing-md); display: flex; gap: var(--spacing-sm); flex-wrap: wrap; }
+
+        .ops-cta .btn { text-transform: uppercase; letter-spacing: 0.5px; }
+
+        .ops-metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: var(--spacing-sm); }
+        .ops-metric {
+            background: linear-gradient(135deg, rgba(255, 153, 0, 0.12), rgba(35, 47, 62, 0.08));
+            border-radius: 10px;
+            padding: var(--spacing-sm);
+            border: 1px solid rgba(255, 153, 0, 0.2);
+        }
+        .ops-metric .label { color: var(--text-secondary); font-size: 0.85rem; }
+        .ops-metric .value { font-size: 1.4rem; font-weight: 700; }
+        .ops-trend { font-size: 0.8rem; margin-top: 0.15rem; }
+        .ops-trend.up { color: var(--success); }
+        .ops-trend.down { color: var(--danger); }
+
+        .ops-pulse { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.65rem; }
+        .ops-pulse li { display: flex; gap: var(--spacing-sm); align-items: flex-start; }
+        .ops-pulse .time { font-weight: 700; color: var(--amazon-orange); }
+        .ops-pulse .badge { padding: 0.2rem 0.55rem; border-radius: 999px; font-size: 0.75rem; }
+        .badge-good { background: rgba(76, 175, 80, 0.12); color: var(--success); }
+        .badge-risk { background: rgba(255, 87, 34, 0.12); color: var(--danger); }
+        .badge-watch { background: rgba(33, 150, 243, 0.12); color: #2196F3; }
+
+        .ops-map {
+            background: linear-gradient(135deg, rgba(35, 47, 62, 0.08), rgba(255, 153, 0, 0.08));
+            border: 1px dashed rgba(255, 153, 0, 0.25);
+            border-radius: 12px;
+            padding: var(--spacing-md);
+        }
+        .ops-map-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.6rem; }
+        .ops-map-cell {
+            background: var(--bg-primary);
+            border-radius: 10px;
+            padding: var(--spacing-sm);
+            border: 1px solid rgba(0,0,0,0.05);
+            position: relative;
+        }
+        .ops-map-cell strong { display: block; font-size: 0.9rem; margin-bottom: 0.2rem; }
+        .ops-map-cell .cell-value { font-weight: 700; }
+        .ops-map-cell .cell-status { font-size: 0.8rem; color: var(--text-secondary); }
+        .ops-map-cell.hot { border-color: var(--danger); box-shadow: 0 0 0 2px rgba(255, 87, 34, 0.18); }
+        .ops-map-cell.stable { border-color: var(--success); box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.18); }
+
         /* Compact Cards */
         .card {
             background: var(--bg-primary);
@@ -4235,6 +4332,104 @@
     <div class="container">
         <!-- Status Message Container -->
         <div id="statusContainer"></div>
+
+        <!-- Logistics Innovation Deck -->
+        <div class="ops-innovation">
+            <div class="ops-card">
+                <h3>🤖 WHS Copilot</h3>
+                <p>AI-assisted playbooks tuned for Amazon Logistics Austria. Use it during pre-shift briefs to surface the highest-risk process paths and the best mitigations.</p>
+                <div class="ops-pills">
+                    <span class="ops-pill">LLM Actions</span>
+                    <span class="ops-pill">Digital Twins</span>
+                    <span class="ops-pill">Voice Ready</span>
+                </div>
+                <div class="ops-cta">
+                    <a class="btn btn-primary" href="whs.html" target="_blank" rel="noopener">Launch WHS Simulator</a>
+                    <button class="btn btn-secondary" onclick="openHelpModal()">How it works</button>
+                </div>
+            </div>
+
+            <div class="ops-card">
+                <h3>📡 Live Ops Pulse</h3>
+                <div class="ops-metrics">
+                    <div class="ops-metric">
+                        <div class="label">Heat Index</div>
+                        <div class="value" id="opsHeat">--</div>
+                        <div class="ops-trend" id="opsHeatTrend">Calibrating...</div>
+                    </div>
+                    <div class="ops-metric">
+                        <div class="label">Dock Queue</div>
+                        <div class="value" id="opsQueue">--</div>
+                        <div class="ops-trend" id="opsQueueTrend">Calibrating...</div>
+                    </div>
+                    <div class="ops-metric">
+                        <div class="label">Fatigue Risk</div>
+                        <div class="value" id="opsFatigue">--</div>
+                        <div class="ops-trend" id="opsFatigueTrend">Calibrating...</div>
+                    </div>
+                    <div class="ops-metric">
+                        <div class="label">Safety Index</div>
+                        <div class="value" id="opsSafety">--</div>
+                        <div class="ops-trend" id="opsSafetyTrend">Calibrating...</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ops-card">
+                <h3>⚡ Shift Watchlist</h3>
+                <ul class="ops-pulse" id="opsPulseList">
+                    <li><span class="time">--</span><div><span class="badge badge-watch">Loading</span> Initializing live stream...</div></li>
+                </ul>
+            </div>
+
+            <div class="ops-card">
+                <h3>🛰️ Floor Digital Twin</h3>
+                <div class="ops-map">
+                    <div class="ops-map-grid" id="opsMapGrid">
+                        <div class="ops-map-cell" data-zone="AR Pack">
+                            <strong>AR Pack</strong>
+                            <div class="cell-value" data-cell="AR Pack">--</div>
+                            <div class="cell-status">Scanning lanes...</div>
+                        </div>
+                        <div class="ops-map-cell" data-zone="Dock 3">
+                            <strong>Dock 3</strong>
+                            <div class="cell-value" data-cell="Dock 3">--</div>
+                            <div class="cell-status">Calibrating sensors...</div>
+                        </div>
+                        <div class="ops-map-cell" data-zone="SLAM">
+                            <strong>SLAM</strong>
+                            <div class="cell-value" data-cell="SLAM">--</div>
+                            <div class="cell-status">Routing cartons...</div>
+                        </div>
+                        <div class="ops-map-cell" data-zone="Returns">
+                            <strong>Returns</strong>
+                            <div class="cell-value" data-cell="Returns">--</div>
+                            <div class="cell-status">Auditing flow...</div>
+                        </div>
+                        <div class="ops-map-cell" data-zone="Robotics">
+                            <strong>Robotics</strong>
+                            <div class="cell-value" data-cell="Robotics">--</div>
+                            <div class="cell-status">AMR telemetry...</div>
+                        </div>
+                        <div class="ops-map-cell" data-zone="Inbound">
+                            <strong>Inbound</strong>
+                            <div class="cell-value" data-cell="Inbound">--</div>
+                            <div class="cell-status">Unloading...</div>
+                        </div>
+                        <div class="ops-map-cell" data-zone="Outbound">
+                            <strong>Outbound</strong>
+                            <div class="cell-value" data-cell="Outbound">--</div>
+                            <div class="cell-status">Dispatch prep...</div>
+                        </div>
+                        <div class="ops-map-cell" data-zone="Yard">
+                            <strong>Yard</strong>
+                            <div class="cell-value" data-cell="Yard">--</div>
+                            <div class="cell-status">Trailer rotation...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <!-- Overview Module -->
         <div id="overview" class="tab-content active">
@@ -8894,6 +9089,86 @@ function generatePDFReport(type) {
         generateWBRReport();
     }
 }
+
+// Live Operations Experience
+const opsMetricsConfig = [
+    { id: 'opsHeat', trendId: 'opsHeatTrend', unit: '°C', min: 18, max: 32, decimals: 1, prefix: 'Ambient' },
+    { id: 'opsQueue', trendId: 'opsQueueTrend', unit: ' trucks', min: 2, max: 14, decimals: 0, prefix: 'Docked' },
+    { id: 'opsFatigue', trendId: 'opsFatigueTrend', unit: '%', min: 12, max: 46, decimals: 0, prefix: 'Model' },
+    { id: 'opsSafety', trendId: 'opsSafetyTrend', unit: '/100', min: 78, max: 99, decimals: 0, prefix: 'Composite' }
+];
+
+const opsPulseEvents = [
+    { badge: 'badge-risk', time: 'Now', text: 'Pick module heat index >30°C. Deploy cooling fans + hydrate in 10 minute rotation.' },
+    { badge: 'badge-good', time: 'Now', text: 'Dock 3 cleared queue. Yard jockey ETA alignment achieved.' },
+    { badge: 'badge-watch', time: '+6m', text: 'AMR slow zone triggered near SLAM. Auto speed limit enforced.' },
+    { badge: 'badge-risk', time: '+12m', text: 'Fatigue predictor high for shift B packers. Move floaters + microbreaks.' },
+    { badge: 'badge-good', time: '+15m', text: 'Inbound trailer 22 arrives early. Slotting logic updated.' },
+    { badge: 'badge-watch', time: '+25m', text: 'Returns surge expected. Add QA checklane to prevent recirculation injuries.' }
+];
+
+function updateOpsMetrics() {
+    opsMetricsConfig.forEach(metric => {
+        const value = (Math.random() * (metric.max - metric.min) + metric.min).toFixed(metric.decimals);
+        const delta = (Math.random() * 4 - 2).toFixed(1);
+
+        const valueEl = document.getElementById(metric.id);
+        const trendEl = document.getElementById(metric.trendId);
+
+        if (valueEl) valueEl.textContent = `${value}${metric.unit}`;
+        if (trendEl) {
+            trendEl.textContent = `${metric.prefix} trend ${delta >= 0 ? '+' : ''}${delta}%`; 
+            trendEl.className = `ops-trend ${delta >= 0 ? 'up' : 'down'}`;
+        }
+    });
+}
+
+let pulseIndex = 0;
+function renderOpsPulse() {
+    const list = document.getElementById('opsPulseList');
+    if (!list) return;
+    list.innerHTML = '';
+
+    for (let i = 0; i < 3; i++) {
+        const item = opsPulseEvents[(pulseIndex + i) % opsPulseEvents.length];
+        const li = document.createElement('li');
+        li.innerHTML = `<span class="time">${item.time}</span><div><span class="badge ${item.badge}">${item.badge.includes('risk') ? 'Risk' : item.badge.includes('good') ? 'Stable' : 'Watch'}</span> ${item.text}</div>`;
+        list.appendChild(li);
+    }
+    pulseIndex = (pulseIndex + 1) % opsPulseEvents.length;
+}
+
+function randomStatus() {
+    const statuses = ['Stable flow', 'Heat alert', 'Congested', 'Audit running', 'Peak volume'];
+    return statuses[Math.floor(Math.random() * statuses.length)];
+}
+
+function refreshOpsMap() {
+    const cells = document.querySelectorAll('.ops-map-cell');
+    cells.forEach(cell => {
+        const zone = cell.getAttribute('data-zone');
+        const valueEl = cell.querySelector(`[data-cell="${zone}"]`);
+        const statusEl = cell.querySelector('.cell-status');
+
+        const utilisation = Math.floor(Math.random() * 40) + 60;
+        const hot = utilisation > 88;
+
+        if (valueEl) valueEl.textContent = `${utilisation}% util`;
+        if (statusEl) statusEl.textContent = randomStatus();
+
+        cell.classList.toggle('hot', hot);
+        cell.classList.toggle('stable', !hot);
+    });
+}
+
+function initializeOpsExperience() {
+    updateOpsMetrics();
+    renderOpsPulse();
+    refreshOpsMap();
+    setInterval(updateOpsMetrics, 5000);
+    setInterval(renderOpsPulse, 4500);
+    setInterval(refreshOpsMap, 6000);
+}
 // Initialize Application
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Safety Analytics Platform - Amazon WHS Austria');
@@ -8904,6 +9179,7 @@ document.addEventListener('DOMContentLoaded', function() {
     setupTableSorting('injury');
     setupTableSorting('nearMiss');
     initializeChartCaptureButtons();
+    initializeOpsExperience();
 
     // Check for saved theme preference
     const savedTheme = localStorage.getItem('theme') || 'light';
