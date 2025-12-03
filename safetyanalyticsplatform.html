@@ -4307,9 +4307,9 @@
             <!-- Unified Filters for Overview Dashboards -->
             <div id="overviewFilters" class="filter-section" style="display: none; margin-top: 1rem; gap: 1rem;">
                 <div class="filter-group">
-                    <label class="filter-label">Site</label>
+                    <label class="filter-label">Station</label>
                     <select class="filter-input" id="overviewSiteFilter" onchange="applyOverviewFilters()">
-                        <option value="">All Sites</option>
+                        <option value="">All Stations</option>
                     </select>
                 </div>
                 <div class="filter-group">
@@ -4508,9 +4508,9 @@
 
                         <div class="filter-section">
                         <div class="filter-group">
-                            <label class="filter-label">Site</label>
+                            <label class="filter-label">Station</label>
                             <select class="filter-input" id="injurySiteFilter" onchange="applyFilters('injury')">
-                                <option value="">All Sites</option>
+                                <option value="">All Stations</option>
                             </select>
                         </div>
                         <div class="filter-group">
@@ -4903,9 +4903,9 @@
 
                         <div class="filter-section">
                         <div class="filter-group">
-                            <label class="filter-label">Site</label>
+                            <label class="filter-label">Station</label>
                             <select class="filter-input" id="nearMissSiteFilter" onchange="applyFilters('nearmiss')">
-                                <option value="">All Sites</option>
+                                <option value="">All Stations</option>
                             </select>
                         </div>
                         <div class="filter-group">
@@ -5273,9 +5273,9 @@
                      dynamically once data is loaded. -->
                 <div id="combinedFilters" class="filter-section" style="display: none; margin-top: 1rem; gap: 1rem;">
                     <div class="filter-group">
-                        <label class="filter-label">Site</label>
+                        <label class="filter-label">Station</label>
                         <select class="filter-input" id="combinedSiteFilter" onchange="applyCombinedFilters()">
-                            <option value="">All Sites</option>
+                            <option value="">All Stations</option>
                         </select>
                     </div>
                     <div class="filter-group">
@@ -5478,7 +5478,7 @@
                 </div>
                 <div class="filters-container">
                     <select id="inspectionSiteFilter" onchange="applyFilters('inspections')">
-                        <option value="">All Sites</option>
+                        <option value="">All Stations</option>
                     </select>
                     <select id="inspectionStatusFilter" onchange="applyFilters('inspections')">
                         <option value="">All Statuses</option>
@@ -5503,7 +5503,7 @@
 
             <div class="chart-grid">
                 <div class="chart-container">
-                    <h3>Inspections by Site</h3>
+                    <h3>Inspections by Station</h3>
                     <canvas id="inspectionsBySite"></canvas>
                 </div>
                 <div class="chart-container">
@@ -5920,7 +5920,7 @@
                     <div class="wbr-card-header">
                         <h3><span class="card-icon">🏭</span> Station Risk Heat Map</h3>
                         <select id="heatmapSiteSelect" class="wbr-select" onchange="updateStationHeatMap()">
-                            <option value="">All Sites</option>
+                            <option value="">All Stations</option>
                         </select>
                     </div>
                     <div class="station-heatmap-container">
@@ -6594,9 +6594,13 @@ function syncFiltersToModules(timePeriod, station) {
     // List of all station filter selects
     const stationSelects = [
         'injuryStationFilter',
+        'nearMissSiteFilter',
         'nearMissStationFilter',
         'overviewStationFilter',
-        'wbrStationFilter'
+        'overviewSiteFilter',
+        'wbrStationFilter',
+        'injurySiteFilter',
+        'heatmapSiteSelect'
     ];
 
     // Sync time period
@@ -6614,6 +6618,12 @@ function syncFiltersToModules(timePeriod, station) {
             select.value = station;
         }
     });
+
+    // Directly update WBR dashboard state for immediate effect
+    if (typeof wbrDashboardState !== 'undefined') {
+        wbrDashboardState.selectedTimePeriod = timePeriod;
+        wbrDashboardState.selectedStation = station;
+    }
 }
 
 // Apply filters to all modules' data
@@ -6638,14 +6648,9 @@ function applyFiltersToAllModules() {
         applyCombinedTimePeriodFilter();
     }
 
-    // Apply to WBR module
-    if (typeof applyWBRTimePeriodFilter === 'function') {
-        applyWBRTimePeriodFilter();
-    }
-
-    // Refresh WBR data
-    if (typeof refreshWBRData === 'function' && state.currentModule === 'wbr') {
-        refreshWBRData();
+    // Refresh WBR components with new filter state
+    if (typeof refreshWBRComponents === 'function') {
+        refreshWBRComponents();
     }
 }
 
@@ -20724,8 +20729,8 @@ function generateEnhancedWBRDeck() {
     const selectedStation = wbrDashboardState.selectedStation;
     const stationLabel = selectedStation || 'All Stations';
 
-    // Get selected period from global filters
-    const selectedPeriod = state.globalFilters?.timePeriod || 'all';
+    // Get selected period from WBR dashboard state (synced from global filters)
+    const selectedPeriod = wbrDashboardState.selectedTimePeriod || 'all';
     const periodLabel = getTimePeriodLabel(selectedPeriod);
 
     // Calculate filtered metrics
