@@ -5,28 +5,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MEU WHS COORDINATOR SIMULATOR</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap');
+
         :root {
             --bg-color: #050505;
             --terminal-green: #33ff00;
             --alert-red: #ff003c;
             --amazon-orange: #ff9900;
             --corp-blue: #00a8ff;
-            --ui-panel: #111;
+            --ui-panel: #0b0b0f;
+            --glass: rgba(255, 255, 255, 0.04);
+            --muted: #8c95a0;
         }
 
         body {
             background-color: var(--bg-color);
             color: var(--terminal-green);
-            font-family: 'Courier New', Courier, monospace;
+            font-family: 'Space Grotesk', 'Courier New', Courier, monospace;
             margin: 0;
             padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            overflow: hidden;
+            min-height: 100vh;
+            overflow-x: hidden;
             text-shadow: 0 0 4px rgba(51, 255, 0, 0.4);
             user-select: none;
+            position: relative;
         }
 
         /* CRT Overlay */
@@ -39,17 +41,255 @@
             z-index: 100;
         }
 
+        /* Background glow */
+        .bg-grid {
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(circle at 20% 20%, rgba(255, 153, 0, 0.08), transparent 35%),
+                        radial-gradient(circle at 80% 10%, rgba(51, 255, 0, 0.08), transparent 30%),
+                        radial-gradient(circle at 50% 80%, rgba(0, 168, 255, 0.07), transparent 32%),
+                        linear-gradient(135deg, rgba(255, 255, 255, 0.02) 0 25%, transparent 25% 50%, rgba(255, 255, 255, 0.02) 50% 75%, transparent 75% 100%);
+            background-size: 120px 120px, 200px 200px, 260px 260px, 180px 180px;
+            filter: blur(0px) saturate(120%);
+            opacity: 0.9;
+            z-index: -2;
+        }
+
+        .page-shell {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 32px 20px 72px;
+            display: grid;
+            gap: 20px;
+        }
+
+        .intel-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 16px;
+            align-items: stretch;
+        }
+
+        .panel {
+            background: var(--glass);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 16px;
+            padding: 16px;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        }
+
+        .panel h2 {
+            margin: 0 0 8px;
+            font-size: 16px;
+            letter-spacing: 0.06em;
+            color: var(--amazon-orange);
+            text-transform: uppercase;
+        }
+
+        .hero-panel {
+            display: grid;
+            grid-template-columns: 1fr 0.9fr;
+            gap: 12px;
+        }
+
+        .hero-meta {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        .badge {
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 8px;
+            border-radius: 10px;
+            background: rgba(255, 153, 0, 0.05);
+            color: #fff8ef;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            letter-spacing: 0.04em;
+        }
+
+        .badge .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--terminal-green);
+            box-shadow: 0 0 8px var(--terminal-green);
+        }
+
+        .metric-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 10px 0;
+        }
+
+        .metric-label { color: var(--muted); font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; }
+        .metric-value { font-size: 22px; font-weight: 700; }
+
+        .gauge {
+            height: 120px;
+            width: 120px;
+            border-radius: 20px;
+            background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.06), transparent 60%);
+            position: relative;
+            display: grid;
+            place-items: center;
+        }
+
+        .gauge::before {
+            content: '';
+            position: absolute;
+            inset: 12px;
+            border-radius: 16px;
+            background: conic-gradient(var(--terminal-green) 0deg, var(--amazon-orange) 160deg, var(--alert-red) 300deg, var(--alert-red));
+            opacity: 0.08;
+        }
+
+        .gauge-fill {
+            position: absolute;
+            inset: 4px;
+            border-radius: 16px;
+            background: conic-gradient(var(--terminal-green) calc(var(--risk, 50) * 3.6deg), rgba(255,255,255,0.06) calc(var(--risk, 50) * 3.6deg));
+            mask: radial-gradient(circle at center, transparent 45%, black 46%);
+        }
+
+        .gauge-value { position: relative; font-size: 26px; font-weight: 700; }
+
+        .telemetry-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 10px;
+        }
+
+        .telemetry-card {
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 12px;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .telemetry-card .label { color: var(--muted); font-size: 12px; letter-spacing: 0.08em; }
+        .telemetry-card .value { font-size: 22px; font-weight: 700; }
+
+        .sparkline {
+            height: 6px;
+            background: linear-gradient(90deg, rgba(51,255,0,0.4), rgba(255,153,0,0.7));
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+            margin-top: 6px;
+        }
+
+        .sparkline::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%);
+            animation: slide 3s linear infinite;
+        }
+
+        @keyframes slide { from { transform: translateX(-100%);} to { transform: translateX(100%);} }
+
+        .playbook-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+        }
+
+        .chip {
+            background: rgba(51, 255, 0, 0.08);
+            border: 1px solid rgba(51, 255, 0, 0.2);
+            border-radius: 12px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .chip small { color: var(--muted); font-size: 12px; }
+
+        .action-btn {
+            background: linear-gradient(120deg, rgba(255, 153, 0, 0.15), rgba(51, 255, 0, 0.14));
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #fff;
+            padding: 10px 12px;
+            font-family: inherit;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: transform 0.12s ease, box-shadow 0.12s ease;
+        }
+
+        .action-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(0,0,0,0.2); }
+
+        .checklist { display: grid; gap: 8px; }
+        .check-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.02);
+            padding: 10px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .check-item input { accent-color: var(--amazon-orange); width: 18px; height: 18px; }
+        .check-item span { color: #f0f0f0; font-size: 14px; }
+
+        .pill {
+            display: inline-flex;
+            gap: 6px;
+            align-items: center;
+            padding: 6px 10px;
+            border-radius: 12px;
+            background: rgba(0, 168, 255, 0.08);
+            border: 1px solid rgba(0, 168, 255, 0.15);
+            color: #d2ecff;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+        }
+
+        .download-btn {
+            margin-top: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            padding: 10px 12px;
+            color: #fff;
+            border-radius: 10px;
+            cursor: pointer;
+            width: 100%;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .download-btn:hover { background: rgba(255, 255, 255, 0.08); }
+
+        .inline-help { color: var(--muted); font-size: 12px; }
+
+        @media (max-width: 960px) {
+            .intel-grid { grid-template-columns: 1fr; }
+            .hero-panel { grid-template-columns: 1fr; }
+            #app-container { height: auto; min-height: 80vh; }
+        }
+
         /* Main Container */
         #app-container {
             width: 100%;
-            max-width: 800px;
+            max-width: 900px;
             height: 90vh;
             border: 2px solid var(--amazon-orange);
             background-color: var(--ui-panel);
             position: relative;
             display: flex;
             flex-direction: column;
-            box-shadow: 0 0 30px rgba(255, 153, 0, 0.1);
+            box-shadow: 0 0 30px rgba(255, 153, 0, 0.12);
+            border-radius: 18px;
+            overflow: hidden;
         }
 
         /* SCREENS */
@@ -237,64 +477,145 @@
 </head>
 <body>
 
+<div class="bg-grid"></div>
 <div class="scanlines"></div>
 
-<div id="app-container">
-    
-    <!-- INTRO SCREEN -->
-    <div id="intro-screen" class="screen active">
-        <div class="title-main">MEU WHS COORDINATOR<br>SIMULATOR</div>
-        <div class="title-sub">by @eeesener</div>
-        <br>
-        <div style="font-size: 12px; color: #888; margin-bottom: 20px;">
-            > INITIALIZING WHS_PROTOCOL_v9.2...<br>
-            > WARNING: ETHICS MODULE CORRUPTED<br>
-            > PROTOCOL: SURVIVE 12 SHIFTS<br>
-            > NOTE: IF METRICS DROP < 30%, INTERVENTION IS IMMEDIATE<br>
-            > READY.
+<main class="page-shell">
+    <section class="intel-grid">
+        <div class="panel hero-panel">
+            <div>
+                <h2>Safety Analytics HQ · Amazon Logistics WHS</h2>
+                <div class="title-main" style="margin: 0 0 6px;">Warehouse Health Console</div>
+                <p class="inline-help">Future-forward telemetry, predictive alerts, and gamified training stay intact while adding Amazon Logistics context.</p>
+                <div class="hero-meta">
+                    <div class="badge"><span class="dot"></span> Live shift telemetry</div>
+                    <div class="badge"><span class="dot"></span> Incident-free streak: <span id="streak-value">03 shifts</span></div>
+                    <div class="badge"><span class="dot"></span> OSHA-ready playbook</div>
+                    <div class="badge"><span class="dot"></span> Keyboard: [1] / [2]</div>
+                </div>
+            </div>
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
+                <div>
+                    <div class="metric-label">Composite Resilience</div>
+                    <div class="metric-value" id="resilience-label">50%</div>
+                    <div class="metric-label">Risk blend of productivity + safety</div>
+                </div>
+                <div class="gauge" aria-label="Risk gauge">
+                    <div class="gauge-fill" id="risk-gauge" style="--risk:50;"></div>
+                    <div class="gauge-value" id="risk-gauge-value">50%</div>
+                </div>
+            </div>
         </div>
-        <button id="btn-start-game" class="intro-btn blink">START SHIFT</button>
-    </div>
 
-    <!-- GAME SCREEN -->
-    <div id="game-screen" class="screen">
-        <header>
-            <span id="header-title">AMZN_LOGISTICS_OS</span>
-            <span id="header-day">SHIFT: 1</span>
-        </header>
+        <div class="panel">
+            <h2>Live Facility Telemetry</h2>
+            <div class="telemetry-grid">
+                <div class="telemetry-card">
+                    <div class="label">Throughput</div>
+                    <div class="value" id="telemetry-throughput">980 UPH</div>
+                    <div class="sparkline"></div>
+                </div>
+                <div class="telemetry-card">
+                    <div class="label">Near Misses</div>
+                    <div class="value" id="telemetry-nearmiss">1 minor</div>
+                    <div class="sparkline"></div>
+                </div>
+                <div class="telemetry-card">
+                    <div class="label">Heat Index</div>
+                    <div class="value" id="telemetry-heat">72°F safe</div>
+                    <div class="sparkline"></div>
+                </div>
+                <div class="telemetry-card">
+                    <div class="label">Prime Ready</div>
+                    <div class="value" id="telemetry-prime">96% SLA</div>
+                    <div class="sparkline"></div>
+                </div>
+            </div>
+            <p class="inline-help">Synthetic feed emulates the latest control tower dashboards without disrupting the original simulator.</p>
+        </div>
+    </section>
 
-        <div id="log-area">
-            <!-- Logs go here -->
-            <div id="boss-visual">
+    <section class="intel-grid">
+        <div class="panel">
+            <h2>Safety Playbook Boosters</h2>
+            <div class="playbook-grid" id="playbook-actions"></div>
+            <p class="inline-help">Drop-in mitigations nudge your stats in real time. Use them between scenarios to coach coordinators.</p>
+        </div>
+        <div class="panel">
+            <h2>Compliance Checklist</h2>
+            <div class="checklist">
+                <label class="check-item"><input type="checkbox" checked> <span>Pre-shift talk completed</span></label>
+                <label class="check-item"><input type="checkbox"> <span>PIT battery swap safety verified</span></label>
+                <label class="check-item"><input type="checkbox"> <span>Heat stress kit staged</span></label>
+                <label class="check-item"><input type="checkbox"> <span>DSD inbound lane clear</span></label>
+                <label class="check-item"><input type="checkbox"> <span>Safety cones deployed in high velocity zones</span></label>
+            </div>
+            <div style="margin-top:10px; display:flex; gap:6px; flex-wrap:wrap;">
+                <span class="pill">Vision: Zero recordables</span>
+                <span class="pill">AI monitor online</span>
+            </div>
+            <button class="download-btn" id="download-log">Download Shift Log</button>
+            <p class="inline-help">Download keeps every original log line intact for audits.</p>
+        </div>
+    </section>
+
+    <div id="app-container">
+
+        <!-- INTRO SCREEN -->
+        <div id="intro-screen" class="screen active">
+            <div class="title-main">MEU WHS COORDINATOR<br>SIMULATOR</div>
+            <div class="title-sub">by @eeesener</div>
+            <br>
+            <div style="font-size: 12px; color: #888; margin-bottom: 20px;">
+                > INITIALIZING WHS_PROTOCOL_v9.2...<br>
+                > WARNING: ETHICS MODULE CORRUPTED<br>
+                > PROTOCOL: SURVIVE 12 SHIFTS<br>
+                > NOTE: IF METRICS DROP < 30%, INTERVENTION IS IMMEDIATE<br>
+                > READY.
+            </div>
+            <button id="btn-start-game" class="intro-btn blink">START SHIFT</button>
+        </div>
+
+        <!-- GAME SCREEN -->
+        <div id="game-screen" class="screen">
+            <header>
+                <span id="header-title">AMZN_LOGISTICS_OS</span>
+                <span id="header-day">SHIFT: 1</span>
+            </header>
+
+            <div id="log-area">
+                <!-- Logs go here -->
+                <div id="boss-visual">
       /---\
      | o o |
      |  ^  |
     _|  -  |_   SIMON UNGLAUBE
    / |  $  | \  [SR. WHS LEAD]
   /  |_____|  \
+                </div>
+            </div>
+
+            <div id="stats-area">
+                <div class="stat-item" id="stat-container-prod">
+                    <div class="stat-label">Corporate Approval (Productivity)</div>
+                    <div class="stat-bar-bg"><div id="bar-prod" class="stat-bar-fill" style="background: var(--amazon-orange);"></div></div>
+                    <div id="val-prod" style="text-align: right; font-size: 12px;">50%</div>
+                </div>
+                <div class="stat-item" id="stat-container-safe">
+                    <div class="stat-label">Worker Survival (Safety)</div>
+                    <div class="stat-bar-bg"><div id="bar-safe" class="stat-bar-fill" style="background: var(--terminal-green);"></div></div>
+                    <div id="val-safe" style="text-align: right; font-size: 12px;">50%</div>
+                </div>
+            </div>
+
+            <div id="controls-area">
+                <button id="btn-choice-1" class="game-btn">OPTION 1</button>
+                <button id="btn-choice-2" class="game-btn risk">OPTION 2</button>
             </div>
         </div>
 
-        <div id="stats-area">
-            <div class="stat-item" id="stat-container-prod">
-                <div class="stat-label">Corporate Approval (Productivity)</div>
-                <div class="stat-bar-bg"><div id="bar-prod" class="stat-bar-fill" style="background: var(--amazon-orange);"></div></div>
-                <div id="val-prod" style="text-align: right; font-size: 12px;">50%</div>
-            </div>
-            <div class="stat-item" id="stat-container-safe">
-                <div class="stat-label">Worker Survival (Safety)</div>
-                <div class="stat-bar-bg"><div id="bar-safe" class="stat-bar-fill" style="background: var(--terminal-green);"></div></div>
-                <div id="val-safe" style="text-align: right; font-size: 12px;">50%</div>
-            </div>
-        </div>
-
-        <div id="controls-area">
-            <button id="btn-choice-1" class="game-btn">OPTION 1</button>
-            <button id="btn-choice-2" class="game-btn risk">OPTION 2</button>
-        </div>
     </div>
-
-</div>
+</main>
 
 <script>
     /* --- AUDIO ENGINE --- */
@@ -384,7 +705,7 @@
 
     /* --- GAME ENGINE --- */
     const state = {
-        phase: 'INTRO', 
+        phase: 'INTRO',
         day: 1,
         prod: 50,
         safe: 50,
@@ -396,6 +717,20 @@
         earlyBossTriggered: false
     };
 
+    const telemetryStream = [
+        { throughput: 980, nearMiss: '1 minor', heat: '72°F safe', prime: '96% SLA' },
+        { throughput: 1040, nearMiss: '0 in last hr', heat: '76°F caution', prime: '97% SLA' },
+        { throughput: 910, nearMiss: '2 line stops', heat: '70°F safe', prime: '95% SLA' },
+        { throughput: 1125, nearMiss: '0 recordables', heat: '78°F watch', prime: '98% SLA' }
+    ];
+
+    const playbookActions = [
+        { title: 'Hydration Microbreak', text: '+Heat recovery, -tempo', p: -5, s: 8, note: 'Cold towels staged at pack wall.' },
+        { title: 'PIT Speed Governor', text: '-3mph in hot zones', p: -8, s: 10, note: 'Drivers acknowledge slow zones via scanner.' },
+        { title: 'Ergo Sprint', text: 'Stretch + rotate roles', p: -4, s: 6, note: 'Cross-train packers to decouple bottlenecks.' },
+        { title: 'Blue Vest Blitz', text: 'Leads swarm high-risk aisles', p: -6, s: 12, note: 'Hazards cleared without pausing the shift.' }
+    ];
+
     // DOM Elements
     const elApp = document.getElementById('app-container');
     const elIntro = document.getElementById('intro-screen');
@@ -405,6 +740,16 @@
     const elBtn2 = document.getElementById('btn-choice-2');
     const elBossVis = document.getElementById('boss-visual');
     const elHeaderDay = document.getElementById('header-day');
+    const elRiskGauge = document.getElementById('risk-gauge');
+    const elRiskGaugeValue = document.getElementById('risk-gauge-value');
+    const elResilienceLabel = document.getElementById('resilience-label');
+    const elStreak = document.getElementById('streak-value');
+    const elTelemetryThroughput = document.getElementById('telemetry-throughput');
+    const elTelemetryNearmiss = document.getElementById('telemetry-nearmiss');
+    const elTelemetryHeat = document.getElementById('telemetry-heat');
+    const elTelemetryPrime = document.getElementById('telemetry-prime');
+    const elPlaybook = document.getElementById('playbook-actions');
+    const elDownload = document.getElementById('download-log');
 
     // Helpers
     function addLog(text, type = '') {
@@ -423,7 +768,13 @@
         document.getElementById('val-prod').textContent = state.prod + '%';
         document.getElementById('bar-safe').style.width = state.safe + '%';
         document.getElementById('val-safe').textContent = state.safe + '%';
-        
+
+        const resilience = Math.round((state.prod + state.safe) / 2);
+        elRiskGauge.style.setProperty('--risk', resilience);
+        elRiskGaugeValue.textContent = resilience + '%';
+        elResilienceLabel.textContent = resilience + '%';
+        elStreak.textContent = String(Math.max(1, Math.min(12, state.day - 1))).padStart(2, '0') + ' shifts';
+
         // Panic visual
         const prodContainer = document.getElementById('stat-container-prod');
         const safeContainer = document.getElementById('stat-container-safe');
@@ -440,9 +791,78 @@
             elBossVis.style.display = 'block';
         } else {
             elHeaderDay.textContent = "SHIFT: " + state.day;
-            elHeaderDay.style.color = "black";
+            elHeaderDay.style.color = "var(--amazon-orange)";
             elBossVis.style.display = 'none';
         }
+    }
+
+    function spinTelemetry() {
+        let idx = 0;
+        const update = () => {
+            const frame = telemetryStream[idx % telemetryStream.length];
+            elTelemetryThroughput.textContent = `${frame.throughput} UPH`;
+            elTelemetryNearmiss.textContent = frame.nearMiss;
+            elTelemetryHeat.textContent = frame.heat;
+            elTelemetryPrime.textContent = frame.prime;
+            idx++;
+        };
+        update();
+        setInterval(update, 3600);
+    }
+
+    function renderPlaybook() {
+        elPlaybook.innerHTML = '';
+        playbookActions.forEach((action) => {
+            const card = document.createElement('div');
+            card.className = 'chip';
+            const title = document.createElement('div');
+            title.style.fontWeight = '800';
+            title.textContent = action.title;
+
+            const sub = document.createElement('small');
+            sub.textContent = action.text;
+
+            const btn = document.createElement('button');
+            btn.className = 'action-btn';
+            btn.textContent = 'Apply + Log';
+            btn.onclick = () => usePlaybookAction(action);
+
+            card.appendChild(title);
+            card.appendChild(sub);
+            card.appendChild(btn);
+            elPlaybook.appendChild(card);
+        });
+    }
+
+    function usePlaybookAction(action) {
+        if (state.phase === 'INTRO' || state.phase === 'END') {
+            addLog('Playbook ready once the shift begins.', 'system');
+            return;
+        }
+        state.prod += action.p;
+        state.safe += action.s;
+        addLog(`PLAYBOOK DEPLOYED: ${action.title}`, 'system');
+        if (action.note) addLog(action.note, action.p < 0 ? 'danger' : 'system');
+        updateDisplay();
+    }
+
+    function downloadLog() {
+        const lines = Array.from(elLog.querySelectorAll('.log-line')).map(l => l.textContent).join('\n') || 'Log empty. Start a shift to generate telemetry.';
+        const blob = new Blob([lines], { type: 'text/plain' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'whs_shift_log.txt';
+        link.click();
+        URL.revokeObjectURL(link.href);
+    }
+
+    function attachKeyboardShortcuts() {
+        document.addEventListener('keydown', (e) => {
+            if (state.phase === 'GAME' || state.phase === 'BOSS') {
+                if (e.key === '1') elBtn1.click();
+                if (e.key === '2' && !elBtn2.classList.contains('hidden')) elBtn2.click();
+            }
+        });
     }
 
     function checkGameOver() {
@@ -664,6 +1084,10 @@
 
     // --- INITIALIZATION ---
     document.getElementById('btn-start-game').addEventListener('click', initGame);
+    elDownload.addEventListener('click', downloadLog);
+    attachKeyboardShortcuts();
+    renderPlaybook();
+    spinTelemetry();
 
 </script>
 
