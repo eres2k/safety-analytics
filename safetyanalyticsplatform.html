@@ -19026,7 +19026,7 @@ const wbrDashboardState = {
     actionItems: [],
     predictions: [],
     selectedStation: '', // '' means all stations
-    selectedTimePeriod: 'all' // 'all', 'week', 'month', 'ytd'
+    selectedTimePeriod: 'all' // 'all', 'week', 'month', 'quarter', 'ytd'
 };
 
 // Get date range based on time period selection
@@ -19045,6 +19045,11 @@ function getTimePeriodDateRange(period) {
             // Last 30 days
             startDate = new Date(today);
             startDate.setDate(startDate.getDate() - 30);
+            break;
+        case 'quarter':
+            // Last 90 days to support the global "Last Quarter" filter
+            startDate = new Date(today);
+            startDate.setDate(startDate.getDate() - 90);
             break;
         case 'ytd':
             // Year to date (from Jan 1 of current year)
@@ -19185,6 +19190,7 @@ function applyWBRTimePeriodFilter() {
         'all': 'All Time',
         'week': 'Last Week',
         'month': 'Last Month',
+        'quarter': 'Last Quarter',
         'ytd': 'Year to Date'
     };
     const periodLabel = periodLabels[wbrDashboardState.selectedTimePeriod] || 'All Time';
@@ -21090,7 +21096,7 @@ function generateWBRDeckHTML(data) {
         .station-label { background: #232F3E; color: white; padding: 6px 16px; border-radius: 20px; font-size: 0.9rem; display: inline-block; margin-top: 8px; margin-right: 8px; }
         .period-label { background: #1565C0; color: white; padding: 6px 16px; border-radius: 20px; font-size: 0.9rem; display: inline-block; margin-top: 8px; }
         .filter-badges { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
-        .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 30px; }
+        .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 30px; }
         .kpi-card { background: linear-gradient(135deg, #232F3E, #37475A); color: white; padding: 20px; border-radius: 8px; text-align: center; }
         .kpi-card.orange { background: linear-gradient(135deg, #FF9900, #ec7211); }
         .kpi-card.green { background: linear-gradient(135deg, #4CAF50, #45a049); }
@@ -21108,7 +21114,7 @@ function generateWBRDeckHTML(data) {
         .badge.good { background: #e8f5e9; color: #2e7d32; }
         .insights-box { background: #e3f2fd; border-left: 4px solid #1976d2; padding: 20px; border-radius: 0 8px 8px 0; }
         .insights-box h3 { color: #1565c0; margin-bottom: 10px; }
-        .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+        .two-col { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 30px; }
         .action-item { display: flex; align-items: center; gap: 10px; padding: 10px; background: #fff3e0; border-radius: 4px; margin-bottom: 8px; }
         .action-item.overdue { background: #ffebee; }
         .footer { text-align: center; color: #666; font-size: 0.8rem; border-top: 1px solid #ddd; padding-top: 20px; margin-top: 30px; }
@@ -21125,6 +21131,11 @@ function generateWBRDeckHTML(data) {
         .email-callout-icon { font-size: 2rem; }
         .email-callout-text h3 { margin-bottom: 5px; }
         .email-callout-text p { opacity: 0.9; font-size: 0.9rem; }
+        @media (max-width: 900px) {
+            .header { flex-direction: column; align-items: flex-start; gap: 12px; }
+            .header .meta { text-align: left; }
+            .page { padding: 24px; }
+        }
         @media print { .page { box-shadow: none; margin: 0; padding: 20px; } }
     </style>
 </head>
