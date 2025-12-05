@@ -277,6 +277,37 @@
             background: var(--bg-secondary);
         }
 
+        /* Admin Navigation Styles */
+        .nav-divider {
+            width: 1px;
+            height: 24px;
+            background: var(--border-color);
+            margin: auto 0.5rem;
+        }
+
+        .admin-tab {
+            color: #F59E0B !important;
+        }
+
+        .admin-tab:hover {
+            color: #D97706 !important;
+            background: rgba(245, 158, 11, 0.1) !important;
+        }
+
+        .admin-tab.active {
+            color: #D97706 !important;
+            border-bottom-color: #F59E0B !important;
+            background: rgba(245, 158, 11, 0.1) !important;
+        }
+
+        .admin-only {
+            display: none;
+        }
+
+        .admin-only.visible {
+            display: flex;
+        }
+
         /* Global Filter Bar */
         .global-filter-bar {
             display: flex;
@@ -4141,6 +4172,596 @@
                 font-size: 1.5rem;
             }
         }
+
+        /* ==================== ADMIN PAGES STYLES ==================== */
+
+        /* Admin Page Header */
+        .admin-page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .admin-page-title {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .admin-page-title h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .admin-page-title .admin-badge {
+            background: linear-gradient(135deg, #F59E0B, #D97706);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        /* User Stats Cards */
+        .user-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .user-stat-card {
+            background: var(--bg-primary);
+            border-radius: var(--border-radius-lg);
+            padding: 1.25rem;
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: var(--transition);
+        }
+
+        .user-stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .user-stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: var(--border-radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .user-stat-icon.admin { background: rgba(239, 68, 68, 0.1); }
+        .user-stat-icon.manager { background: rgba(59, 130, 246, 0.1); }
+        .user-stat-icon.auditor { background: rgba(16, 185, 129, 0.1); }
+        .user-stat-icon.viewer { background: rgba(107, 114, 128, 0.1); }
+
+        .user-stat-info h3 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .user-stat-info p {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin: 0;
+        }
+
+        /* Search & Filter Bar */
+        .admin-toolbar {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .admin-search {
+            flex: 1;
+            min-width: 250px;
+            position: relative;
+        }
+
+        .admin-search input {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 2.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            font-size: 0.875rem;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            transition: var(--transition);
+        }
+
+        .admin-search input:focus {
+            outline: none;
+            border-color: var(--amazon-orange);
+            box-shadow: 0 0 0 3px rgba(255, 153, 0, 0.1);
+        }
+
+        .admin-search i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+
+        /* Users Table */
+        .users-table-container {
+            background: var(--bg-primary);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .users-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .users-table th,
+        .users-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .users-table th {
+            background: var(--bg-secondary);
+            font-weight: 600;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-secondary);
+        }
+
+        .users-table tr:hover {
+            background: var(--bg-secondary);
+        }
+
+        .users-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--amazon-orange), var(--amazon-orange-dark));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        .user-details h4 {
+            margin: 0;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .user-details p {
+            margin: 0;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        /* Role Badges */
+        .role-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.35rem 0.75rem;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .role-badge.admin {
+            background: rgba(239, 68, 68, 0.1);
+            color: #DC2626;
+        }
+
+        .role-badge.manager {
+            background: rgba(59, 130, 246, 0.1);
+            color: #2563EB;
+        }
+
+        .role-badge.auditor {
+            background: rgba(16, 185, 129, 0.1);
+            color: #059669;
+        }
+
+        .role-badge.viewer {
+            background: rgba(107, 114, 128, 0.1);
+            color: #4B5563;
+        }
+
+        /* Status Badge */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 999px;
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+
+        .status-badge.active {
+            background: rgba(16, 185, 129, 0.1);
+            color: #059669;
+        }
+
+        .status-badge.inactive {
+            background: rgba(107, 114, 128, 0.1);
+            color: #6B7280;
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
+
+        .status-badge.active .status-dot {
+            background: #10B981;
+        }
+
+        .status-badge.inactive .status-dot {
+            background: #9CA3AF;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .action-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: var(--border-radius);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .action-btn.edit {
+            background: rgba(59, 130, 246, 0.1);
+            color: #2563EB;
+        }
+
+        .action-btn.edit:hover {
+            background: rgba(59, 130, 246, 0.2);
+        }
+
+        .action-btn.delete {
+            background: rgba(239, 68, 68, 0.1);
+            color: #DC2626;
+        }
+
+        .action-btn.delete:hover {
+            background: rgba(239, 68, 68, 0.2);
+        }
+
+        /* Permissions Page Styles */
+        .permissions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .role-card {
+            background: var(--bg-primary);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .role-card-header {
+            padding: 1.25rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .role-card-header.admin { background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(239, 68, 68, 0.05)); }
+        .role-card-header.manager { background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(59, 130, 246, 0.05)); }
+        .role-card-header.auditor { background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(16, 185, 129, 0.05)); }
+        .role-card-header.viewer { background: linear-gradient(135deg, rgba(107, 114, 128, 0.1), rgba(107, 114, 128, 0.05)); }
+
+        .role-card-title {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .role-card-title h3 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .role-card-title.admin h3 { color: #DC2626; }
+        .role-card-title.manager h3 { color: #2563EB; }
+        .role-card-title.auditor h3 { color: #059669; }
+        .role-card-title.viewer h3 { color: #4B5563; }
+
+        .permission-count {
+            background: var(--bg-secondary);
+            padding: 0.25rem 0.75rem;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .role-card-body {
+            padding: 1.25rem;
+        }
+
+        .permission-category {
+            margin-bottom: 1.25rem;
+        }
+
+        .permission-category:last-child {
+            margin-bottom: 0;
+        }
+
+        .permission-category-title {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .permission-category-title::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border-color);
+        }
+
+        .permission-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+        }
+
+        .permission-label {
+            display: flex;
+            flex-direction: column;
+            gap: 0.15rem;
+        }
+
+        .permission-label span {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .permission-label small {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+        }
+
+        /* Toggle Switch */
+        .toggle-switch {
+            position: relative;
+            width: 44px;
+            height: 24px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--border-color);
+            transition: var(--transition);
+            border-radius: 24px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: var(--transition);
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .toggle-switch input:checked + .toggle-slider {
+            background-color: var(--success);
+        }
+
+        .toggle-switch input:checked + .toggle-slider:before {
+            transform: translateX(20px);
+        }
+
+        .toggle-switch input:disabled + .toggle-slider {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Access Denied */
+        .access-denied {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 400px;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .access-denied-icon {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+            opacity: 0.5;
+        }
+
+        .access-denied h2 {
+            font-size: 1.5rem;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .access-denied p {
+            color: var(--text-secondary);
+            max-width: 400px;
+        }
+
+        /* Modal Styles for Edit User */
+        .admin-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1100;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .admin-modal.active {
+            display: flex;
+        }
+
+        .admin-modal-content {
+            background: var(--bg-primary);
+            border-radius: var(--border-radius-lg);
+            width: 90%;
+            max-width: 500px;
+            box-shadow: var(--shadow-lg);
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .admin-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.25rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .admin-modal-header h3 {
+            margin: 0;
+            font-size: 1.125rem;
+            font-weight: 600;
+        }
+
+        .admin-modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+            line-height: 1;
+        }
+
+        .admin-modal-close:hover {
+            color: var(--text-primary);
+        }
+
+        .admin-modal-body {
+            padding: 1.25rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .form-group select,
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            font-size: 0.875rem;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+
+        .form-group select:focus,
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--amazon-orange);
+            box-shadow: 0 0 0 3px rgba(255, 153, 0, 0.1);
+        }
+
+        .admin-modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+            padding: 1.25rem;
+            border-top: 1px solid var(--border-color);
+        }
     </style>
 </head>
 <body>
@@ -4205,6 +4826,16 @@
                 <div class="nav-tab" data-module="reports" onclick="switchModule('reports', event)">
                     <span class="tab-icon">📄</span>
                     <span>Reports</span>
+                </div>
+                <!-- Administration Section - Admin Only -->
+                <div class="nav-divider admin-only" id="adminNavDivider"></div>
+                <div class="nav-tab admin-tab admin-only" data-module="users" onclick="switchModule('users', event)" id="usersNavTab">
+                    <span class="tab-icon">👥</span>
+                    <span>Users</span>
+                </div>
+                <div class="nav-tab admin-tab admin-only" data-module="permissions" onclick="switchModule('permissions', event)" id="permissionsNavTab">
+                    <span class="tab-icon">🔐</span>
+                    <span>Permissions</span>
                 </div>
             </div>
             <div class="global-filter-bar">
@@ -6312,6 +6943,61 @@ Follow-up Items:
             </div>
         </div>
 
+        <!-- User Management Module (Admin Only) -->
+        <div id="users" class="tab-content">
+            <div id="usersContent">
+                <!-- Content will be rendered by JavaScript based on admin status -->
+            </div>
+        </div>
+
+        <!-- Permissions Module (Admin Only) -->
+        <div id="permissions" class="tab-content">
+            <div id="permissionsContent">
+                <!-- Content will be rendered by JavaScript based on admin status -->
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Edit User Modal -->
+    <div id="editUserModal" class="admin-modal">
+        <div class="admin-modal-content">
+            <div class="admin-modal-header">
+                <h3>Edit User</h3>
+                <button class="admin-modal-close" onclick="closeEditUserModal()">&times;</button>
+            </div>
+            <div class="admin-modal-body">
+                <input type="hidden" id="editUserId">
+                <div class="form-group">
+                    <label>Name</label>
+                    <input type="text" id="editUserName" readonly style="background: var(--bg-secondary);">
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="editUserEmail" readonly style="background: var(--bg-secondary);">
+                </div>
+                <div class="form-group">
+                    <label>Role</label>
+                    <select id="editUserRole">
+                        <option value="Admin">Admin</option>
+                        <option value="Manager">Manager</option>
+                        <option value="Auditor">Auditor</option>
+                        <option value="Viewer">Viewer</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Status</label>
+                    <select id="editUserStatus">
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
+                </div>
+            </div>
+            <div class="admin-modal-footer">
+                <button class="btn btn-secondary" onclick="closeEditUserModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="saveUserChanges()">Save Changes</button>
+            </div>
+        </div>
     </div>
 
     <!-- Help Modal -->
@@ -6520,8 +7206,401 @@ const state = {
     globalFilters: {
         timePeriod: 'all',
         station: ''
+    },
+    // Current logged-in user
+    currentUser: {
+        id: 1,
+        name: 'Erwin Esener',
+        email: 'erwin.esener@gmail.com',
+        role: 'Admin',
+        avatar: null,
+        lastLogin: new Date().toISOString()
+    },
+    // All registered users
+    users: [
+        { id: 1, name: 'Erwin Esener', email: 'erwin.esener@gmail.com', role: 'Admin', status: 'active', lastLogin: '2024-12-05T10:30:00Z' },
+        { id: 2, name: 'Maria Schmidt', email: 'maria.schmidt@amazon.com', role: 'Manager', status: 'active', lastLogin: '2024-12-04T14:22:00Z' },
+        { id: 3, name: 'Thomas Weber', email: 'thomas.weber@amazon.com', role: 'Auditor', status: 'active', lastLogin: '2024-12-03T09:15:00Z' },
+        { id: 4, name: 'Anna Müller', email: 'anna.mueller@amazon.com', role: 'Viewer', status: 'active', lastLogin: '2024-12-02T16:45:00Z' },
+        { id: 5, name: 'Klaus Fischer', email: 'klaus.fischer@amazon.com', role: 'Manager', status: 'active', lastLogin: '2024-12-01T11:00:00Z' },
+        { id: 6, name: 'Sophie Bauer', email: 'sophie.bauer@amazon.com', role: 'Auditor', status: 'inactive', lastLogin: '2024-11-28T08:30:00Z' }
+    ],
+    // Role permissions matrix
+    permissions: {
+        Admin: ['view_dashboard', 'view_reports', 'export_data', 'create_audits', 'edit_audits', 'delete_audits', 'manage_templates', 'create_actions', 'edit_actions', 'delete_actions', 'view_team', 'manage_team', 'manage_users', 'manage_permissions', 'system_settings'],
+        Manager: ['view_dashboard', 'view_reports', 'export_data', 'create_audits', 'edit_audits', 'manage_templates', 'create_actions', 'edit_actions', 'view_team', 'manage_team'],
+        Auditor: ['view_dashboard', 'view_reports', 'export_data', 'create_audits', 'edit_audits', 'create_actions', 'edit_actions', 'view_team'],
+        Viewer: ['view_dashboard', 'view_reports']
+    },
+    // All available permissions
+    allPermissions: {
+        general: [
+            { id: 'view_dashboard', label: 'View Dashboard', description: 'Access main dashboard and overview' },
+            { id: 'view_reports', label: 'View Reports', description: 'Access and view all reports' },
+            { id: 'export_data', label: 'Export Data', description: 'Export data to Excel/PDF' }
+        ],
+        audits: [
+            { id: 'create_audits', label: 'Create Audits', description: 'Create new safety audits' },
+            { id: 'edit_audits', label: 'Edit Audits', description: 'Modify existing audits' },
+            { id: 'delete_audits', label: 'Delete Audits', description: 'Remove audits from system' }
+        ],
+        templates: [
+            { id: 'manage_templates', label: 'Manage Templates', description: 'Create and edit audit templates' }
+        ],
+        actions: [
+            { id: 'create_actions', label: 'Create Actions', description: 'Create corrective actions' },
+            { id: 'edit_actions', label: 'Edit Actions', description: 'Modify action items' },
+            { id: 'delete_actions', label: 'Delete Actions', description: 'Remove action items' }
+        ],
+        team: [
+            { id: 'view_team', label: 'View Team', description: 'See team members and assignments' },
+            { id: 'manage_team', label: 'Manage Team', description: 'Assign and manage team members' }
+        ],
+        administration: [
+            { id: 'manage_users', label: 'Manage Users', description: 'Add, edit, and remove users' },
+            { id: 'manage_permissions', label: 'Manage Permissions', description: 'Configure role permissions' },
+            { id: 'system_settings', label: 'System Settings', description: 'Access system configuration' }
+        ]
     }
 };
+
+// ==================== ADMIN FUNCTIONS ====================
+
+// Check if current user is admin
+function isAdmin() {
+    return state.currentUser && state.currentUser.role === 'Admin';
+}
+
+// Initialize admin UI - show/hide admin tabs based on role
+function initAdminUI() {
+    const adminElements = document.querySelectorAll('.admin-only');
+    adminElements.forEach(el => {
+        if (isAdmin()) {
+            el.classList.add('visible');
+        } else {
+            el.classList.remove('visible');
+        }
+    });
+}
+
+// Get user initials for avatar
+function getUserInitials(name) {
+    return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+}
+
+// Format date for display
+function formatLastLogin(dateString) {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diff = now - date;
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+
+    if (days === 0) return 'Today';
+    if (days === 1) return 'Yesterday';
+    if (days < 7) return `${days} days ago`;
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+// Get user counts by role
+function getUserCountsByRole() {
+    const counts = { Admin: 0, Manager: 0, Auditor: 0, Viewer: 0 };
+    state.users.forEach(user => {
+        if (counts.hasOwnProperty(user.role)) {
+            counts[user.role]++;
+        }
+    });
+    return counts;
+}
+
+// Render Users Page
+function renderUsersPage() {
+    const container = document.getElementById('usersContent');
+    if (!container) return;
+
+    if (!isAdmin()) {
+        container.innerHTML = `
+            <div class="access-denied">
+                <div class="access-denied-icon">🔒</div>
+                <h2>Access Denied</h2>
+                <p>You don't have permission to access User Management. Please contact an administrator if you need access.</p>
+            </div>
+        `;
+        return;
+    }
+
+    const counts = getUserCountsByRole();
+    const searchTerm = document.getElementById('userSearchInput')?.value?.toLowerCase() || '';
+
+    const filteredUsers = state.users.filter(user =>
+        user.name.toLowerCase().includes(searchTerm) ||
+        user.email.toLowerCase().includes(searchTerm) ||
+        user.role.toLowerCase().includes(searchTerm)
+    );
+
+    container.innerHTML = `
+        <div class="admin-page-header">
+            <div class="admin-page-title">
+                <h2>👥 User Management</h2>
+                <span class="admin-badge">Admin Only</span>
+            </div>
+        </div>
+
+        <div class="user-stats-grid">
+            <div class="user-stat-card">
+                <div class="user-stat-icon admin">👑</div>
+                <div class="user-stat-info">
+                    <h3>${counts.Admin}</h3>
+                    <p>Admins</p>
+                </div>
+            </div>
+            <div class="user-stat-card">
+                <div class="user-stat-icon manager">👔</div>
+                <div class="user-stat-info">
+                    <h3>${counts.Manager}</h3>
+                    <p>Managers</p>
+                </div>
+            </div>
+            <div class="user-stat-card">
+                <div class="user-stat-icon auditor">📋</div>
+                <div class="user-stat-info">
+                    <h3>${counts.Auditor}</h3>
+                    <p>Auditors</p>
+                </div>
+            </div>
+            <div class="user-stat-card">
+                <div class="user-stat-icon viewer">👁️</div>
+                <div class="user-stat-info">
+                    <h3>${counts.Viewer}</h3>
+                    <p>Viewers</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="admin-toolbar">
+            <div class="admin-search">
+                <i class="fas fa-search"></i>
+                <input type="text" id="userSearchInput" placeholder="Search users by name, email, or role..."
+                       onkeyup="renderUsersPage()" value="${searchTerm}">
+            </div>
+        </div>
+
+        <div class="users-table-container">
+            <table class="users-table">
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Role</th>
+                        <th>Status</th>
+                        <th>Last Login</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${filteredUsers.map(user => `
+                        <tr>
+                            <td>
+                                <div class="user-info">
+                                    <div class="user-avatar">${getUserInitials(user.name)}</div>
+                                    <div class="user-details">
+                                        <h4>${user.name}</h4>
+                                        <p>${user.email}</p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="role-badge ${user.role.toLowerCase()}">
+                                    ${getRoleIcon(user.role)} ${user.role}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="status-badge ${user.status}">
+                                    <span class="status-dot"></span>
+                                    ${user.status.charAt(0).toUpperCase() + user.status.slice(1)}
+                                </span>
+                            </td>
+                            <td>${formatLastLogin(user.lastLogin)}</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="action-btn edit" onclick="openEditUserModal(${user.id})" title="Edit User">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    ${user.id !== state.currentUser.id ? `
+                                        <button class="action-btn delete" onclick="confirmDeleteUser(${user.id})" title="Remove User">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    ` : ''}
+                                </div>
+                            </td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+        </div>
+    `;
+}
+
+// Get role icon
+function getRoleIcon(role) {
+    const icons = {
+        Admin: '👑',
+        Manager: '👔',
+        Auditor: '📋',
+        Viewer: '👁️'
+    };
+    return icons[role] || '👤';
+}
+
+// Open edit user modal
+function openEditUserModal(userId) {
+    const user = state.users.find(u => u.id === userId);
+    if (!user) return;
+
+    document.getElementById('editUserId').value = user.id;
+    document.getElementById('editUserName').value = user.name;
+    document.getElementById('editUserEmail').value = user.email;
+    document.getElementById('editUserRole').value = user.role;
+    document.getElementById('editUserStatus').value = user.status;
+
+    document.getElementById('editUserModal').classList.add('active');
+}
+
+// Close edit user modal
+function closeEditUserModal() {
+    document.getElementById('editUserModal').classList.remove('active');
+}
+
+// Save user changes
+function saveUserChanges() {
+    const userId = parseInt(document.getElementById('editUserId').value);
+    const newRole = document.getElementById('editUserRole').value;
+    const newStatus = document.getElementById('editUserStatus').value;
+
+    const userIndex = state.users.findIndex(u => u.id === userId);
+    if (userIndex !== -1) {
+        state.users[userIndex].role = newRole;
+        state.users[userIndex].status = newStatus;
+
+        // Update current user if editing self
+        if (userId === state.currentUser.id) {
+            state.currentUser.role = newRole;
+            initAdminUI(); // Re-check admin status
+        }
+
+        closeEditUserModal();
+        renderUsersPage();
+        showStatus(`User updated successfully`, 'success');
+    }
+}
+
+// Confirm delete user
+function confirmDeleteUser(userId) {
+    const user = state.users.find(u => u.id === userId);
+    if (!user) return;
+
+    if (confirm(`Are you sure you want to remove ${user.name} from the system?`)) {
+        deleteUser(userId);
+    }
+}
+
+// Delete user
+function deleteUser(userId) {
+    state.users = state.users.filter(u => u.id !== userId);
+    renderUsersPage();
+    showStatus('User removed successfully', 'success');
+}
+
+// Render Permissions Page
+function renderPermissionsPage() {
+    const container = document.getElementById('permissionsContent');
+    if (!container) return;
+
+    if (!isAdmin()) {
+        container.innerHTML = `
+            <div class="access-denied">
+                <div class="access-denied-icon">🔒</div>
+                <h2>Access Denied</h2>
+                <p>You don't have permission to access Permissions settings. Please contact an administrator if you need access.</p>
+            </div>
+        `;
+        return;
+    }
+
+    const roles = ['Admin', 'Manager', 'Auditor', 'Viewer'];
+    const categoryLabels = {
+        general: 'General',
+        audits: 'Audits',
+        templates: 'Templates',
+        actions: 'Actions',
+        team: 'Team',
+        administration: 'Administration'
+    };
+
+    container.innerHTML = `
+        <div class="admin-page-header">
+            <div class="admin-page-title">
+                <h2>🔐 Permissions</h2>
+                <span class="admin-badge">Admin Only</span>
+            </div>
+        </div>
+
+        <div class="permissions-grid">
+            ${roles.map(role => `
+                <div class="role-card">
+                    <div class="role-card-header ${role.toLowerCase()}">
+                        <div class="role-card-title ${role.toLowerCase()}">
+                            <span>${getRoleIcon(role)}</span>
+                            <h3>${role}</h3>
+                        </div>
+                        <span class="permission-count">${state.permissions[role].length} permissions</span>
+                    </div>
+                    <div class="role-card-body">
+                        ${Object.entries(state.allPermissions).map(([category, perms]) => `
+                            <div class="permission-category">
+                                <div class="permission-category-title">${categoryLabels[category]}</div>
+                                ${perms.map(perm => `
+                                    <div class="permission-item">
+                                        <div class="permission-label">
+                                            <span>${perm.label}</span>
+                                            <small>${perm.description}</small>
+                                        </div>
+                                        <label class="toggle-switch">
+                                            <input type="checkbox"
+                                                   ${state.permissions[role].includes(perm.id) ? 'checked' : ''}
+                                                   ${role === 'Admin' ? 'disabled' : ''}
+                                                   onchange="togglePermission('${role}', '${perm.id}', this.checked)">
+                                            <span class="toggle-slider"></span>
+                                        </label>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('')}
+        </div>
+    `;
+}
+
+// Toggle permission for a role
+function togglePermission(role, permissionId, enabled) {
+    if (role === 'Admin') return; // Admin permissions cannot be modified
+
+    if (enabled) {
+        if (!state.permissions[role].includes(permissionId)) {
+            state.permissions[role].push(permissionId);
+        }
+    } else {
+        state.permissions[role] = state.permissions[role].filter(p => p !== permissionId);
+    }
+
+    // Update permission count display
+    const countElement = document.querySelector(`.role-card-header.${role.toLowerCase()} .permission-count`);
+    if (countElement) {
+        countElement.textContent = `${state.permissions[role].length} permissions`;
+    }
+
+    showStatus(`Permission ${enabled ? 'granted' : 'revoked'} for ${role}`, 'success');
+}
 
 // ==================== GLOBAL FILTER SYNCHRONIZATION ====================
 
@@ -8902,6 +9981,9 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeChartCaptureButtons();
     initializeGlobalFilters();
 
+    // Initialize admin UI (show/hide admin tabs based on user role)
+    initAdminUI();
+
     // Check for saved theme preference
     const savedTheme = localStorage.getItem('theme') || 'light';
     if (savedTheme === 'dark') {
@@ -9069,6 +10151,10 @@ function switchModule(module, evt) {
         updateActionItems();
     } else if (module === 'wbr') {
         refreshWBRData();
+    } else if (module === 'users') {
+        renderUsersPage();
+    } else if (module === 'permissions') {
+        renderPermissionsPage();
     }
 }
 
